@@ -32,7 +32,7 @@ def decomposeX_balance_allfactors(A, B, k, c1, c2, c3):
 
     usums = sum(U,0)
     usums = usums * du
-    # println("done with U")
+
 
     V= np.zeros((nB, k))
     V[:, -1] = eB
@@ -111,9 +111,5 @@ def decomposeX_balance_allfactors(A, B, k, c1, c2, c3):
         W2 = np.vstack((temp12b, temp34b))
         W_curr = W_curr / W_curr[-1][-1]
         W_prev = W_curr
-    print("U")
-    #print(U)
-    print("V")
-   # print(V)
     return U, V, W_prev, W1, W2
 

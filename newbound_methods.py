@@ -87,7 +87,6 @@ def newbound_rounding_lowrank_evaluation_relaxed(U, V, bmatch):
         V1.extend(ej)
 
         #bmatchval = 6
-        print("bmatchval is ",bmatch)
         for bm in range(0, bmatch):
             if not ej.size==0:
                 ej = np.delete(ej, 0)
@@ -106,15 +105,12 @@ def newbound_rounding_lowrank_evaluation_relaxed(U, V, bmatch):
     U1=np.reshape(U1,(U1len,1))
     V1 = np.reshape(V1, (V1len, 1))
     all_matches = np.hstack((U1, V1))
-    print(np.shape(all_matches))
     y = np.ascontiguousarray(all_matches).view(
         np.dtype((np.void, all_matches.dtype.itemsize * all_matches.shape[1])))
     _, idx = np.unique(y, return_index=True)
     #unique_result = all_matches[(idx)]
 
     unique_result = all_matches[np.sort(idx)]
-    print(np.shape(unique_result))
-
     U1unique = unique_result[:,0]
     V1unique = unique_result[:,1]
     U1unique1=np.array(U1)
@@ -194,7 +190,6 @@ def newbound_rounding_lowrank_evaluation_relaxed1(U, V, bmatch):
         U1.extend(ei)
         V1.extend(ej)
         #bmatchval = 6
-        print("bmatchval is ",bmatch)
         for bm in range(0, bmatch):
             if not ej.size==0:
                 ej = np.delete(ej, 0)

@@ -15,9 +15,11 @@ from scipy.sparse import csr_matrix
 
 
 def check_with_identity(mb):
+    count=0
     for i in range(len(mb)):
-        if i == mb[i]:
+        if i == mb[i]-1:
             count = count + 1
+    return count/len(mb)
 
 
 def accuracy(gma, gmb, mb, ma):

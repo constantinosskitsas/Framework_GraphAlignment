@@ -58,7 +58,6 @@ def edgelist_to_adjmatrixR(edgeList_file, edgeList_file1):
     e = np.shape(true_alignments)[0]
     a = np.zeros((n + m, n + m), dtype=int)
     # make adjacency matrix A1
-    print("n ", n)
     for i in range(e):
         n1 = int(true_alignments[i, 0])  # +1
         n2 = int(true_alignments[i, 1])  # +1
@@ -70,5 +69,19 @@ def edgelist_to_adjmatrixR(edgeList_file, edgeList_file1):
         n2 = int(true_alignments1[i, 1])  # +1
         a[n1 + n, n2 + n] = 1.0
         a[n2 + n, n1 + n] = 1.0
+    #a = remove_edges_directed(a,n)
+    return a
+
+
+
+def Edge_Removed_edgelist_to_adjmatrixR(edgeList_file, edgeList_file1):
+    e=len(edgeList_file)
+    a = np.zeros((e + e, e + e), dtype=int)
+    for i in range(e):
+        for j in range(e):
+            a[i , j ] =  edgeList_file[i , j ]
+            a[j , i] =  edgeList_file[i , j ]
+            a[i + e, j + e] =  edgeList_file1[i , j ]
+            a[j + e, i + e] =  edgeList_file1[i , j ]
     #a = remove_edges_directed(a,n)
     return a

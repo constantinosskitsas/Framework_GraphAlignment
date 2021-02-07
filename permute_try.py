@@ -22,6 +22,7 @@ def main():
     #G1 = ReadFile.edgelist_to_adjmatrix1("magkas.txt")
     data2 = "data/noise_level_1/arenas_orig.txt"
     G1 = ReadFile.edgelist_to_adjmatrix1(data2)
+    G4=ReadFile.edgelist_to_adjmatrix1(data2)
     G2 = nx.Graph(ReadFile.edgelist_to_adjmatrix1(data2))
     mapp=create_mapping(len(G2))
     B = nx.relabel_nodes(G2, mapp, copy=True)
@@ -42,12 +43,15 @@ def main():
     args1 = regal.parse_args()
 
     adj = ReadFile.Edge_Removed_edgelist_to_adjmatrixR(G1, G3)
+    adj1 = ReadFile.Edge_Removed_edgelist_to_adjmatrixR(G1, G4)
     alignmatrix = regal.main(adj, args1)
+    alignmatrix1 = regal.main(adj1, args1)
     mar, mbr = evaluation.transformRAtoNormalALign(alignmatrix)
+    mar1, mbr1 = evaluation.transformRAtoNormalALign(alignmatrix1)
     reg = evaluation.accuracy2(gmb,mbr)
-    print(mbr)
-    print(gmb)
+    reg1=evaluation.check_with_identity(mbr1+1)
     print(reg)
+    print(reg1)
 if __name__ == "__main__":
     hi = 0
     main()

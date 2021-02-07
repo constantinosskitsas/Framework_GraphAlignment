@@ -10,7 +10,7 @@ def main():
     G2 = ReadFile.edgelist_to_adjmatrix1(data2)
     G1 = ReadFile.edgelist_to_adjmatrix1(data1)
     G3= ReadFile.edgelist_to_adjmatrix1(data2)
-    G3=evaluation_design.remove_edges_directed(G3)
+    #G3=evaluation_design.remove_edges_directed(G3)
     adj1=ReadFile.Edge_Removed_edgelist_to_adjmatrixR(G2,G3)
     adj = ReadFile.edgelist_to_adjmatrixR(data1, data2)
     gma, gmb = ReadFile.gt1(gt)

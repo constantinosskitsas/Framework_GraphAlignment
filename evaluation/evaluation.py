@@ -30,10 +30,18 @@ def accuracy(gma, gmb, mb, ma):
             if (gmb[i]) == (mb[i]):
                 count = count + 1
         else:
-            print("mistake")
+            print("mistake",ma[i],gma[i])
     print(count)
     return count / nodes
-
+def accuracy2(gmb, mb):
+    nodes = len(gmb)
+    count = 0
+    for i in range(nodes):
+        print(gmb[i],mb[i])
+        if (gmb[i]) == (mb[i]):
+            count = count + 1
+    print(count)
+    return count / nodes
 
 def split(Matching):
     Tempxx = (Matching[0])

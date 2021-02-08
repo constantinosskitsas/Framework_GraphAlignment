@@ -1,2 +1,3 @@
 from .REGAL import regal
-from .LREA import AlignNetworks_EigenAlign
+from .LREA import eigenalign
+from .CONE import conealign

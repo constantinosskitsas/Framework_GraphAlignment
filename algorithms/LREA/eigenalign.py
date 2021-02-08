@@ -9,7 +9,7 @@ from scipy.linalg._expm_frechet import vec
 from . import bipartiteMatching, decomposeX, newbound_methods
 
 
-def align_networks_eigenalign(A, B, iters, method, bmatch, default_params=True):
+def main(A, B, iters, method, bmatch, default_params=True):
     D = 0
     s1, s2, s3 = find_parameters(A, B)
 

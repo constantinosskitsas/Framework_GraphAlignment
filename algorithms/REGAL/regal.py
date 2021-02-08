@@ -54,44 +54,44 @@ def parse_args():
     return parser.parse_args()
 
 
-def main(adj, args: object) -> object:
-    if args.attributes is not None:
+def main(adj) -> object:
+    if REGAL_args.attributes is not None:
         # load vector of attributes in from file
-        args.attributes = np.load(args.attributes)
-    embed = learn_representations(args, adj)
+        REGAL_args.attributes = np.load(REGAL_args.attributes)
+    embed = learn_representations(adj)
     emb1, emb2 = get_embeddings(embed)
-    if args.numtop == 0:
-        args.numtop = None
+    if REGAL_args.numtop == 0:
+        REGAL_args.numtop = None
     alignment_matrix = get_embedding_similarities(
-        emb1, emb2, num_top=args.numtop)
+        emb1, emb2, num_top=REGAL_args.numtop)
     return alignment_matrix
 
 
-# Should take in a file with the input graph as edgelist (args.input)
-# Should save representations to args.output
-def learn_representations(args, adj):
-    graph = Graph(adj, node_attributes=args.attributes)
-    max_layer = args.untillayer
-    if args.untillayer == 0:
+# Should take in a file with the input graph as edgelist (REGAL_args.input)
+# Should save representations to REGAL_args.output
+def learn_representations(adj):
+    graph = Graph(adj, node_attributes=REGAL_args.attributes)
+    max_layer = REGAL_args.untillayer
+    if REGAL_args.untillayer == 0:
         max_layer = None
-    alpha = args.alpha
-    num_buckets = args.buckets  # BASE OF LOG FOR LOG SCALE
+    alpha = REGAL_args.alpha
+    num_buckets = REGAL_args.buckets  # BASE OF LOG FOR LOG SCALE
     if num_buckets == 1:
         num_buckets = None
     rep_method = RepMethod(max_layer=max_layer,
                            alpha=alpha,
-                           k=args.k,
+                           k=REGAL_args.k,
                            num_buckets=num_buckets,
                            normalize=True,
-                           gammastruc=args.gammastruc,
-                           gammaattr=args.gammaattr)
+                           gammastruc=REGAL_args.gammastruc,
+                           gammaattr=REGAL_args.gammaattr)
     if max_layer is None:
         max_layer = 1000
     representations = xnetmf.get_representations(graph, rep_method)
     return representations
 
 
-# pickle.dump(representations, open(args.output, "w"))
+# pickle.dump(representations, open(REGAL_args.output, "w"))
 
 
 def recovery(gt1, mb):
@@ -103,10 +103,4 @@ def recovery(gt1, mb):
     return count / nodes
 
 
-if __name__ == "__main__":
-    args = parse_args()
-    hi = 0
-    mb = main(args)
-    mb = mb + 1
-    gmb = gt("data/noise_level_1/gt_1.txt")
-    gmb = gmb + 1
+REGAL_args = parse_args()

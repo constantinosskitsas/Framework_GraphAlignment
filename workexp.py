@@ -76,4 +76,4 @@ def main():
     # eval_regal()
     # eval_eigenalign()
     # eval_conealign()
-    # playground()
+    playground()

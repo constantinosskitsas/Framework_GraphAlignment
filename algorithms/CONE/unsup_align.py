@@ -96,7 +96,7 @@ def convex_init_sparse(X, Y, K_X=None, K_Y=None, niter=10, reg=1.0, apply_sqrt=F
         K_Y = np.dot(Y, Y.T)
     print((type(K_X), K_X.shape))
     print((type(K_Y), K_Y.shape))
-    K_Y *= int(sparse.linalg.norm(K_X) / sparse.linalg.norm(K_Y))  # CHANGED
+    K_Y = sparse.linalg.norm(K_X) / sparse.linalg.norm(K_Y) * K_Y  # CHANGED
     K2_X, K2_Y = K_X.dot(K_X), K_Y.dot(K_Y)
     # print K_X, K_Y, K2_X, K2_Y
     K_X, K_Y, K2_X, K2_Y = K_X.toarray(), K_Y.toarray(), K2_X.toarray(), K2_Y.toarray()

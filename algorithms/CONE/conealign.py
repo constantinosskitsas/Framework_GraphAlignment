@@ -5,7 +5,7 @@ import argparse
 import time
 from scipy.sparse import csr_matrix, coo_matrix
 from sklearn.neighbors import KDTree
-
+from data import ReadFile
 from . import unsup_align, embedding
 
 
@@ -176,17 +176,18 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=1
 
 
 def main(adj):
-    node_num = int(adj.shape[0] / 2)
-    adjA = adj[:node_num, :node_num]
-    adjB = adj[node_num:, node_num:]
-
+    #node_num = int(adj.shape[0] / 2)
+    #adjA = adj[:node_num, :node_num]
+    #adjB = adj[node_num:, node_num:]
+    adjA= ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/arenas_orig.txt")
+    adjB = ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/edges_4.txt")
     start = time.time()
    # step1: obtain normalized proximity-preserving node embeddings
-    if (CONE_args.embmethod == "netMF"):
-        emb_matrixA = embedding.netmf(
-            adjA, dim=CONE_args.dim, window=CONE_args.window, b=CONE_args.negative, normalize=True)
-        emb_matrixB = embedding.netmf(
-            adjB, dim=CONE_args.dim, window=CONE_args.window, b=CONE_args.negative, normalize=True)
+    #if (CONE_args.embmethod == "netMF"):
+    emb_matrixA = embedding.netmf(
+        adjA, dim=CONE_args.dim, window=CONE_args.window, b=CONE_args.negative, normalize=True)
+    emb_matrixB = embedding.netmf(
+        adjB, dim=CONE_args.dim, window=CONE_args.window, b=CONE_args.negative, normalize=True)
 
     # step2 and 3: align embedding spaces and match nodes with similar embeddings
     alignment_matrix = align_embeddings(

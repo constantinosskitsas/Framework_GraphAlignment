@@ -5,6 +5,7 @@ import numpy as np
 def bipartite_matching(A, nzi, nzj, nzv):
     # return bipartite_matching_primal_dual(bipartite_matching_setup(A,nzi,nzj,nzv))
     rp, ci, ai, [], m, n = bipartite_matching_setup(A, nzi, nzj, nzv)
+    print("hi7")
     return bipartite_matching_primal_dual(rp, ci, ai, [], m, n)
 
 
@@ -22,6 +23,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
     ntmod = 0
 
     # initialize the primal and dual variables
+    print("jo")
     for i in range(1, m):
         for rpi in range(rp[i], rp[i+1]):
             if ai[rpi] > alpha[i]:
@@ -29,7 +31,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
 
     # dual variables (bt) are initialized to 0 already
     # match1 and match2 are both 0, which indicates no matches
-
+    print("to")
     i = 1
     while i < m:
         for j in range(1, ntmod+1):
@@ -77,6 +79,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
             continue
         i = i+1
     val = 0
+    print("po")
     for i in range(1, m):
         for rpi in range(rp[i], rp[i+1]):
             if ci[rpi] == match1[i]:
@@ -91,6 +94,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
 def bipartite_matching_setup(A, nzi, nzj, nzv):
     #(nzi,nzj,nzv) = bipartite_matching_setup_phase1(A,nzi,nzj,nzv)
     (nzi, nzj, nzv) = bipartite_matching_setup_phase1(A)
+    print("hi-setup")
     nedges = len(nzi)
     (m, n) = np.shape(A)
     m = m+1
@@ -146,7 +150,6 @@ def bipartite_matching_setup_phase1(A, nzi, nzj, nzv):
     nzi1 = nzi1+1
     nzj1 = nzj1+1
     return (nzi1, nzj1, nzv1)
-
 
 def bipartite_matching_setup_phase1(A):
     nzi, nzj = scipy.sparse.csr_matrix.nonzero(A)

@@ -1,5 +1,4 @@
-*.txt
-!data/*.txt
+matching.txt
 .idea
 .vscode
 __pycache__

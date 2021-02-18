@@ -15,7 +15,7 @@ from scipy.sparse import csr_matrix
 
 
 def check_with_identity(mb):
-    count=0
+    count = 0
     for i in range(len(mb)):
         if i == mb[i]-1:
             count = count + 1
@@ -30,18 +30,21 @@ def accuracy(gma, gmb, mb, ma):
             if (gmb[i]) == (mb[i]):
                 count = count + 1
         else:
-            print("mistake",ma[i],gma[i])
+            print("mistake", ma[i], gma[i])
     print(count)
     return count / nodes
+
+
 def accuracy2(gmb, mb):
     nodes = len(gmb)
     count = 0
     for i in range(nodes):
-        print(gmb[i],mb[i])
+        print(gmb[i], mb[i])
         if (gmb[i]) == (mb[i]):
             count = count + 1
     print(count)
     return count / nodes
+
 
 def split(Matching):
     Tempxx = (Matching[0])
@@ -68,7 +71,7 @@ def transformRAtoNormalALign(alignment_matrix):
             alignment_matrix[node_index])
         node_sorted_indices = possible_alignments[possible_values.argsort()]
         mb[node_index] = node_sorted_indices[-1:]
-    np.savetxt("matchingPy.txt",
+    np.savetxt("matching.txt",
                np.vstack((range(1133), mb)).T, fmt="%i")
     mar = range(0, len(mb))
     return mar, mb

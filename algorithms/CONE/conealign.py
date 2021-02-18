@@ -29,7 +29,7 @@ def parse_args():
     # netMF parameters
     parser.add_argument("--rank", default=256, type=int,
                         help='Number of eigenpairs used to approximate normalized graph Laplacian.')
-    parser.add_argument("--dim", default=128, type=int,
+    parser.add_argument("--dim", default=64, type=int,
                         help='Dimension of embedding.')
     parser.add_argument("--window", default=10, type=int,
                         help='Context window size.')
@@ -175,15 +175,15 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=1
     return sparse_align_matrix.tocsr()
 
 
-def main(adj):
+def main(adjA, adjB):
     #node_num = int(adj.shape[0] / 2)
     #adjA = adj[:node_num, :node_num]
     #adjB = adj[node_num:, node_num:]
-    adjA= ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/arenas_orig.txt")
-    adjB = ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/edges_4.txt")
+    # adjA= ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/arenas_orig.txt")
+    # adjB = ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/edges_4.txt")
     start = time.time()
    # step1: obtain normalized proximity-preserving node embeddings
-    #if (CONE_args.embmethod == "netMF"):
+    # if (CONE_args.embmethod == "netMF"):
     emb_matrixA = embedding.netmf(
         adjA, dim=CONE_args.dim, window=CONE_args.window, b=CONE_args.negative, normalize=True)
     emb_matrixB = embedding.netmf(

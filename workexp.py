@@ -1,22 +1,19 @@
-import networkx as nx
-
-from algorithms import regal, eigenalign, conealign, NSD
-from algorithms.NSD.NSD import normout_rowstochastic, run
+from algorithms import regal, eigenalign, conealign, netalign, NSD
 from data import ReadFile
 from evaluation import evaluation, evaluation_design
 from sacred import Experiment
-import numpy as np
+
 ex = Experiment("experiment")
-print("hola")
 
 
 @ex.config
 def global_config():
-    gt = "data/noise_level_1/gt_1.txt"
-    data1 = "data/noise_level_1/edges_1.txt"
-    data2 = "data/noise_level_1/arenas_orig.txt"
-    data1 = "magkas.txt"
-    data2 = "magkas1.txt"
+
+    gt = "data/example/gt.txt"
+    data1 = "data/example/arenas_orig_100.txt"
+    data2 = "data/example/arenas_orig_100.txt"
+    # data1 = "magkas.txt"
+    # data2 = "magkas1.txt"
     G2 = ReadFile.edgelist_to_adjmatrix1(data2)
     G1 = ReadFile.edgelist_to_adjmatrix1(data1)
     G3 = ReadFile.edgelist_to_adjmatrix1(data2)
@@ -57,9 +54,9 @@ def eval_eigenalign(_log, gma, gmb, G1, G2, G3):
 
 
 @ex.capture
-def eval_conealign(_log, gma, gmb, adj, adj1):
+def eval_conealign(_log, gma, gmb, G1, G2):
 
-    alignmatrix = conealign.main(adj)
+    alignmatrix = conealign.main(G1, G2)
     mar, mbr = evaluation.transformRAtoNormalALign(alignmatrix)
     acc1 = evaluation.accuracy(gma, gmb, mbr, mar)
     _log.info(f"acc1: {acc1}")
@@ -72,9 +69,9 @@ def eval_conealign(_log, gma, gmb, adj, adj1):
 def eval_netalign(_log):
     import numpy as np
 
-    S = "data/test_/S.txt"
-    li = "data/test_/li.txt"
-    lj = "data/test_/lj.txt"
+    S = "data/karol/S.txt"
+    li = "data/karol/li.txt"
+    lj = "data/karol/lj.txt"
 
     S = ReadFile.edgelist_to_adjmatrix1(S)
     li = np.loadtxt(li)
@@ -86,39 +83,20 @@ def eval_netalign(_log):
 
 
 @ex.capture
-def playground(_log, gma, gmb, G1, G2, G3, adj, adj1):
-    import networkx as nx
-
-    # G = nx.Graph()
-    # G.add_nodes_from(range(10))
-    # G.add_edge(1, 2)
-    # print(len(G))
-    # print(len(G))
-    B = nx.Graph()
-    # Add nodes with the node attribute "bipartite"
-    B.add_nodes_from([1, 2, 3, 4], bipartite=0)
-    B.add_nodes_from(["a", "b", "c"], bipartite=1)
-    # Add edges only between nodes of opposite node sets
-    B.add_edges_from([(1, "a"), (1, "b"), (2, "b"),
-                      (2, "c"), (3, "c"), (4, "a"), (1, 2)])
-
-    print(nx.bipartite.maximum_matching(B))
-
-
-@ex.capture
-def NSD(_log, gma, gmb, adj, adj1):
-    ma, mb = run()
+def eval_NSD(_log, gma, gmb, G1, G2):
+    ma, mb = NSD.run(G1, G2)
     print(ma)
     print(mb)
     print(gmb)
-    acc = evaluation.accuracy(gma, gmb, mb, ma)
-    print(acc)
+    # acc = evaluation.accuracy(gma, gmb, mb, ma)
+    # print(acc)
 
 
 @ex.automain
 def main():
-    # eval_regal()
-    # eval_eigenalign()
+    eval_regal()
+    eval_eigenalign()
     eval_conealign()
-    # playground()
-    NSD()
+    eval_netalign()
+    eval_NSD()
+    print("MALAKA")

@@ -16,6 +16,29 @@ def edgelist_to_adjmatrix1(edgeList_file):
         a[n1][n2] = 1.0
         a[n2][n1] = 1.0
     return a
+#no weight so we consider 1 for now !
+def nonzeroentries(edgeList_file):
+    true_alignments = np.loadtxt(edgeList_file)
+    n = int(np.amax(true_alignments)) + 1
+    e = np.shape(true_alignments)[0]
+    a = np.zeros((n+n), dtype=int)
+    b = np.zeros((n+n), dtype=int)
+    c = np.zeros((n+n), dtype=float)
+    #
+    # make adjacency matrix A1
+    i=0
+    for _ in range(n):
+        n1 = int(true_alignments[i, 0])  # +1
+        n2 = int(true_alignments[i, 1])  # +1
+        a[i] = n1
+        b[i] = n2
+        c[i]=1
+        i=i+1
+        a[i] = n2
+        b[i] = n1
+        c[i]=1
+        i=i+1
+    return a,b,c
 
 
 def gt(edgeList_file, gma=None):

@@ -1,16 +1,25 @@
-from algorithms import regal, eigenalign, conealign
+from algorithms import regal, eigenalign, conealign, netalign
 from data import ReadFile
 from evaluation import evaluation, evaluation_design
 from sacred import Experiment
+
 
 ex = Experiment("experiment")
 
 
 @ex.config
 def global_config():
+
     gt = "data/noise_level_2/gt_4.txt"
     data1 = "data/noise_level_2/edges_4.txt"
     data2 = "data/noise_level_1/arenas_orig.txt"
+
+    # gt = "data/test/gt.txt"
+    # data1 = "data/test/edges.txt"
+    # data2 = "data/test/arenas_orig.txt"
+
+    # data1 = "data/test/A.txt"
+    # data2 = "data/test/B.txt"
 
     G2 = ReadFile.edgelist_to_adjmatrix1(data2)
     G1 = ReadFile.edgelist_to_adjmatrix1(data1)
@@ -67,8 +76,40 @@ def eval_conealign(_log, gma, gmb, adj, adj1):
 
 
 @ex.capture
+def eval_netalign(_log):
+    import numpy as np
+
+    S = "data/test_/S.txt"
+    li = "data/test_/li.txt"
+    lj = "data/test_/lj.txt"
+
+    S = ReadFile.edgelist_to_adjmatrix1(S)
+    li = np.loadtxt(li)
+    lj = np.loadtxt(lj)
+
+    alignmatrix = netalign.main(S, li, lj, 0, 1)
+
+    _log.info(alignmatrix)
+
+
+@ex.capture
 def playground(_log, gma, gmb, G1, G2, G3, adj, adj1):
-    pass
+    import networkx as nx
+
+    # G = nx.Graph()
+    # G.add_nodes_from(range(10))
+    # G.add_edge(1, 2)
+    # print(len(G))
+    # print(len(G))
+    B = nx.Graph()
+    # Add nodes with the node attribute "bipartite"
+    B.add_nodes_from([1, 2, 3, 4], bipartite=0)
+    B.add_nodes_from(["a", "b", "c"], bipartite=1)
+    # Add edges only between nodes of opposite node sets
+    B.add_edges_from([(1, "a"), (1, "b"), (2, "b"),
+                      (2, "c"), (3, "c"), (4, "a"), (1, 2)])
+
+    print(nx.bipartite.maximum_matching(B))
 
 
 @ex.automain
@@ -76,4 +117,5 @@ def main():
     # eval_regal()
     # eval_eigenalign()
     # eval_conealign()
-    playground()
+    eval_netalign()
+    # playground()

@@ -1,4 +1,5 @@
 *.txt
+!data/*.txt
 .idea
 .vscode
 __pycache__

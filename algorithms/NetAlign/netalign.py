@@ -1,6 +1,10 @@
 import scipy.sparse as sps
 import numpy as np
-from ..LREA.bipartiteMatching import bipartite_matching_setup
+from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list
+
+
+# def print(*args):
+#     pass
 
 
 def othermaxplus(dim, li, lj, lw, m, n):
@@ -52,9 +56,37 @@ def accumarray(xij, xw, n):
     return sums
 
 
+def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm):
+    print("rm")
+    # ai=np.zeros(length(tripi),1);
+    # ai(tripi>0)=messages(perm);
+    # %disp(ai)
+    ai = np.zeros(len(ci))
+    ai[:len(messages)] = messages
+    print(rp)
+    print(ci)
+    print(ai)
+    # val ma mb mi
+    m, n, val, noute, match1 = bipartite_matching_primal_dual(
+        rp, ci, ai, tripi, m, n)
+    ma, mb = edge_list(m, n, val, noute, match1)
+    print(ma)
+    print(mb)
+    # print(mi)
+    # matchweight = sum(w[mi])
+    # cardinality = sum(mi)
+    # overlap = (mi*(S*mi))/2
+    # f = alpha*matchweight + beta*overlap
+    # return f, matchweight, cardinality, overlap
+    print("VAL:", val)
+    return [val, ma, mb]
+
+
 def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
-    li = [int(x-1) for x in li]
-    lj = [int(x-1) for x in lj]
+    li = np.array(li, int)
+    li -= 1
+    lj = np.array(lj, int)
+    lj -= 1
     S = sps.csr_matrix(S)
     w = np.ones(len(li))
 
@@ -92,15 +124,17 @@ def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     beta = b
 
     # Initialize history
-    hista = np.zeros((maxiter, 4))
-    histb = np.zeros((maxiter, 4))
+    # hista = np.zeros((maxiter, 4))
+    # histb = np.zeros((maxiter, 4))
     fbest = 0
     fbestiter = 0
-
-    DA = sps.csc_matrix((w, (li, lj)))
-
+    print(li)
+    print(lj)
+    DA = sps.csc_matrix((w, (li+1, lj+1)))
     rp, ci, ai, tripi, matn, matm = bipartite_matching_setup(
         DA, None, None, None)
+
+    # rp, ci, ai, tripi, matn, matm = bipartite_matching_setupc(w, li, lj, m, n)
     mperm = [x for x in tripi if x > 0]
 
     for it in range(maxiter):
@@ -147,3 +181,20 @@ def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
         print(ma)
         print(mb)
         print(ms)
+        # f, matchweight, cardinality, overlap
+        hista = round_messages(ma, S, w, alpha, beta, rp,
+                               ci, tripi, matn, matm, mperm)
+        histb = round_messages(mb, S, w, alpha, beta, rp,
+                               ci, tripi, matn, matm, mperm)
+        if hista[0] > fbest:
+            fbestiter = iter
+            # mbest = ma
+            mbest = hista[1:]
+            fbest = hista[0]
+        if histb[0] > fbest:
+            fbestiter = -iter
+            # mbest = mb
+            mbest = mbest = histb[1:]
+            fbest = histb[0]
+        # return
+    return mbest

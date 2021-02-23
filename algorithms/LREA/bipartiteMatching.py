@@ -2,17 +2,21 @@ import scipy
 import numpy as np
 
 
+def print(*args):
+    pass
+
+
 def bipartite_matching(A, nzi, nzj, nzv):
     # return bipartite_matching_primal_dual(bipartite_matching_setup(A,nzi,nzj,nzv))
-    rp, ci, ai, [], m, n = bipartite_matching_setup(A, nzi, nzj, nzv)
+    rp, ci, ai, tripi, m, n = bipartite_matching_setup(A, nzi, nzj, nzv)
     print("hi7")
-    return bipartite_matching_primal_dual(rp, ci, ai, [], m, n)
+    return bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n)
 
 
 def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
     # variables used for the primal-dual algorithm
     # normalize ai values # updated on 2-19-2019
-    ai = ai/np.amax(abs(ai))
+    # ai = ai/np.amax(abs(ai))
     alpha = np.zeros(m)
     bt = np.zeros(m+n)  # beta
     queue = np.zeros(m, int)
@@ -91,17 +95,23 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
     return m, n, val, noute, match1
 
 
-def bipartite_matching_setup(A, nzi, nzj, nzv):
+def bipartite_matching_setup(A, nzi, nzj, nzv, m=None, n=None):
     #(nzi,nzj,nzv) = bipartite_matching_setup_phase1(A,nzi,nzj,nzv)
-    (nzi, nzj, nzv) = bipartite_matching_setup_phase1(A)
+    if A is not None:
+        (nzi, nzj, nzv) = bipartite_matching_setup_phase1(A)
+        (m, n) = np.shape(A)
+        m = m+1  # ?
+        n = n+1  # ?
+    print(nzi)
+    print(nzj)
+    print(nzv)
+    print(m, n)
     print("hi-setup")
     nedges = len(nzi)
-    (m, n) = np.shape(A)
-    m = m+1
-    n = n+1
-    rp = np.ones(m+1, int)  # csr matrix with extra edges
+    rp = np.ones(m+2, int)  # csr matrix with extra edges
     ci = np.zeros(nedges+m, int)
     ai = np.zeros(nedges+m)
+    tripi = np.zeros(nedges+m, int)
 
     rp[0] = 0
     rp[1] = 0
@@ -110,17 +120,19 @@ def bipartite_matching_setup(A, nzi, nzj, nzv):
     rp = np.cumsum(rp)
 
     for i in range(1, nedges):
+        tripi[rp[nzi[i]]+1] = i
         ai[rp[nzi[i]]+1] = nzv[i]
         ci[rp[nzi[i]]+1] = nzj[i]
         rp[nzi[i]] = rp[nzi[i]]+1
 
-    for i in range(1, m):  # add the extra edges
+    for i in range(1, m+1):  # add the extra edges
+        tripi[rp[i]+1] = -1
         ai[rp[i]+1] = 0
         ci[rp[i]+1] = n+i
         rp[i] = rp[i]+1
 
     # restore the row pointer array
-    for i in range(m-1, 0, -1):
+    for i in range(m, 0, -1):
         rp[i+1] = rp[i]
     rp[1] = 0
     rp = rp+1
@@ -135,7 +147,7 @@ def bipartite_matching_setup(A, nzi, nzj, nzv):
 
         for rpi in range(rp[i], rp[i+1]):
             colind[ci[rpi]] = 0
-    return rp, ci, ai, [], m, n
+    return rp, ci, ai, tripi, m, n
 
 
 def bipartite_matching_setup_phase1(A, nzi, nzj, nzv):
@@ -150,6 +162,7 @@ def bipartite_matching_setup_phase1(A, nzi, nzj, nzv):
     nzi1 = nzi1+1
     nzj1 = nzj1+1
     return (nzi1, nzj1, nzv1)
+
 
 def bipartite_matching_setup_phase1(A):
     nzi, nzj = scipy.sparse.csr_matrix.nonzero(A)

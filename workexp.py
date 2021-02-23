@@ -49,7 +49,7 @@ def eval_conealign(_log, gma, gmb, G1, G2):
 
 
 @ex.capture
-def eval_netalign(_log):
+def eval_netalign(_log, data1, data2):
     import numpy as np
 
     S = "data/karol/S.txt"
@@ -59,10 +59,18 @@ def eval_netalign(_log):
     S = ReadFile.edgelist_to_adjmatrix1(S)
     li = np.loadtxt(li)
     lj = np.loadtxt(lj)
+    li = np.array(li, int)
+    li -= 1
+    lj = np.array(lj, int)
+    lj -= 1
 
-    alignmatrix = netalign.main(S, li, lj, 0, 1)
+    # S = ReadFile.edgelist_to_adjmatrix1(data1)
+    # M = np.loadtxt(data2, int)
+    # li, lj = M.transpose()
 
-    _log.info(alignmatrix)
+    matching = netalign.main(S, li, lj, 0, 1)
+
+    _log.info(matching)
 
 
 @ex.capture

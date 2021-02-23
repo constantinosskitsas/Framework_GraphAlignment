@@ -1,6 +1,6 @@
 import scipy.sparse as sps
 import numpy as np
-from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list
+from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, bipartite_matching
 
 
 # def print(*args):
@@ -56,37 +56,60 @@ def accumarray(xij, xw, n):
     return sums
 
 
-def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm):
+def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm2):
     print("rm")
-    # ai=np.zeros(length(tripi),1);
-    # ai(tripi>0)=messages(perm);
+    print(len(perm1))
+    print(len(perm2))
+    ai = np.zeros(len(tripi))
+    ai[perm2] = messages[perm1]
     # %disp(ai)
-    ai = np.zeros(len(ci))
-    ai[:len(messages)] = messages
-    print(rp)
-    print(ci)
-    print(ai)
+    # ai = np.zeros(len(ci))
+    # ai[:len(messages)] = messages
+    # print(m, n)
+    # print(rp)
+    # print(ci)
+    # print(ai)
+    # print(tripi)
     # val ma mb mi
-    m, n, val, noute, match1 = bipartite_matching_primal_dual(
-        rp, ci, ai, tripi, m, n)
+    _, _, val, noute, match1 = bipartite_matching_primal_dual(
+        rp, ci, ai, tripi, m+1, n+1)
+
+    # print("pd")
+    # print(val)
+    # print(noute)
+    # print(match1)
+    mi = np.zeros(len(tripi)-m, int)
+    print(mi.size)
+    for i in range(1, m+1):
+        for rpi in range(rp[i], rp[i+1]):
+            if match1[i] <= n and ci[rpi] == match1[i]:
+                mi[tripi[rpi]] = 1
+    mi = mi[1:]
+    print(mi)
     ma, mb = edge_list(m, n, val, noute, match1)
-    print(ma)
-    print(mb)
-    # print(mi)
-    # matchweight = sum(w[mi])
-    # cardinality = sum(mi)
-    # overlap = (mi*(S*mi))/2
-    # f = alpha*matchweight + beta*overlap
-    # return f, matchweight, cardinality, overlap
-    print("VAL:", val)
+    # print(ma)
+    # print(mb)
+    # # print(mi)
+    matchweight = sum(w[mi])
+    cardinality = sum(mi)
+    print(S.shape)
+    print(S)
+    print(S.todense().shape)
+    print(mi.shape)
+    print(S.dot(mi))
+    print(np.dot(S, mi))
+    print(S*mi)
+    # print(mi.transpose()*(S*mi))
+    # print(np.dot(mi.transpose(), (S*mi)))
+    overlap = np.dot(mi.transpose(), (S*mi))/2
+    f = alpha*matchweight + beta*overlap
+    print(f)
+    # # return f, matchweight, cardinality, overlap
+    # print("VAL:", val)
     return [val, ma, mb]
 
 
-def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
-    li = np.array(li, int)
-    li -= 1
-    lj = np.array(lj, int)
-    lj -= 1
+def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=1, verbose=1):
     S = sps.csr_matrix(S)
     w = np.ones(len(li))
 
@@ -128,14 +151,36 @@ def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     # histb = np.zeros((maxiter, 4))
     fbest = 0
     fbestiter = 0
-    print(li)
-    print(lj)
-    DA = sps.csc_matrix((w, (li+1, lj+1)))
-    rp, ci, ai, tripi, matn, matm = bipartite_matching_setup(
-        DA, None, None, None)
+    # print(li)
+    # print(lj)
+    # DA = sps.csc_matrix((w, (li, lj)))
+    # rp, ci, ai, tripi, matn, matm = bipartite_matching_setup(
+    #     DA, None, None, None, None, None)
+
+    # bipartite_matching(DA, li, lj, w)
+
+    nzi = li.copy()
+    nzi += 1
+    nzi = np.insert(nzi, [0], [0])
+
+    nzj = lj.copy()
+    nzj += 1
+    nzj = np.insert(nzj, [0], [0])
+
+    ww = np.insert(w, [0], [0])
+
+    rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
+        None, nzi, nzj, ww, m, n)
 
     # rp, ci, ai, tripi, matn, matm = bipartite_matching_setupc(w, li, lj, m, n)
-    mperm = [x for x in tripi if x > 0]
+    mperm1 = [x-1 for x in tripi if x > 0]
+    mperm2 = [i for i, x in enumerate(tripi) if x > 0]
+
+    # print(rp)
+    # print(ci)
+    # print(ai)
+    # print(tripi)
+    # return
 
     for it in range(maxiter):
         print(it)
@@ -178,14 +223,14 @@ def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
             mb = curdamp*mb + (1-curdamp)*(prevmb+prevma-alpha*w+prevsums)
             ms = curdamp*ms + (1-curdamp)*(prevms+prevms[spair]-beta)
 
-        print(ma)
-        print(mb)
-        print(ms)
+        # print(ma)
+        # print(mb)
+        # print(ms)
         # f, matchweight, cardinality, overlap
         hista = round_messages(ma, S, w, alpha, beta, rp,
-                               ci, tripi, matn, matm, mperm)
+                               ci, tripi, n, m, mperm1, mperm2)
         histb = round_messages(mb, S, w, alpha, beta, rp,
-                               ci, tripi, matn, matm, mperm)
+                               ci, tripi, n, m, mperm1, mperm2)
         if hista[0] > fbest:
             fbestiter = iter
             # mbest = ma

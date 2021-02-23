@@ -1,4 +1,4 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus
 from data import ReadFile
 from evaluation import evaluation, evaluation_design
 from sacred import Experiment
@@ -57,18 +57,17 @@ def eval_netalign(_log, data1, data2):
     lj = "data/karol/lj.txt"
 
     S = ReadFile.edgelist_to_adjmatrix1(S)
-    li = np.loadtxt(li)
-    lj = np.loadtxt(lj)
-    li = np.array(li, int)
+    li = np.loadtxt(li, int)
+    lj = np.loadtxt(lj, int)
     li -= 1
-    lj = np.array(lj, int)
     lj -= 1
 
     # S = ReadFile.edgelist_to_adjmatrix1(data1)
     # M = np.loadtxt(data2, int)
     # li, lj = M.transpose()
 
-    matching = netalign.main(S, li, lj, 0, 1)
+    w = np.ones(len(li))
+    matching = netalign.main(S, w, li, lj, 0, 1)
 
     _log.info(matching)
 
@@ -83,6 +82,30 @@ def eval_NSD(_log, gma, gmb, G1, G2):
     # print(acc)
 
 
+@ex.capture
+def eval_klaus(_log, data1, data2):
+    import numpy as np
+
+    S = "data/karol/S.txt"
+    li = "data/karol/li.txt"
+    lj = "data/karol/lj.txt"
+
+    S = ReadFile.edgelist_to_adjmatrix1(S)
+    li = np.loadtxt(li, int)
+    lj = np.loadtxt(lj, int)
+    li -= 1
+    lj -= 1
+
+    # S = ReadFile.edgelist_to_adjmatrix1(data1)
+    # M = np.loadtxt(data2, int)
+    # li, lj = M.transpose()
+
+    w = np.ones(len(li))
+    matching = klaus.main(S, w, li, lj, 0, 1)
+
+    _log.info(matching)
+
+
 @ex.automain
 def main():
     eval_regal()
@@ -90,3 +113,4 @@ def main():
     eval_conealign()
     eval_netalign()
     eval_NSD()
+    eval_klaus()

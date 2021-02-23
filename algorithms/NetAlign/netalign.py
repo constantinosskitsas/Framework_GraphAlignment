@@ -1,6 +1,6 @@
 import scipy.sparse as sps
 import numpy as np
-from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, bipartite_matching
+from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list
 
 
 # def print(*args):
@@ -109,9 +109,8 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm
     return [val, ma, mb]
 
 
-def main(S, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=1, verbose=1):
+def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=1, verbose=1):
     S = sps.csr_matrix(S)
-    w = np.ones(len(li))
 
     nedges = len(li)
     nsquares = S.count_nonzero() // 2

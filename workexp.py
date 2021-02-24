@@ -67,7 +67,7 @@ def eval_netalign(_log, data1, data2):
     # li, lj = M.transpose()
 
     w = np.ones(len(li))
-    matching = netalign.main(S, w, li, lj, 0, 1)
+    matching = netalign.main(S, w, li, lj, a=0)
 
     _log.info(matching)
 
@@ -101,7 +101,7 @@ def eval_klaus(_log, data1, data2):
     # li, lj = M.transpose()
 
     w = np.ones(len(li))
-    matching = klaus.main(S, w, li, lj, 0, 1)
+    matching = klaus.main(S, w, li, lj, a=0, maxiter=1)
 
     _log.info(matching)
 

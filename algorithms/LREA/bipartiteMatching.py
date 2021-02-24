@@ -96,7 +96,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
 
 
 def bipartite_matching_setup(A, nzi, nzj, nzv, m=None, n=None):
-    #(nzi,nzj,nzv) = bipartite_matching_setup_phase1(A,nzi,nzj,nzv)
+    # (nzi,nzj,nzv) = bipartite_matching_setup_phase1(A,nzi,nzj,nzv)
     if A is not None:
         (nzi, nzj, nzv) = bipartite_matching_setup_phase1(A)
         (m, n) = np.shape(A)
@@ -190,6 +190,15 @@ def edge_list(m, n, weight, cardinality, match):
             m2[noute] = match[i]
             noute = noute+1
     return m1, m2
+
+
+def matching_indicator(rp, ci, match1, tripi, m, n):
+    mi = np.zeros(len(tripi)-m, int)
+    for i in range(1, m+1):
+        for rpi in range(rp[i], rp[i+1]):
+            if match1[i] <= n and ci[rpi] == match1[i]:
+                mi[tripi[rpi]] = 1
+    return mi
 
 
 def bipartite_matching_setupc(x, ei, ej, m, n):

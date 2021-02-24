@@ -1,6 +1,6 @@
 import scipy.sparse as sps
 import numpy as np
-from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list
+from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
 
 
 # def print(*args):
@@ -58,8 +58,8 @@ def accumarray(xij, xw, n):
 
 def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm2):
     print("rm")
-    print(len(perm1))
-    print(len(perm2))
+    # print(len(perm1))
+    # print(len(perm2))
     ai = np.zeros(len(tripi))
     ai[perm2] = messages[perm1]
     # %disp(ai)
@@ -78,38 +78,33 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm
     # print(val)
     # print(noute)
     # print(match1)
-    mi = np.zeros(len(tripi)-m, int)
-    print(mi.size)
-    for i in range(1, m+1):
-        for rpi in range(rp[i], rp[i+1]):
-            if match1[i] <= n and ci[rpi] == match1[i]:
-                mi[tripi[rpi]] = 1
+    mi = matching_indicator(rp, ci, match1, tripi, m, n)
     mi = mi[1:]
-    print(mi)
+    # print(mi)
     ma, mb = edge_list(m, n, val, noute, match1)
     # print(ma)
     # print(mb)
     # # print(mi)
     matchweight = sum(w[mi])
     cardinality = sum(mi)
-    print(S.shape)
-    print(S)
-    print(S.todense().shape)
-    print(mi.shape)
-    print(S.dot(mi))
-    print(np.dot(S, mi))
-    print(S*mi)
+    # print(S.shape)
+    # print(S)
+    # print(S.todense().shape)
+    # print(mi.shape)
+    # print(S.dot(mi))
+    # print(np.dot(S, mi))
+    # print(S*mi)
     # print(mi.transpose()*(S*mi))
     # print(np.dot(mi.transpose(), (S*mi)))
     overlap = np.dot(mi.transpose(), (S*mi))/2
     f = alpha*matchweight + beta*overlap
-    print(f)
+    # print(f)
     # # return f, matchweight, cardinality, overlap
     # print("VAL:", val)
     return [val, ma, mb]
 
 
-def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=1, verbose=1):
+def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     S = sps.csr_matrix(S)
 
     nedges = len(li)

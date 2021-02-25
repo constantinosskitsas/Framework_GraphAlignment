@@ -6,7 +6,8 @@ from numpy.linalg import svd
 from scipy.linalg import lu
 from scipy.linalg._expm_frechet import vec
 
-from . import bipartiteMatching, decomposeX, newbound_methods
+from . import decomposeX, newbound_methods
+from .. import bipartiteMatching
 
 
 def main(A, B, iters, method, bmatch, default_params=True):

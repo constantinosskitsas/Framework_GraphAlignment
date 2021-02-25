@@ -2,8 +2,7 @@ import networkx
 from networkx.algorithms.bipartite.tests.test_matrix import sparse
 import numpy as np
 import scipy
-from algorithms.LREA import bipartiteMatching
-from algorithms.LREA.bipartiteMatching import edge_list, bipartite_matching
+from .. import bipartiteMatching
 from data.ReadFile import nonzeroentries, edgelist_to_adjmatrix1
 from scipy.sparse import csc_matrix
 

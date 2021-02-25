@@ -1,6 +1,6 @@
 import scipy.sparse as sps
 import numpy as np
-from ..LREA.bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
+from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
 
 
 # def print(*args):

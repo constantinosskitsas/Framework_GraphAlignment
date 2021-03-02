@@ -1,5 +1,5 @@
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus
-from data import ReadFile
+from data import ReadFile, similarities_preprocess
 from evaluation import evaluation, evaluation_design
 from sacred import Experiment
 

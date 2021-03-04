@@ -117,6 +117,10 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     SI = sps.csr_matrix(
         (list(range(1, len(sui)+1)), (sui, suj)), shape=S.shape
     )
+    # print(S.nnz)
+    # print(sps.triu(S, 1).nnz)
+    # print(sps.tril(S, 1).nnz)
+    # return
     SI = SI + SI.transpose()
     si, sj, sind = sps.find(SI)
     sind = [x-1 for x in sind]
@@ -204,6 +208,19 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
         ms = alpha*w[sij]-(omaxb[sij] + omaxa[sij])
         ms += othersum(sij, sijrs, mymsflip, nedges, nsquares)
 
+        # print(ma)
+        # print(mb)
+        # print(ms)
+        # print(sums)
+        # print(omaxa)
+        # print(omaxb)
+        # print(curdamp)
+        # print(1-curdamp)
+        # print(prevms)
+        # print(spair)
+        # print(prevms[spair])
+        # return
+
         if dtype == 1:
             ma = curdamp*(ma) + (1-curdamp)*(prevma)
             mb = curdamp*(mb) + (1-curdamp)*(prevmb)
@@ -233,7 +250,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
         if histb[0] > fbest:
             fbestiter = -iter
             # mbest = mb
-            mbest = mbest = histb[1:]
+            mbest = histb[1:]
             fbest = histb[0]
         # return
-    return mbest
+    return np.array(mbest)

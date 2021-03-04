@@ -2,16 +2,28 @@ from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus
 from data import ReadFile, similarities_preprocess
 from evaluation import evaluation, evaluation_design
 from sacred import Experiment
+import numpy as np
+import scipy.sparse as sps
 
 ex = Experiment("experiment")
 
 
+# def print(*args):
+#     pass
+
+
 @ex.config
 def global_config():
-
-    gt = "data/example/gt.txt"
     data1 = "data/example/arenas_orig_100.txt"
     data2 = "data/example/arenas_orig_100.txt"
+    gt = "data/example/gt.txt"
+
+    # noise_level = 1
+    # edges = 1
+
+    # data1 = "data/arenas_orig.txt"
+    # data2 = f"data/noise_level_{noise_level}/edges_{edges}.txt"
+    # gt = f"data/noise_level_{noise_level}/gt_{edges}.txt"
 
     gma, gmb = ReadFile.gt1(gt)
     G1 = ReadFile.edgelist_to_adjmatrix1(data1)
@@ -50,26 +62,40 @@ def eval_conealign(_log, gma, gmb, G1, G2):
 
 @ex.capture
 def eval_netalign(_log, data1, data2):
-    import numpy as np
+    Ai, Aj = np.loadtxt(data1, int).T
+    n = max(max(Ai), max(Aj)) + 1
+    nedges = len(Ai)
+    Aw = np.ones(nedges)
+    A = sps.csr_matrix((Aw, (Ai, Aj)), shape=(n, n), dtype=int)
+    A = A + A.T
 
-    S = "data/karol/S.txt"
-    li = "data/karol/li.txt"
-    lj = "data/karol/lj.txt"
+    Bi, Bj = np.loadtxt(data2, int).T
+    m = max(max(Bi), max(Bj)) + 1
+    medges = len(Bi)
+    Bw = np.ones(medges)
+    B = sps.csr_matrix((Bw, (Bi, Bj)), shape=(m, m), dtype=int)
+    B = B + B.T
 
-    S = ReadFile.edgelist_to_adjmatrix1(S)
-    li = np.loadtxt(li, int)
-    lj = np.loadtxt(lj, int)
-    li -= 1
-    lj -= 1
+    L = similarities_preprocess.create_L(A, B)
+    print(L.A)
+    print(L.shape)
+    print(L.nnz)
 
-    # S = ReadFile.edgelist_to_adjmatrix1(data1)
-    # M = np.loadtxt(data2, int)
-    # li, lj = M.transpose()
+    S = similarities_preprocess.create_S(A, B, L)
+    print(S.A)
+    print(S.shape)
+    print(S.nnz)
 
-    w = np.ones(len(li))
+    li, lj, w = sps.find(L)
+    # print(li)
+    # print(li.shape)
+    # print(lj)
+    # print(lj.shape)
+    # print(w)
+    # print(w.shape)
+
     matching = netalign.main(S, w, li, lj, a=0)
-
-    _log.info(matching)
+    print(matching.T)
 
 
 @ex.capture
@@ -101,9 +127,19 @@ def eval_klaus(_log, data1, data2):
     # li, lj = M.transpose()
 
     w = np.ones(len(li))
-    matching = klaus.main(S, w, li, lj, a=0, maxiter=1)
 
-    _log.info(matching)
+    print(S)
+    print(S.shape)
+    # print(li)
+    print(li.shape)
+    # print(lj)
+    print(lj.shape)
+    # print(w)
+    print(w.shape)
+
+    # matching = klaus.main(S, w, li, lj, a=0, maxiter=1)
+
+    # _log.info(matching)
 
 
 @ex.automain

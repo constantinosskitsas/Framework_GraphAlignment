@@ -1,6 +1,7 @@
 import scipy.sparse as sps
 import numpy as np
 from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
+from ..maxrowmatch import column_maxmatchsum
 
 
 def maxrowmatch_mock(Q, li, lj, m, n):
@@ -36,19 +37,50 @@ def maxrowmatch_mock(Q, li, lj, m, n):
     return q, SM
 
 
+def to_matlab(array, diff=1):
+    res = array.copy()
+    res += diff
+    return np.insert(res, [0], [0])
+
+
+def to_python(array, diff=1):
+    res = array.copy()
+    res -= diff
+    return np.delete(res, [0])
+
+
+def maxrowmatch(Q, nzi, nzj, M, N):
+    Qp, Qr, Qv = sps.find(Q)
+
+    q, mj, mi, medges = column_maxmatchsum(
+        M,
+        N,
+        to_matlab(Qp),
+        to_matlab(Qr),
+        to_matlab(Qv, 0),
+        nzi.shape[0]-1,
+        nzj.shape[0]-1,
+        Qv.shape[0],
+        nzi,
+        nzj
+    )
+    mi = to_python(mi)[:medges]
+    mj = to_python(mj)[:medges]
+    q = to_python(q, 0)
+
+    SM = sps.csr_matrix(([1]*medges, (mi, mj)), shape=Q.shape)
+    return q, SM
+
+
 def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=1):
     m = max(li) + 1
     n = max(lj) + 1
 
-    nzi = li.copy()
-    nzi += 1
-    nzi = np.insert(nzi, [0], [0])
+    nzi = to_matlab(li)
 
-    nzj = lj.copy()
-    nzj += 1
-    nzj = np.insert(nzj, [0], [0])
+    nzj = to_matlab(lj)
 
-    ww = np.insert(w, [0], [0])
+    ww = to_matlab(w, 0)
 
     rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
         None, nzi, nzj, ww, m, n)
@@ -69,7 +101,10 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
 
     for it in range(maxiter):
         print(it)
-        q, SM = maxrowmatch_mock((b/2)*S + U-U.transpose(), li, lj, m, n)
+        q, SM = maxrowmatch((b/2)*S + U-U.transpose(), nzi, nzj, m, n)
+        print(q)
+        print(SM.A)
+        print(SM.shape)
 
         x = a*w + q
         ai = np.zeros(len(tripi))

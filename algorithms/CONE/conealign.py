@@ -67,7 +67,7 @@ def parse_args():
     parser.add_argument('--numtop', type=int, default=10,
                         help='Number of top similarities to compute with kd-tree.  If None, computes all pairwise similarities.')
 
-    return parser.parse_args()
+    return parser.parse_known_args()[0]
 
 
 def align_embeddings(embed1, embed2, adj1=None, adj2=None, struc_embed=None, struc_embed2=None):
@@ -176,6 +176,9 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=1
 
 
 def main(adjA, adjB):
+    global CONE_args
+    CONE_args = parse_args()
+
     #node_num = int(adj.shape[0] / 2)
     #adjA = adj[:node_num, :node_num]
     #adjB = adj[node_num:, node_num:]
@@ -204,4 +207,4 @@ def main(adjA, adjB):
     return alignment_matrix
 
 
-CONE_args = parse_args()
+# CONE_args = parse_args()

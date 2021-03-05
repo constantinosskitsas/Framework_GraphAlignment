@@ -89,10 +89,11 @@ def create_S(A, B, L):
                         Sj.append(wv[j])
         for ri1 in range(rpAB[i], rpAB[i+1]):
             wv[ciAB[ri1]] = -1
+
     return sps.csr_matrix(([1]*len(Si), (Si, Sj)), shape=(nedges, nedges), dtype=int)
 
 
-def create_L(A, B):
+def create_L(A, B, alpha=1):
     n = A.shape[0]
     m = B.shape[0]
 
@@ -107,7 +108,7 @@ def create_L(A, B):
 
     ab_m = [0] * n
     s = 0
-    e = floor(log2(m))
+    e = alpha * floor(log2(m))
     for ap in a_p:
         while(e < m and
               abs(b_p[e][1] - ap[1]) <= abs(b_p[s][1] - ap[1])
@@ -122,10 +123,14 @@ def create_L(A, B):
     for i, bj in enumerate(ab_m):
         for j in bj:
             d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
-            if (d >= 0):
-                li.append(i)
-                lj.append(j)
-                lw.append(d)
+            # if (d >= 0):
+            li.append(i)
+            lj.append(j)
+            lw.append(0.0001 if d <= 0 else d)
+
+    # print(len(li))
+    # print(len(lj))
+    # print(len(lj))
 
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
 

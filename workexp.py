@@ -14,17 +14,23 @@ ex = Experiment("experiment")
 
 @ex.config
 def global_config():
+    noise_level = 1
+    edges = 1
+
+    data1 = "data/arenas_orig.txt"
+    data2 = f"data/noise_level_{noise_level}/edges_{edges}.txt"
+    gt = f"data/noise_level_{noise_level}/gt_{edges}.txt"
+
+
+@ex.named_config
+def demo():
     data1 = "data/example/arenas_orig_100.txt"
     data2 = "data/example/arenas_orig_100.txt"
     gt = "data/example/gt.txt"
 
-    # noise_level = 1
-    # edges = 1
 
-    # data1 = "data/arenas_orig.txt"
-    # data2 = f"data/noise_level_{noise_level}/edges_{edges}.txt"
-    # gt = f"data/noise_level_{noise_level}/gt_{edges}.txt"
-
+@ex.config
+def init(data1, data2, gt):
     gma, gmb = ReadFile.gt1(gt)
     G1 = ReadFile.edgelist_to_adjmatrix1(data1)
     G2 = ReadFile.edgelist_to_adjmatrix1(data2)
@@ -76,23 +82,9 @@ def eval_netalign(_log, data1, data2):
     B = sps.csr_matrix((Bw, (Bi, Bj)), shape=(m, m), dtype=int)
     B = B + B.T
 
-    L = similarities_preprocess.create_L(A, B)
-    print(L.A)
-    print(L.shape)
-    print(L.nnz)
-
+    L = similarities_preprocess.create_L(A, B, alpha=2)
     S = similarities_preprocess.create_S(A, B, L)
-    print(S.A)
-    print(S.shape)
-    print(S.nnz)
-
     li, lj, w = sps.find(L)
-    # print(li)
-    # print(li.shape)
-    # print(lj)
-    # print(lj.shape)
-    # print(w)
-    # print(w.shape)
 
     matching = netalign.main(S, w, li, lj, a=0)
     print(matching.T)
@@ -110,7 +102,23 @@ def eval_NSD(_log, gma, gmb, G1, G2):
 
 @ex.capture
 def eval_klaus(_log, data1, data2):
-    import numpy as np
+    # Ai, Aj = np.loadtxt(data1, int).T
+    # n = max(max(Ai), max(Aj)) + 1
+    # nedges = len(Ai)
+    # Aw = np.ones(nedges)
+    # A = sps.csr_matrix((Aw, (Ai, Aj)), shape=(n, n), dtype=int)
+    # A = A + A.T
+
+    # Bi, Bj = np.loadtxt(data2, int).T
+    # m = max(max(Bi), max(Bj)) + 1
+    # medges = len(Bi)
+    # Bw = np.ones(medges)
+    # B = sps.csr_matrix((Bw, (Bi, Bj)), shape=(m, m), dtype=int)
+    # B = B + B.T
+
+    # L = similarities_preprocess.create_L(A, B, alpha=2)
+    # S = similarities_preprocess.create_S(A, B, L)
+    # li, lj, w = sps.find(L)
 
     S = "data/karol/S.txt"
     li = "data/karol/li.txt"
@@ -121,25 +129,11 @@ def eval_klaus(_log, data1, data2):
     lj = np.loadtxt(lj, int)
     li -= 1
     lj -= 1
-
-    # S = ReadFile.edgelist_to_adjmatrix1(data1)
-    # M = np.loadtxt(data2, int)
-    # li, lj = M.transpose()
-
     w = np.ones(len(li))
 
-    print(S)
-    print(S.shape)
-    # print(li)
-    print(li.shape)
-    # print(lj)
-    print(lj.shape)
-    # print(w)
-    print(w.shape)
+    matching = klaus.main(S, w, li, lj, a=0, maxiter=1)
 
-    # matching = klaus.main(S, w, li, lj, a=0, maxiter=1)
-
-    # _log.info(matching)
+    _log.info(matching)
 
 
 @ex.automain
@@ -149,4 +143,4 @@ def main():
     eval_conealign()
     eval_netalign()
     eval_NSD()
-    eval_klaus()
+    # eval_klaus()

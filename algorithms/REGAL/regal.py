@@ -51,10 +51,13 @@ def parse_args():
                         help="Number of top similarities to compute with kd-tree.  If 0, computes all pairwise similarities.")
     parser.add_argument('--buckets', default=2, type=float,
                         help="base of log for degree (node feature) binning")
-    return parser.parse_args()
+    return parser.parse_known_args()[0]
 
 
 def main(adj) -> object:
+    global REGAL_args
+    REGAL_args = parse_args()
+
     if REGAL_args.attributes is not None:
         # load vector of attributes in from file
         REGAL_args.attributes = np.load(REGAL_args.attributes)
@@ -103,4 +106,4 @@ def recovery(gt1, mb):
     return count / nodes
 
 
-REGAL_args = parse_args()
+# REGAL_args = parse_args()

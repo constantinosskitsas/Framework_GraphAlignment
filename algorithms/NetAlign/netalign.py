@@ -49,6 +49,12 @@ def othersum(si, sj, s, m, n):
 
 def accumarray(xij, xw, n):
     sums = np.zeros(n)
+    # sums = np.zeros(max(xij)+1)
+    # print(xij)
+    # print(xw)
+    # print(xij.shape)
+    # print(len(xw))
+    # print(n)
 
     for i in range(len(xij)):
         sums[xij[i]] += xw[i]
@@ -57,7 +63,7 @@ def accumarray(xij, xw, n):
 
 
 def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm2):
-    print("rm")
+    # print("rm")
     # print(len(perm1))
     # print(len(perm2))
     ai = np.zeros(len(tripi))
@@ -105,7 +111,7 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm
 
 
 def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
-    S = sps.csr_matrix(S)
+    # S = sps.csr_matrix(S)
 
     nedges = len(li)
     nsquares = S.count_nonzero() // 2
@@ -181,7 +187,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     # return
 
     for it in range(maxiter):
-        print(it)
+        print(f"({it:03d}/{maxiter})")
         prevma = ma
         prevmb = mb
         prevms = ms
@@ -201,6 +207,13 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
         mymsflip = [max(0, x) for x in mymsflip]
 
         sums = accumarray(sij, mymsflip, nedges)
+
+        # print(m)
+        # print(n)
+        # print(nedges)
+        # print(omaxa.size)
+        # print(omaxb.size)
+        # print(sums.size)
 
         ma = alpha*w - omaxb + sums
         mb = alpha*w - omaxa + sums

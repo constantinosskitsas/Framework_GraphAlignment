@@ -156,10 +156,10 @@ def eval_gwl(_log, data1, data2):
 
 @ex.automain
 def main():
-    # eval_regal()
-    # eval_eigenalign()
-    # eval_conealign()
-    # eval_netalign()
-    # eval_NSD()
-    # # eval_klaus()
+    eval_regal()
+    eval_eigenalign()
+    eval_conealign()
+    eval_netalign()
+    eval_NSD()
+    # eval_klaus()
     eval_gwl()

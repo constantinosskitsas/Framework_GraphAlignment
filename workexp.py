@@ -1,4 +1,4 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl
 from data import ReadFile, similarities_preprocess
 from evaluation import evaluation, evaluation_design
 from sacred import Experiment
@@ -136,11 +136,30 @@ def eval_klaus(_log, data1, data2):
     _log.info(matching)
 
 
+@ex.capture
+def eval_gwl(_log, data1, data2):
+    A = np.loadtxt(data1, int)
+    n = np.amax(A) + 1
+    B = np.loadtxt(data2, int)
+    m = np.amax(B) + 1
+
+    data = {
+        'src_index': {float(i): i for i in range(n)},
+        'src_interactions': A.tolist(),
+        'tar_index': {float(i): i for i in range(m)},
+        'tar_interactions': B.tolist(),
+        'mutual_interactions': None
+    }
+
+    gwl.main(data)
+
+
 @ex.automain
 def main():
-    eval_regal()
-    eval_eigenalign()
-    eval_conealign()
-    eval_netalign()
-    eval_NSD()
-    # eval_klaus()
+    # eval_regal()
+    # eval_eigenalign()
+    # eval_conealign()
+    # eval_netalign()
+    # eval_NSD()
+    # # eval_klaus()
+    eval_gwl()

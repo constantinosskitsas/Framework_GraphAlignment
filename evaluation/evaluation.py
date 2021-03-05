@@ -71,7 +71,7 @@ def transformRAtoNormalALign(alignment_matrix):
             alignment_matrix[node_index])
         node_sorted_indices = possible_alignments[possible_values.argsort()]
         mb[node_index] = node_sorted_indices[-1:]
-    np.savetxt("matching.txt",
+    np.savetxt("results/matching.txt",
                np.vstack((range(1133), mb)).T, fmt="%i")
     mar = range(0, len(mb))
     return mar, mb

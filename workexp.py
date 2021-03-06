@@ -96,8 +96,8 @@ def eval_NSD(_log, gma, gmb, G1, G2):
     print(ma)
     print(mb)
     print(gmb)
-    # acc = evaluation.accuracy(gma, gmb, mb, ma)
-    # print(acc)
+    acc = evaluation.accuracy(gma, gmb, mb, ma)
+    print(acc)
 
 
 @ex.capture

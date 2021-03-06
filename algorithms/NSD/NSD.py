@@ -2,9 +2,15 @@ import networkx
 from networkx.algorithms.bipartite.tests.test_matrix import sparse
 import numpy as np
 import scipy
-from .. import bipartiteMatching
+import networkx.algorithms.bipartite.matching
+from scipy.sparse.csgraph._matching import maximum_bipartite_matching
+
+from algorithms import bipartiteMatching
+from data import ReadFile
 from data.ReadFile import nonzeroentries, edgelist_to_adjmatrix1
 from scipy.sparse import csc_matrix
+scipy.sparse.csgraph
+from evaluation import evaluation
 
 
 def normout_rowstochastic(P, file):
@@ -16,7 +22,26 @@ def normout_rowstochastic(P, file):
     Q = csc_matrix((pv, (pi, pj)), shape=(n, n)).toarray()
     return Q
 
+def makesparse(D):
+    num=np.shape(D)[0]*0.2
+    num=int(num)
+    print(num)
+    X=np.copy(D)
+    V = np.sort(X, axis=0)
+    X=np.sort(X)
 
+    count=0
+    for i in range(np.shape(D)[0]):
+        test = X[i,num]
+        count=0
+        for j in range(np.shape(D)[1]):
+            test1 = V[j, num]
+            if (D[i,j]<=test and D[i,j]<=test1):
+                D[i,j]=0
+                count=count+1
+        print("metrw",count)
+    Da=csc_matrix(D)
+    return Da,D
 def nsd(A, B, alpha, iters, Zvecs, Wvecs):
     A = normout_rowstochastic(A, "data/noise_level_1/arenas_orig.txt")
     B = normout_rowstochastic(B, "data/noise_level_1/edges_1.txt")
@@ -103,28 +128,78 @@ def findnz(A):
     return rw, col, vi
 
 
-def run(A, B):
+def fast2(l2):
+    num = np.shape(l2)[0]
+    print(num)
+    print(np.shape(l2))
+    zero_els = np.count_nonzero(l2)
+    print(zero_els,"hiii")
+    ma = np.zeros(np.shape(l2)[0])
+    mb = np.zeros(np.shape(l2)[0])
+    i=0
+    while i < num:
+        hi = (np.where(l2 == np.amax(l2)))
+        mb[hi[1][0]] = hi[0][0]
+        ma[hi[1][0]] = hi[1][0]
+        print(hi[0][0])
+        print(hi[1][0])
+        print(l2[hi[0][0],hi[1][0]])
+        l2[hi[0][0], :] = 0
+        l2[:, hi[1][0]] = 0
+        i = i + 1
+        print(i)
+    return ma,mb
+def run(A, B, matches=None):
     print("hey1")
-    X = nsd(A, B, 0.8, 10, np.ones(
+    X = nsd(A, B, 0.5, 10, np.ones(
         (np.shape(A)[0], 1)), np.ones((np.shape(A)[0], 1)))
     print(X)
+    #np.savetxt("array.txt",X, fmt="%s")
     asa = (np.shape(X))[0]
-    nzi1 = np.zeros(asa, int)
-    nzj1 = np.zeros(asa, int)
-    nzv1 = np.zeros(asa, float)
-    nzi1, nzj1, nzv1 = findnz1(X)
-    DA = scipy.sparse.csc_matrix(
-        (nzv1, (nzi1, nzj1)), shape=(asa, asa))
+    print("asa",asa)
+    #nzi1 = np.zeros(asa, int)
+    #nzj1 = np.zeros(asa, int)
+    #nzv1 = np.zeros(asa, float)
+    #nzi1, nzj1, nzv1 = findnz1(X)
+    #DA = scipy.sparse.csc_matrix(
+     #   (nzv1, (nzi1, nzj1)), shape=(asa, asa))
     print("hey4")
-    print(DA)
-    Ba = networkx.from_scipy_sparse_matrix(DA)
-    ma = networkx.max_weight_matching(Ba)
-    mb = np.zeros(asa, float)
-    # print(np.shape(DA),"hi")
-    # m, n, val, noute, match1 = (
-    # bipartiteMatching.bipartite_matching(DA, nzi1, nzj1, nzv1))
-    #ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
-    # networkx.algorithms.bipartite.matching.hopcroft_karp_matching(X)
+    #print(DA)
+    x1=np.copy(X)
+    ma1, mb1 = fast2(x1)
+    #newarr,pr=makesparse(X)
+    #np.savetxt("array1.txt", pr, fmt="%s")
+    print("hey5")
+    #print(newarr)
+    #nzi, nzj, nzv = findnz1(newarr)
+    #asa = maximum_bipartite_matching(newarr,perm_type='column')
 
-    print(mb)
-    return ma, mb
+    #Ba = networkx.from_scipy_sparse_matrix(newarr)
+    #ma = networkx.max_weight_matching(Ba)
+    #mb = np.zeros(asa, float)
+    # print(np.shape(DA),"hi")
+    #m, n, val, noute, match1 = (
+     #bipartiteMatching.bipartite_matching(newarr, nzi, nzj, nzv))
+    #ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
+    return ma1,mb1
+
+data1 = "../../data/arenas_orig.txt"
+data2 = "../../data/noise_level_1/edges_1.txt"
+gt = "../../data/noise_level_1/gt_1.txt"
+
+
+gma, gmb = ReadFile.gt1(gt)
+G1 = ReadFile.edgelist_to_adjmatrix1(data1)
+G2 = ReadFile.edgelist_to_adjmatrix1(data2)
+adj = ReadFile.edgelist_to_adjmatrixR(data1, data2)
+ma,mb,ma1,mb1=run(G1,G2)
+print(np.shape(ma))
+print(np.shape(mb))
+print(gma)
+print(gmb)
+print(ma)
+print(mb)
+acc = evaluation.accuracy(gma, gmb, mb, ma)
+print(acc,"acc")
+acc1 = evaluation.accuracy(gma, gmb, mb1, ma1)
+print(acc1,"acc1")

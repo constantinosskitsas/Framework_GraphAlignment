@@ -49,18 +49,21 @@ def to_python(array, diff=1):
     return np.delete(res, [0])
 
 
-def maxrowmatch(Q, nzi, nzj, M, N):
-    Qp, Qr, Qv = sps.find(Q)
+def maxrowmatch(Q, nzi, nzj, m, n):
+    Qt = Q.T
+    Qp = Qt.indptr
+    Qr = Qt.indices
+    Qv = Qt.data
 
     q, mj, mi, medges = column_maxmatchsum(
-        M,
-        N,
+        nzi.shape[0]-1,
+        nzj.shape[0]-1,
         to_matlab(Qp),
         to_matlab(Qr),
         to_matlab(Qv, 0),
-        nzi.shape[0]-1,
-        nzj.shape[0]-1,
-        Qv.shape[0],
+        m,
+        n,
+        Qv.shape[0]+1,
         nzi,
         nzj
     )
@@ -93,24 +96,32 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
 
     xbest = np.zeros(len(w))
 
-    flower = 0
+    flower = 0.0
     fupper = np.inf
     next_reduction_iteration = stepm
 
     matching = ()
 
     for it in range(maxiter):
-        print(it)
-        q, SM = maxrowmatch((b/2)*S + U-U.transpose(), nzi, nzj, m, n)
-        print(q)
-        print(SM.A)
-        print(SM.shape)
+        print(f"({it:03d}/{maxiter})")
+        q, SM = maxrowmatch((b/2)*S + U-U.T, nzi, nzj, m, n)
+        # print(q)
+        # print(SM.A)
+        # print(SM.shape)
 
         x = a*w + q
         ai = np.zeros(len(tripi))
         ai[mperm2] = x[mperm1]
         _, _, val, noute, match1 = bipartite_matching_primal_dual(
             rp, ci, ai, tripi, m+1, n+1)
+
+        # print(rp)
+        # print(ci)
+        # print(ai)
+        # print(tripi)
+        # print(val)
+        # print(noute)
+        # print(match1)
 
         mi = matching_indicator(rp, ci, match1, tripi, m, n)
         mi = mi[1:]
@@ -120,6 +131,14 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         overlap = np.dot(mi, S*mi/2)
         card = len(ma)
         f = a*matchval + b*overlap
+
+        # print(ma)
+        # print(mb)
+        # print(mi)
+        # print(f)
+        # print(val)
+
+        # return
 
         if val < fupper:
             fupper = val
@@ -132,7 +151,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         if rtype == 1:
             pass
         elif rtype == 2:
-            mw = S*x
+            mw = S*x  # remove first 0 from x?
             mw = a*w + b/2*mw
 
             ai = np.zeros(len(tripi))
@@ -164,7 +183,21 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         if (fupper-flower) < 1e-2:
             break
 
-        # U = U - diag(sparse(gamma*mi))*triu(SM) + tril(SM)'*diag(sparse(gamma*mi));
+        # print((gamma*mi))
+        # print(sps.diags(gamma*mi))
+        # print(sps.triu(SM))
+        GM = sps.diags(gamma*mi)
+        # print(GM)
+        # print()
+        # print(GM * sps.triu(SM))
+        # print()
+        # print(sps.tril(SM).T * GM)
+        # print()
 
-        # U = bound(U, -.5, .5);
-    return matching
+        U = U - GM * sps.triu(SM) + sps.tril(SM).T * GM
+        # print(U)
+
+        U.data = U.data.clip(-0.5, 0.5)
+        # bound(U, -.5, .5)
+        # print(U)
+    return np.array(matching)

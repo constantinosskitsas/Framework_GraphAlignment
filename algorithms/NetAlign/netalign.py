@@ -68,6 +68,7 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm
     # print(len(perm2))
     ai = np.zeros(len(tripi))
     ai[perm2] = messages[perm1]
+    ai = np.roll(ai, 1)
     # %disp(ai)
     # ai = np.zeros(len(ci))
     # ai[:len(messages)] = messages
@@ -111,7 +112,7 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm
 
 
 def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
-    # S = sps.csr_matrix(S)
+    S = sps.csr_matrix(S)
 
     nedges = len(li)
     nsquares = S.count_nonzero() // 2
@@ -256,12 +257,12 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
         histb = round_messages(mb, S, w, alpha, beta, rp,
                                ci, tripi, n, m, mperm1, mperm2)
         if hista[0] > fbest:
-            fbestiter = iter
+            # fbestiter = iter
             # mbest = ma
             mbest = hista[1:]
             fbest = hista[0]
         if histb[0] > fbest:
-            fbestiter = -iter
+            # fbestiter = -iter
             # mbest = mb
             mbest = histb[1:]
             fbest = histb[0]

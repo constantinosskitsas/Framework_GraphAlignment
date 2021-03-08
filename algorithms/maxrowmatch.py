@@ -100,14 +100,14 @@ def intmatch(n, m, nedges, v1, v2, weight):
             i += 1
     ret = 0.0
     for i in range(1, n):
-        for j in range(0, deg[i] - 1):
+        for j in range(0, deg[i] ):
             if list[offset[i] + j] == match1[i]:
                 ret += w[offset[i] + j]
 
     mi = np.zeros(nedges, int)
     for i in range(1, n):
         if match1[i] <= m:
-            for j in range(0, deg[i] - 1):
+            for j in range(0, deg[i] ):
                 if list[offset[i] + j] == match1[i]:
                     mi[index[offset[i] + j]] = 1
 

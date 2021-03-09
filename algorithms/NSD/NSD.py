@@ -127,7 +127,6 @@ def findnz(A):
     vi = np.zeros(np.shape(rw))
     for i in range(np.shape(rw)[0]):
         vi = A[rw, col]
-    print(np.shape(vi))
     return rw, col, vi
 
 
@@ -199,7 +198,7 @@ if __name__ == "__main__":
     G1 = ReadFile.edgelist_to_adjmatrix1(data1)
     G2 = ReadFile.edgelist_to_adjmatrix1(data2)
     adj = ReadFile.edgelist_to_adjmatrixR(data1, data2)
-    ma, mb, ma1, mb1 = run(G1, G2)
+    ma, mb = run(G1, G2)
     print(np.shape(ma))
     print(np.shape(mb))
     print(gma)
@@ -208,5 +207,4 @@ if __name__ == "__main__":
     print(mb)
     acc = evaluation.accuracy(gma, gmb, mb, ma)
     print(acc, "acc")
-    acc1 = evaluation.accuracy(gma, gmb, mb1, ma1)
-    print(acc1, "acc1")
+

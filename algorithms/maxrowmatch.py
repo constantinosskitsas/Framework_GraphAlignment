@@ -5,6 +5,11 @@ import numpy as np
 
 
 def intmatch(n, m, nedges, v1, v2, weight):
+    print(n, m, nedges)
+    print(v1)
+    print(v2)
+    print(weight)
+
     n = n + 1
     m = m + 1
     nedges = nedges + 1
@@ -41,7 +46,7 @@ def intmatch(n, m, nedges, v1, v2, weight):
         index[offset[i] + deg[i]] = -1
         deg[i] += 1
     for i in range(1, n):
-        for j in range(0, deg[i]):
+        for j in range(0, deg[i] - 1):
             if w[offset[i] + j] > l1[i]:
                 l1[i] = w[offset[i] + j]
     i = 1
@@ -66,7 +71,6 @@ def intmatch(n, m, nedges, v1, v2, weight):
                     q = q + 1
                     s[q] = match2[j]
                     t[j] = k
-                    ntmod += 1
                     tmod[ntmod] = j
                     if match2[j] < 0:
                         while j >= 1:
@@ -79,7 +83,6 @@ def intmatch(n, m, nedges, v1, v2, weight):
                         break
             p += 1
         p -= 1
-
         if match1[i] < 0:
             al = 1e20
             for j in range(1, p):
@@ -99,14 +102,14 @@ def intmatch(n, m, nedges, v1, v2, weight):
             i += 1
     ret = 0.0
     for i in range(1, n):
-        for j in range(0, deg[i] ):
+        for j in range(0, deg[i] - 1):
             if list[offset[i] + j] == match1[i]:
                 ret += w[offset[i] + j]
 
     mi = np.zeros(nedges, int)
     for i in range(1, n):
         if match1[i] <= m:
-            for j in range(0, deg[i] ):
+            for j in range(0, deg[i] - 1):
                 if list[offset[i] + j] == match1[i]:
                     mi[index[offset[i] + j]] = 1
 
@@ -173,7 +176,6 @@ def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
         smalledges = 1
         nsmall1 = 1
         nsmall2 = 1
-
         for nzi in range(Qp[j], Qp[j + 1]):
             print("nzi", nzi)
             i = Qr[nzi]

@@ -181,7 +181,7 @@ def eval_klaus(Ae, Be, gma, gmb):
     # li = "data/karol/li.txt"
     # lj = "data/karol/lj.txt"
 
-    # S = ReadFile.edgelist_to_adjmatrix1(S)
+    # S = e_to_G(np.loadtxt(S, int))
     # li = np.loadtxt(li, int)
     # lj = np.loadtxt(lj, int)
     # li -= 1
@@ -213,12 +213,12 @@ def eval_gwl(Ae, Be, gma, gmb):
 @ex.automain
 def main(Ae, Be, gma, gmb, G1, G2, adj):
     results = np.array([
-        eval_regal(),
-        eval_eigenalign(),
-        eval_conealign(),
-        eval_netalign(),
-        eval_NSD(),
-        # eval_klaus(),
-        eval_gwl(),
+        # eval_regal(),
+        # eval_eigenalign(),
+        # eval_conealign(),
+        # eval_netalign(),
+        # eval_NSD(),
+        eval_klaus(),
+        # eval_gwl(),
     ])
     print(results)

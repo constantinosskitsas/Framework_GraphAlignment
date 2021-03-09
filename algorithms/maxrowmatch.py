@@ -1,8 +1,7 @@
 import numpy as np
 
-
 # def print(*args):
-# pass
+#     pass
 
 
 def intmatch(n, m, nedges, v1, v2, weight):
@@ -115,6 +114,30 @@ def intmatch(n, m, nedges, v1, v2, weight):
 
 
 def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
+
+    # print(M, N, m, n, nedges)
+    # print(Qp)
+    # print(Qp.shape)
+    # print(Qr)
+    # print(Qr.shape)
+    # print(Qv)
+    # print(Qv.shape)
+    # print(li)
+    # print(li.shape)
+    # print(lj)
+    # print(lj.shape)
+
+    # with open('Qp.txt', 'wb') as f:
+    #     np.savetxt(f, Qp)
+    # with open('Qr.txt', 'wb') as f:
+    #     np.savetxt(f, Qr)
+    # with open('Qv.txt', 'wb') as f:
+    #     np.savetxt(f, Qv)
+    # with open('li.txt', 'wb') as f:
+    #     np.savetxt(f, li)
+    # with open('lj.txt', 'wb') as f:
+    #     np.savetxt(f, lj)
+
     minnm = n
     if m < minnm:
         minnm = m
@@ -222,8 +245,29 @@ if __name__ == "__main__":
          0.5, 0.5,
          0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
     )
-    Qp = np.array([0, 0, 5, 8, 11, 14, 18, 19, 22, 23, 26, 27, 28, 30])
-    Qr = np.array([0, 5, 7, 9, 10, 11, 4, 6, 8, 4, 6, 8, 4, 6, 8, 1, 2, 3, 11, 0, 1, 2, 3, 0, 1, 2, 3, 0, 0, 0, 4])
+    Qp = np.array([-1, 0, 5, 8, 11, 14, 18, 19, 22, 23, 26, 27, 28, 30])
+    Qr = np.array([-1, 5, 7, 9, 10, 11, 4, 6, 8, 4, 6, 8, 4, 6, 8,
+                   1, 2, 3, 11, 0, 1, 2, 3, 0, 1, 2, 3, 0, 0, 0, 4])
     Qp = Qp + 1
     Qr = Qr + 1
     print(column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj))
+
+# 12 12 6 5 31
+# [ 0  1  6  9 12 15 19 20 23 24 27 28 29 31]
+# (14,)
+# [ 0  6  8 10 11 12  5  7  9  5  7  9  5  7  9  2  3  4 12  1  2  3  4  1
+#   2  3  4  1  1  1  5]
+# (31,)
+# [0.  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
+#  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5]
+# (31,)
+# [0 1 1 1 1 2 2 3 3 4 4 5 6]
+# (13,)
+# [0 1 2 3 4 1 2 1 3 1 4 5 2]
+# (13,)
+
+
+# [0. , 2. , 0.5, 0.5, 0.5, 1. , 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+# [ 0,  6,  8, 10, 11,  5,  5,  5,  3, 12,  1,  2,  1,  2,  1,  1,  1, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]
+# [ 0,  1,  1,  1,  1,  2,  3,  4,  5,  5,  6,  7,  8,  9, 10, 11, 12, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]
+# 16

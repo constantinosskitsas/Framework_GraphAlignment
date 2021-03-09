@@ -33,23 +33,26 @@ def accuracy(gma, gmb, mb, ma):
             print("mistake", ma[i], gma[i])
     print(count)
     return count / nodes
+
+
 def accuracydiff(gma, gmb, mb, ma):
-    nodes = len(ma)
-    nodes1= len(gma)
+    nodes = len(ma) - 1
+    nodes1 = len(gma)
     count = 0
-    j=0
-    i=0
-    while i <nodes:
-        if (ma[i]==gma[j]):
+    j = 0
+    i = 0
+    while i < nodes:
+        if (ma[i] == gma[j]):
             if (gmb[j]) == (mb[i]):
                 count = count + 1
-                i=i+i
-                j=j+1
+                j = j+1
+            i = i+1
         else:
-            j=j+1
-            print("mistake", ma[i], gma[i])
+            j = j+1
+            # print("mistake", ma[i], gma[i])
     print(count)
-    return count / nodes,count/nodes1
+    return count / nodes, count/nodes1
+
 
 def accuracy2(gmb, mb):
     nodes = len(gmb)

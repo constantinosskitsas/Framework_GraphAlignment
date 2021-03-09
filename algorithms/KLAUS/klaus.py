@@ -198,6 +198,5 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         # print(U)
 
         U.data = U.data.clip(-0.5, 0.5)
-        # bound(U, -.5, .5)
-        # print(U)
+
     return np.array(matching)

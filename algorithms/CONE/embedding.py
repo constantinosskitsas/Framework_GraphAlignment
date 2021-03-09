@@ -36,7 +36,7 @@ def svd_embed(prox_sim, dim):
     return sparse.diags(np.sqrt(s)).dot(u.T).T
 
 
-def netmf(A, dim=64, window=10, b=1.0, normalize=True):
+def netmf(A, dim=128, window=10, b=1.0, normalize=True):
     prox_sim = netmf_mat_full(A, window, b)
     embed = svd_embed(prox_sim, dim)
     if normalize:

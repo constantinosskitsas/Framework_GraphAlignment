@@ -35,8 +35,9 @@ def evall(gma, gmb, ma, mb):
 
 def e_to_G(e):
     n = np.amax(e) + 1
-    G = sps.csr_matrix((np.ones(e.shape[0]), e.T), shape=(n, n))
+    G = sps.csr_matrix((np.ones(e.shape[0]), e.T), shape=(n, n), dtype=int)
     G += G.T
+    G.data = G.data.clip(0, 1)
     return G.A
 
 
@@ -53,8 +54,8 @@ def global_config():
     edges = 1
     _lim = 0
 
-    data1 = "data/arenas_orig.txt"
-    data2 = f"data/noise_level_{noise_level}/edges_{edges}.txt"
+    data = f"data/noise_level_{noise_level}/edges_{edges}.txt"
+    target = "data/arenas_orig.txt"
     gt = f"data/noise_level_{noise_level}/gt_{edges}.txt"
 
     # gma, gmb = ReadFile.gt1(gt)
@@ -63,8 +64,8 @@ def global_config():
     # adj = ReadFile.edgelist_to_adjmatrixR(data1, data2)
 
     gma, gmb = np.loadtxt(gt, int).T
-    Ae = np.loadtxt(data1, int)
-    Be = np.loadtxt(data2, int)
+    Ae = np.loadtxt(data, int)
+    Be = np.loadtxt(target, int)
 
     G1 = e_to_G(Ae)
     G2 = e_to_G(Be)
@@ -74,9 +75,9 @@ def global_config():
 @ex.named_config
 def demo():
     _lim = 200
-    data1 = "data/arenas_orig.txt"
+    data = "data/arenas_orig.txt"
 
-    Ae = np.loadtxt(data1, int)
+    Ae = np.loadtxt(data, int)
     # Ae = np.random.permutation(np.amax(Ae)+1)[Ae]
 
     gma = np.arange(_lim)
@@ -150,7 +151,7 @@ def eval_netalign(Ae, Be, gma, gmb):
 
 @ex.capture
 def eval_NSD(Ae, Be, gma, gmb, G1, G2):
-    ma, mb = NSD.run(G1, G2)
+    ma, mb = NSD.run(G2, G1)
     # acc = evaluation.accuracy(gma, gmb, mb, ma)
     # print(acc)
 
@@ -213,12 +214,12 @@ def eval_gwl(Ae, Be, gma, gmb):
 @ex.automain
 def main(Ae, Be, gma, gmb, G1, G2, adj):
     results = np.array([
-        # eval_regal(),
-        # eval_eigenalign(),
-        # eval_conealign(),
+        eval_regal(),
+        eval_eigenalign(),
+        eval_conealign(),
         # eval_netalign(),
-        # eval_NSD(),
-        eval_klaus(),
+        eval_NSD(),
+        # eval_klaus(),
         # eval_gwl(),
     ])
     print(results)

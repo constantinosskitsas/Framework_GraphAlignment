@@ -80,7 +80,7 @@ def convex_init(X, Y, niter=10, reg=1.0, apply_sqrt=False):
         alpha = 2.0 / float(2.0 + it)
         P = alpha * q + (1.0 - alpha) * P
     obj = np.linalg.norm(np.dot(P, K_X) - np.dot(K_Y, P))
-    print(obj)
+    # print(obj)
     return utils.procrustes(np.dot(P, X), Y).T, P
 
 
@@ -94,8 +94,8 @@ def convex_init_sparse(X, Y, K_X=None, K_Y=None, niter=10, reg=1.0, apply_sqrt=F
         K_X = np.dot(X, X.T)
     if K_Y is None:
         K_Y = np.dot(Y, Y.T)
-    print((type(K_X), K_X.shape))
-    print((type(K_Y), K_Y.shape))
+    # print((type(K_X), K_X.shape))
+    # print((type(K_Y), K_Y.shape))
     K_Y = sparse.linalg.norm(K_X) / sparse.linalg.norm(K_Y) * K_Y  # CHANGED
     K2_X, K2_Y = K_X.dot(K_X), K_Y.dot(K_Y)
     # print K_X, K_Y, K2_X, K2_Y
@@ -103,8 +103,8 @@ def convex_init_sparse(X, Y, K_X=None, K_Y=None, niter=10, reg=1.0, apply_sqrt=F
     P = np.ones([n, n]) / float(n)
 
     for it in range(1, niter + 1):
-        if it % 10 == 0:
-            print(it)
+        # if it % 10 == 0:
+        #     print(it)
         G = P.dot(K2_X) + K2_Y.dot(P) - 2 * K_Y.dot(P.dot(K_X))
         # G = G.todense() #TODO how to get around this??
         q = ot.sinkhorn(np.ones(n), np.ones(n), G, reg, stopThr=1e-3)
@@ -113,5 +113,5 @@ def convex_init_sparse(X, Y, K_X=None, K_Y=None, niter=10, reg=1.0, apply_sqrt=F
         alpha = 2.0 / float(2.0 + it)
         P = alpha * q + (1.0 - alpha) * P
     obj = np.linalg.norm(P.dot(K_X) - K_Y.dot(P))
-    print(obj)
+    # print(obj)
     return utils.procrustes(P.dot(X), Y).T, P

@@ -72,7 +72,7 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=5
     data = np.array([])
     # change later
     dist, ind = kd_tree.query(emb1, k=num_top)
-    print("queried alignments")
+    # print("queried alignments")
     row = np.array([])
     for i in range(emb1.shape[0]):
         row = np.concatenate((row, np.ones(num_top)*i))

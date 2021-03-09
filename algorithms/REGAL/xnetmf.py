@@ -252,11 +252,11 @@ if __name__ == "__main__":
     else:
         graph_file = sys.argv[1]
     nx_graph = nx.read_edgelist(graph_file, nodetype=int, comments="%")
-    print(nx_graph.edges)
+    # print(nx_graph.edges)
     adj_matrix = nx.adjacency_matrix(nx_graph).todense()
 
     graph = Graph(adj_matrix)
     # Learn representations with xNetMF.  Can adjust parameters (e.g. as in REGAL)
     rep_method = RepMethod(max_layer=2)
     representations = get_representations(graph, rep_method)
-    print(representations.shape)
+    # print(representations.shape)

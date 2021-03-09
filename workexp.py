@@ -1,4 +1,4 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, isorank
 from data import similarities_preprocess
 # from data import ReadFile
 # from evaluation import evaluation, evaluation_design
@@ -8,29 +8,31 @@ import scipy.sparse as sps
 
 ex = Experiment("experiment")
 
-
 # def print(*args):
 #     pass
 
+
 def evall(gma, gmb, ma, mb):
-    print("\n\n\n#### EVAL ####")
+    np.set_printoptions(threshold=100)
+    # np.set_printoptions(threshold=np.inf)
+    print("\n\n\n#### EVAL ####\n")
     gma = np.array(gma, int)
     gmb = np.array(gmb, int)
     ma = np.array(ma, int)
     mb = np.array(mb, int)
-    alignment = np.array([ma, mb], dtype=int).T
-    # print(np.array([gma, gmb], dtype=int).T)
-    print("\n")
-    print(alignment)
-    mab = gmb[ma]
-    # print(np.array([mab, mb]).T)
-    matches = np.sum(mab == mb)
-    print(f"\nacc({matches}/{len(gma)}): {matches/len(gma)}")
+    # alignment = np.array([ma, mb], dtype=int).T
+    # print(alignment)
+    gmab = gmb[ma]
+    print(np.array([ma, mb, gmab]).T)
+    matches = np.sum(mb == gmab)
+    acc = matches/len(gma)
+    acc2 = matches/len(ma)
+    print(f"\nacc({matches}/{len(gma)}): {acc}")
     if(len(gma) != len(ma)):
-        print(f"acc2({matches}/{len(ma)}): {matches/len(ma)}")
+        print(f"acc2({matches}/{len(ma)}): {acc2}")
+    print("\n")
 
-    return matches/len(gma), matches/len(ma)
-    # return np.array([alignment, matches/len(gma), matches/len(ma)])
+    return acc, acc2
 
 
 def e_to_G(e):
@@ -82,7 +84,6 @@ def demo():
 
     gma = np.arange(_lim)
     gmb = np.random.permutation(_lim)
-    print(np.array([gma, gmb]).T)
 
     Ae = Ae[np.where(Ae < _lim, True, False).all(axis=1)]
     Be = gmb[Ae]
@@ -211,15 +212,51 @@ def eval_gwl(Ae, Be, gma, gmb):
     return (0, 0)
 
 
+@ex.capture
+def eval_isorank(Ae, Be, gma, gmb):
+    Ai, Aj = Ae.T
+    n = max(max(Ai), max(Aj)) + 1
+    nedges = len(Ai)
+    Aw = np.ones(nedges)
+    A = sps.csr_matrix((Aw, (Ai, Aj)), shape=(n, n), dtype=int)
+    A = A + A.T
+
+    Bi, Bj = Be.T
+    m = max(max(Bi), max(Bj)) + 1
+    medges = len(Bi)
+    Bw = np.ones(medges)
+    B = sps.csr_matrix((Bw, (Bi, Bj)), shape=(m, m), dtype=int)
+    B = B + B.T
+
+    L = similarities_preprocess.create_L(B, A, alpha=2)
+    S = similarities_preprocess.create_S(B, A, L)
+    li, lj, w = sps.find(L)
+
+    a = 0.2
+    b = 0.8
+    ma, mb = isorank.main(S, w, a, b, li, lj, 0)
+
+    # acc = evaluation.accuracy(gma+1, gmb+1, mb, ma)
+    # print(acc)
+
+    return evall(gma, gmb, ma-1, mb-1)
+
+
 @ex.automain
 def main(Ae, Be, gma, gmb, G1, G2, adj):
+    np.set_printoptions(threshold=np.inf)
+    print(np.array([gma, gmb]).T)
+
     results = np.array([
         eval_regal(),
         eval_eigenalign(),
         eval_conealign(),
-        # eval_netalign(),
+        eval_netalign(),
         eval_NSD(),
         # eval_klaus(),
         # eval_gwl(),
+        # eval_isorank(),
     ])
+
+    print("\n####################################\n\n")
     print(results)

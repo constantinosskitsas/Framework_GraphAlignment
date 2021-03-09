@@ -96,14 +96,14 @@ def align_embeddings(embed1, embed2, adj1=None, adj2=None, struc_embed=None, str
     else:
         init_sim, corr_mat = unsup_align.convex_init(
             embed1, embed2, apply_sqrt=False, niter=CONE_args.niter_init, reg=CONE_args.reg_init, P=corr)
-    print(corr_mat)
-    print(np.max(corr_mat, axis=0))
-    print(np.max(corr_mat, axis=1))
+    # print(corr_mat)
+    # print(np.max(corr_mat, axis=0))
+    # print(np.max(corr_mat, axis=1))
 
     # Stochastic Alternating Optimization
     dim_align_matrix, corr_mat = unsup_align.align(
         embed1, embed2, init_sim, lr=CONE_args.lr, bsz=CONE_args.bsz, nepoch=CONE_args.nepoch, niter=CONE_args.niter_align, reg=CONE_args.reg_align)
-    print(dim_align_matrix.shape, corr_mat.shape)
+    # print(dim_align_matrix.shape, corr_mat.shape)
 
     # Step 3: Match Nodes with Similar Embeddings
     # Align embedding spaces
@@ -164,7 +164,7 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=1
     data = np.array([])
 
     dist, ind = kd_tree.query(emb1, k=num_top)
-    print("queried alignments")
+    # print("queried alignments")
     row = np.array([])
     for i in range(emb1.shape[0]):
         row = np.concatenate((row, np.ones(num_top) * i))

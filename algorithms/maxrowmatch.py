@@ -42,7 +42,7 @@ def intmatch(n, m, nedges, v1, v2, weight):
         index[offset[i] + deg[i]] = -1
         deg[i] += 1
     for i in range(1, n):
-        for j in range(0, deg[i] - 1):
+        for j in range(0, deg[i]):
             if w[offset[i] + j] > l1[i]:
                 l1[i] = w[offset[i] + j]
     i = 1

@@ -215,38 +215,38 @@ def netalign_setup(A, B, L, undirected):#needs fix
     S = scipy.csc_matrix(values, (Se1, Se2,), (el, el))
 
     return S,LeWeights,li,lj
+if __name__ == "__main__":
+    data1 = "../../data/arenas_orig.txt"
+    data2 = "../../data/noise_level_1/edges_1.txt"
+    gt = "../../data/noise_level_1/gt_1.txt"
 
-data1 = "../../data/arenas_orig.txt"
-data2 = "../../data/noise_level_1/edges_1.txt"
-gt = "../../data/noise_level_1/gt_1.txt"
+    gma, gmb = ReadFile.gt1(gt)
+    G1 = ReadFile.edgelist_to_adjmatrix1(data1)
+    G2 = ReadFile.edgelist_to_adjmatrix1(data2)
+    adj = ReadFile.edgelist_to_adjmatrixR(data1, data2)
+    Ai, Aj = np.loadtxt(data1, int).T
+    n = max(max(Ai), max(Aj)) + 1
+    nedges = len(Ai)
+    Aw = np.ones(nedges)
+    A = scipy.sparse.csr_matrix((Aw, (Ai, Aj)), shape=(n, n), dtype=int)
+    A = A + A.T
 
-gma, gmb = ReadFile.gt1(gt)
-G1 = ReadFile.edgelist_to_adjmatrix1(data1)
-G2 = ReadFile.edgelist_to_adjmatrix1(data2)
-adj = ReadFile.edgelist_to_adjmatrixR(data1, data2)
-Ai, Aj = np.loadtxt(data1, int).T
-n = max(max(Ai), max(Aj)) + 1
-nedges = len(Ai)
-Aw = np.ones(nedges)
-A = scipy.sparse.csr_matrix((Aw, (Ai, Aj)), shape=(n, n), dtype=int)
-A = A + A.T
-
-Bi, Bj = np.loadtxt(data2, int).T
-m = max(max(Bi), max(Bj)) + 1
-medges = len(Bi)
-Bw = np.ones(medges)
-B = scipy.sparse.csr_matrix((Bw, (Bi, Bj)), shape=(m, m), dtype=int)
-B = B + B.T
-L = similarities_preprocess.create_L(A, B, alpha=2)
-S = similarities_preprocess.create_S(A, B, L)
-print(S)
-li, lj, w = scipy.sparse.find(L)
-a = 0.2
-b = 0.8
-x,flag,reshist = isorank(S,w,a,b,li,lj,0)
-print(x,flag,reshist)
-m, n, val, noute, match1 = (
+    Bi, Bj = np.loadtxt(data2, int).T
+    m = max(max(Bi), max(Bj)) + 1
+    medges = len(Bi)
+    Bw = np.ones(medges)
+    B = scipy.sparse.csr_matrix((Bw, (Bi, Bj)), shape=(m, m), dtype=int)
+    B = B + B.T
+    L = similarities_preprocess.create_L(A, B, alpha=2)
+    S = similarities_preprocess.create_S(A, B, L)
+    print(S)
+    li, lj, w = scipy.sparse.find(L)
+    a = 0.2
+    b = 0.8
+    x,flag,reshist = isorank(S,w,a,b,li,lj,0)
+    print(x,flag,reshist)
+    m, n, val, noute, match1 = (
     bipartiteMatching.bipartite_matching(None,li,lj,x))
-ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
-acc = evaluation.accuracy(gma+1, gmb+1, mb, ma)
-print(acc)
+    ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
+    acc = evaluation.accuracy(gma+1, gmb+1, mb, ma)
+    print(acc)

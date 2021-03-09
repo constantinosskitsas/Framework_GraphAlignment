@@ -102,6 +102,10 @@ def bipartite_matching_setup(A, nzi, nzj, nzv, m=None, n=None):
         (m, n) = np.shape(A)
         m = m+1  # ?
         n = n+1  # ?
+    if m is None:
+        m=len(nzi)
+    if n is None:
+        n=len(nzj)
     print(nzi)
     print(nzj)
     print(nzv)

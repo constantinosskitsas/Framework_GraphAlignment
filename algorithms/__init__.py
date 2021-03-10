@@ -6,3 +6,4 @@ from .NSD import NSD
 from .KLAUS import klaus
 from .GWL import gwl
 from .isorank import isorank
+from .GrASp import grasp

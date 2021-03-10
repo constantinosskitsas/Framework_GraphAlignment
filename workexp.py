@@ -1,4 +1,4 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, isorank
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, isorank, grasp
 from data import similarities_preprocess
 from sacred import Experiment
 import numpy as np
@@ -56,8 +56,8 @@ def global_config():
     maxiter = 100
     lalpha = 4
 
-    noise_level = 1
-    edges = 1
+    noise_level = 5
+    edges = 2
 
     data = f"data/noise_level_{noise_level}/edges_{edges}.txt"
     target = "data/arenas_orig.txt"
@@ -194,6 +194,17 @@ def eval_isorank(Ae, Be, gma, gmb, maxiter, lalpha):
     return evall(gma, gmb, ma-1, mb-1)
 
 
+@ex.capture
+def eval_grasp(Ae, Be, gma, gmb):
+    G1 = e_to_G(Ae)
+    G2 = e_to_G(Be)
+
+    ma, mb = grasp.main(G2.A, G1.A, alg=2, base_align=True)
+    # ma, mb = grasp.main(G2, G1, alg=2, base_align=True)
+
+    return evall(gma, gmb, ma, mb)
+
+
 @ex.automain
 def main(Ae, Be, gma, gmb):
     np.set_printoptions(threshold=np.inf)
@@ -203,11 +214,12 @@ def main(Ae, Be, gma, gmb):
         eval_regal(),
         eval_eigenalign(),
         eval_conealign(),
-        eval_netalign(),
+        # eval_netalign(),
         eval_NSD(),
-        eval_klaus(),
+        # eval_klaus(),
         # eval_gwl(),
-        eval_isorank(),
+        # eval_isorank(),
+        eval_grasp(),
     ])
 
     print("\n####################################\n\n")

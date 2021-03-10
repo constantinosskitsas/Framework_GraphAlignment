@@ -22,6 +22,21 @@ def edge_indicator(match, ei, ej):
 
 
 def main(S, w, li, lj, a=0.5, b=1, alpha=2/3, rtype=2, tol=1e-12, maxiter=100, verbose=True):
+    nzi = li.copy()
+    nzi += 1
+    nzi = np.insert(nzi, [0], [0])
+
+    nzj = lj.copy()
+    nzj += 1
+    nzj = np.insert(nzj, [0], [0])
+
+    ww = np.insert(w, [0], [0])
+
+    m = max(li) + 1
+    n = max(lj) + 1
+
+    alpha = alpha if alpha else b/(a+b)
+
     P = normout_rowstochastic(S)
     csum = math.fsum(w)
     v = w/csum
@@ -31,10 +46,8 @@ def main(S, w, li, lj, a=0.5, b=1, alpha=2/3, rtype=2, tol=1e-12, maxiter=100, v
     if allstats:
         rhistsize = 6
         #rp, ci, ai, tripi, m, n = bipartite_matching_setup(w,li,lj,np.amax(li),np.amax(lj))
-        m = max(li) + 1
-        n = max(lj) + 1
         rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
-            None, li, lj, w, m, n)
+            None, nzi, nzj, ww, m, n)
         # print(ci)
         # print(ai)
         # print(tripi)
@@ -81,11 +94,16 @@ def main(S, w, li, lj, a=0.5, b=1, alpha=2/3, rtype=2, tol=1e-12, maxiter=100, v
             _, _, _, noute1, match1 = bipartite_matching_primal_dual(
                 rp, ci, ai, tripi, m+1, n+1)
             ma = noute1-1
+            # mi = bipartiteMatching.matching_indicator(
+            #     rp, ci, match1, tripi, m, n)
             match1 = match1-1
             mi_int = edge_indicator(match1, li, lj)  # implement this
+            # mi_int = mi[1:]
             val = np.dot(w, mi_int)
             overlap = np.dot(mi_int, (S*mi_int)/2)
             f = a*val + b*overlap
+            # print(mi_int)
+            # print(mi)
             if f > fbest:
                 xbest = x
                 fbest = f
@@ -106,14 +124,6 @@ def main(S, w, li, lj, a=0.5, b=1, alpha=2/3, rtype=2, tol=1e-12, maxiter=100, v
 
     # print(x, flag, reshist)
     # return x, flag, reshist
-
-    nzi = li.copy()
-    nzi += 1
-    nzi = np.insert(nzi, [0], [0])
-
-    nzj = lj.copy()
-    nzj += 1
-    nzj = np.insert(nzj, [0], [0])
 
     xx = np.insert(x, [0], [0])
 
@@ -152,7 +162,12 @@ def normout_rowstochastic(S):  # to check
     #pi, pj, pv = findnz(S)
     # print(m)
     # print(n)
+    # print(Q.argmax(1))
+    # return
     #Q= scipy.sparse.csc_matrix((pv / colsums[pi], (pi, pj)),shape = (m, n))
+
+    # print(Q.sum(1))
+
     return Q
 
 

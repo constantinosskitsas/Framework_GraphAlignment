@@ -1,6 +1,6 @@
 import scipy.sparse as sps
 import numpy as np
-from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
+from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator, bipartite_matching
 from ..maxrowmatchcpp import column_maxmatchsum
 
 
@@ -91,7 +91,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
     fupper = np.inf
     next_reduction_iteration = stepm
 
-    matching = ()
+    # matching = ()
 
     for it in range(1, maxiter+1):
         print(f"({it:03d}/{maxiter})")
@@ -116,7 +116,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
 
         mi = matching_indicator(rp, ci, match1, tripi, m, n)
         mi = mi[1:]
-        ma, mb = edge_list(m, n, val, noute, match1)
+        ma, mb = edge_list(m+1, n+1, val, noute, match1)
 
         matchval = np.dot(mi, w)
         overlap = np.dot(mi, S*mi/2)
@@ -137,7 +137,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         if f > flower:
             flower = f
             xbest = mi
-            matching = (ma, mb)
+            # matching = (ma, mb)
 
         if rtype == 1:
             pass
@@ -163,7 +163,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
                 flower = f
                 mi = mx
                 xbest = mw
-                matching = (ma, mb)
+                # matching = (ma, mb)
 
         if it == next_reduction_iteration:
             gamma = gamma*0.5
@@ -190,4 +190,10 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
 
         U.data = U.data.clip(-0.5, 0.5)
 
-    return np.array(matching)
+    m, n, val, noute, match1 = bipartite_matching(
+        None, to_matlab(li), to_matlab(lj), to_matlab(xbest, 0))
+    ma, mb = edge_list(m, n, val, noute, match1)
+
+    return ma, mb
+
+    # return np.array(matching)

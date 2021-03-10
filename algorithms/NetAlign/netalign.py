@@ -1,7 +1,7 @@
 import scipy.sparse as sps
 import numpy as np
 from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
-
+from .. import bipartiteMatching
 
 # def print(*args):
 #     pass
@@ -88,7 +88,13 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm
     mi = matching_indicator(rp, ci, match1, tripi, m, n)
     mi = mi[1:]
     # print(mi)
-    ma, mb = edge_list(m, n, val, noute, match1)
+    # print(match1.shape)
+    # print(match1)
+    ma, mb = edge_list(m+1, n+1, val, noute, match1)
+    # ma = ma[1:]
+    # mb = mb[1:]
+    # print(ma)
+    # print(mb)
     # print(ma)
     # print(mb)
     # # print(mi)
@@ -108,7 +114,7 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm
     # print(f)
     # # return f, matchweight, cardinality, overlap
     # print("VAL:", val)
-    return [val, ma, mb]
+    return [f, ma, mb]
 
 
 def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
@@ -258,13 +264,21 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
                                ci, tripi, n, m, mperm1, mperm2)
         if hista[0] > fbest:
             # fbestiter = iter
-            # mbest = ma
-            mbest = hista[1:]
+            mbest = ma
+            # mbest = hista[1:]
             fbest = hista[0]
         if histb[0] > fbest:
             # fbestiter = -iter
-            # mbest = mb
-            mbest = histb[1:]
+            mbest = mb
+            # mbest = histb[1:]
             fbest = histb[0]
         # return
-    return np.array(mbest)
+
+    xx = np.insert(mbest, [0], [0])
+
+    m, n, val, noute, match1 = bipartiteMatching.bipartite_matching(
+        None, nzi, nzj, xx)
+    ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
+
+    return ma, mb
+    # return np.array(mbest)

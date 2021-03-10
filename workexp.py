@@ -136,7 +136,7 @@ def eval_netalign(Ae, Be, gma, gmb, maxiter, lalpha):
 
     ma, mb = netalign.main(S, w, li, lj, a=0, maxiter=maxiter)
 
-    return evall(gma, gmb, ma, mb)
+    return evall(gma, gmb, ma-1, mb-1)
 
 
 @ex.capture
@@ -159,7 +159,7 @@ def eval_klaus(Ae, Be, gma, gmb, maxiter, lalpha):
 
     ma, mb = klaus.main(S, w, li, lj, a=0, maxiter=maxiter)
 
-    return evall(gma, gmb, ma, mb)
+    return evall(gma, gmb, ma-1, mb-1)
 
 
 @ex.capture
@@ -189,7 +189,7 @@ def eval_isorank(Ae, Be, gma, gmb, maxiter, lalpha):
     li, lj, w = sps.find(L)
 
     ma, mb = isorank.main(S, w, li, lj, a=0.2, b=0.8,
-                          alpha=0, rtype=1, maxiter=maxiter)
+                          alpha=None, rtype=1, maxiter=maxiter)
 
     return evall(gma, gmb, ma-1, mb-1)
 

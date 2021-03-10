@@ -21,40 +21,37 @@ def edge_indicator(match, ei, ej):
     return ind
 
 
-def main(S, w, a, b, li, lj, alpha):
-    alpha = b / (a + b)
-    rtype = 1
-    tol = 1e-12
-    maxit = 100
-    verbose = True
+def main(S, w, li, lj, a=0.5, b=1, alpha=2/3, rtype=2, tol=1e-12, maxiter=100, verbose=True):
     P = normout_rowstochastic(S)
     csum = math.fsum(w)
     v = w/csum
-    n = np.shape(P)[0]
+    nedges = np.shape(P)[0]
     #allstats = not li and not lj
     allstats = True
     if allstats:
         rhistsize = 6
         #rp, ci, ai, tripi, m, n = bipartite_matching_setup(w,li,lj,np.amax(li),np.amax(lj))
-        m = len(li)
-        n = len(lj)
-        rp, ci, ai, tripi, m, n = bipartite_matching_setup(
+        m = max(li) + 1
+        n = max(lj) + 1
+        rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
             None, li, lj, w, m, n)
         # print(ci)
         # print(ai)
         # print(tripi)
         # print(m)
         # print(n)
-        matm = m
-        matn = n
-        mperm = tripi[tripi > 0]  # a permutation for the matching problem
+        # matm = m
+        # matn = n
+        # mperm = tripi[tripi > 0]  # a permutation for the matching problem
+        mperm1 = [x-1 for x in tripi if x > 0]
+        mperm2 = [i for i, x in enumerate(tripi) if x > 0]
     else:
         rhistsize = 1
     r = alpha
-    x = np.zeros(n, float) + v
+    x = np.zeros(nedges, float) + v
     delta = 2
     it = 0
-    reshist = np.zeros((maxit+1, rhistsize), float)
+    reshist = np.zeros((maxiter+1, rhistsize), float)
     xbest = x
     fbest = 0
     fbestiter = 0
@@ -63,7 +60,7 @@ def main(S, w, a, b, li, lj, alpha):
                                                                       "pr-delta", "obj", "weight", "card", "overlap"))
     elif verbose:
         print("{:4s}   {:8s}", "iter", "delta")
-    while it < maxit and delta > tol:
+    while it < maxiter and delta > tol:
         y = r * (P.T * x)
         omega = math.fsum(x) - math.fsum(y)
         y = y + omega * v
@@ -76,10 +73,13 @@ def main(S, w, a, b, li, lj, alpha):
                 xf = x
             elif rtype == 2:
                 xf = a*v + b/2*(S*x)  # add v to preserve scale
-            ai = np.zeros(len(tripi), float)  # check the dimensions
-            ai[tripi > 0] = xf[mperm]
+            # ai = np.zeros(len(tripi), float)  # check the dimensions
+            # ai[tripi > 0] = xf[mperm]
+            ai = np.zeros(len(tripi))
+            ai[mperm2] = xf[mperm1]
+            ai = np.roll(ai, 1)
             _, _, _, noute1, match1 = bipartite_matching_primal_dual(
-                rp, ci, ai, tripi, matm, matn)
+                rp, ci, ai, tripi, m+1, n+1)
             ma = noute1-1
             match1 = match1-1
             mi_int = edge_indicator(match1, li, lj)  # implement this
@@ -107,8 +107,18 @@ def main(S, w, a, b, li, lj, alpha):
     # print(x, flag, reshist)
     # return x, flag, reshist
 
+    nzi = li.copy()
+    nzi += 1
+    nzi = np.insert(nzi, [0], [0])
+
+    nzj = lj.copy()
+    nzj += 1
+    nzj = np.insert(nzj, [0], [0])
+
+    xx = np.insert(x, [0], [0])
+
     m, n, val, noute, match1 = bipartiteMatching.bipartite_matching(
-        None, li, lj, x)
+        None, nzi, nzj, xx)
     ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
 
     return ma, mb

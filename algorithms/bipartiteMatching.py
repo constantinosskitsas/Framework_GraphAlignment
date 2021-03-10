@@ -103,9 +103,9 @@ def bipartite_matching_setup(A, nzi, nzj, nzv, m=None, n=None):
         m = m+1  # ?
         n = n+1  # ?
     if m is None:
-        m = len(nzi)
+        m = max(nzi) + 1
     if n is None:
-        n = len(nzj)
+        n = max(nzj) + 1
     print(nzi)
     print(nzj)
     print(nzv)

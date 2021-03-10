@@ -187,7 +187,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     # print(tripi)
     # return
 
-    for it in range(maxiter):
+    for it in range(1, maxiter+1):
         print(f"({it:03d}/{maxiter})")
         prevma = ma
         prevmb = mb

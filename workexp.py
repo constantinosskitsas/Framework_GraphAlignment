@@ -52,9 +52,12 @@ def G_to_Adj(G1, G2):
 
 @ex.config
 def global_config():
+    _lim = None
+    maxiter = 100
+    lalpha = 4
+
     noise_level = 1
     edges = 1
-    _lim = 0
 
     data = f"data/noise_level_{noise_level}/edges_{edges}.txt"
     target = "data/arenas_orig.txt"
@@ -68,6 +71,9 @@ def global_config():
 @ex.named_config
 def demo():
     _lim = 200
+    maxiter = 10
+    lalpha = 2
+
     data = "data/arenas_orig.txt"
 
     Ae = np.loadtxt(data, int)
@@ -75,9 +81,16 @@ def demo():
 
     gma = np.arange(_lim)
     gmb = np.random.permutation(_lim)
-
     Ae = Ae[np.where(Ae < _lim, True, False).all(axis=1)]
     Be = gmb[Ae]
+
+
+def init():
+    A = e_to_G(Ae)
+    B = e_to_G(Be)
+    L = similarities_preprocess.create_L(B, A, alpha=lalpha)
+    S = similarities_preprocess.create_S(B, A, L)
+    li, lj, w = sps.find(L)
 
 
 @ex.capture
@@ -114,14 +127,14 @@ def eval_conealign(Ae, Be, gma, gmb):
 
 
 @ex.capture
-def eval_netalign(Ae, Be, gma, gmb):
+def eval_netalign(Ae, Be, gma, gmb, maxiter, lalpha):
     A = e_to_G(Ae)
     B = e_to_G(Be)
-    L = similarities_preprocess.create_L(A, B, alpha=2)
+    L = similarities_preprocess.create_L(A, B, alpha=lalpha)
     S = similarities_preprocess.create_S(A, B, L)
     li, lj, w = sps.find(L)
 
-    ma, mb = netalign.main(S, w, li, lj, a=0)
+    ma, mb = netalign.main(S, w, li, lj, a=0, maxiter=maxiter)
 
     return evall(gma, gmb, ma, mb)
 
@@ -137,25 +150,14 @@ def eval_NSD(Ae, Be, gma, gmb):
 
 
 @ex.capture
-def eval_klaus(Ae, Be, gma, gmb):
+def eval_klaus(Ae, Be, gma, gmb, maxiter, lalpha):
     A = e_to_G(Ae)
     B = e_to_G(Be)
-    L = similarities_preprocess.create_L(A, B, alpha=4)
+    L = similarities_preprocess.create_L(A, B, alpha=lalpha)
     S = similarities_preprocess.create_S(A, B, L)
     li, lj, w = sps.find(L)
 
-    # S = "data/karol/S.txt"
-    # li = "data/karol/li.txt"
-    # lj = "data/karol/lj.txt"
-
-    # S = e_to_G(np.loadtxt(S, int))
-    # li = np.loadtxt(li, int)
-    # lj = np.loadtxt(lj, int)
-    # li -= 1
-    # lj -= 1
-    # w = np.ones(len(li))
-
-    ma, mb = klaus.main(S, w, li, lj, a=0, maxiter=10)
+    ma, mb = klaus.main(S, w, li, lj, a=0, maxiter=maxiter)
 
     return evall(gma, gmb, ma, mb)
 
@@ -179,16 +181,15 @@ def eval_gwl(Ae, Be, gma, gmb):
 
 
 @ex.capture
-def eval_isorank(Ae, Be, gma, gmb):
+def eval_isorank(Ae, Be, gma, gmb, maxiter, lalpha):
     A = e_to_G(Ae)
     B = e_to_G(Be)
-    L = similarities_preprocess.create_L(B, A, alpha=2)
-    S = similarities_preprocess.create_S(B, A, L)
+    L = similarities_preprocess.create_L(A, B, alpha=lalpha)
+    S = similarities_preprocess.create_S(A, B, L)
     li, lj, w = sps.find(L)
 
-    a = 0.2
-    b = 0.8
-    ma, mb = isorank.main(S, w, a, b, li, lj, 0)
+    ma, mb = isorank.main(S, w, li, lj, a=0.2, b=0.8,
+                          alpha=0, rtype=1, maxiter=maxiter)
 
     return evall(gma, gmb, ma-1, mb-1)
 
@@ -204,10 +205,21 @@ def main(Ae, Be, gma, gmb):
         eval_conealign(),
         eval_netalign(),
         eval_NSD(),
-        # eval_klaus(),
+        eval_klaus(),
         # eval_gwl(),
-        # eval_isorank(),
+        eval_isorank(),
     ])
 
     print("\n####################################\n\n")
     print(results)
+
+    # S = "data/karol/S.txt"
+    # li = "data/karol/li.txt"
+    # lj = "data/karol/lj.txt"
+
+    # S = e_to_G(np.loadtxt(S, int))
+    # li = np.loadtxt(li, int)
+    # lj = np.loadtxt(lj, int)
+    # li -= 1
+    # lj -= 1
+    # w = np.ones(len(li))

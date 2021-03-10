@@ -1,7 +1,7 @@
 import scipy.sparse as sps
 import numpy as np
 from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
-from ..maxrowmatch import column_maxmatchsum
+from ..maxrowmatchcpp import column_maxmatchsum
 
 
 def maxrowmatch_mock(Q, li, lj, m, n):
@@ -49,29 +49,26 @@ def to_python(array, diff=1):
     return np.delete(res, [0])
 
 
-def maxrowmatch(Q, nzi, nzj, m, n):
+def maxrowmatch(Q, li, lj, m, n):
     Qt = Q.T
-    Qp = Qt.indptr
-    Qr = Qt.indices
-    Qv = Qt.data
 
-    q, mj, mi, medges = column_maxmatchsum(
-        nzi.shape[0]-1,
-        nzj.shape[0]-1,
-        to_matlab(Qp),
-        to_matlab(Qr),
-        to_matlab(Qv, 0),
+    q, mi, mj = column_maxmatchsum(
+        li.shape[0],
+        lj.shape[0],
+        Qt.indptr,
+        Qt.indices,
+        Qt.data,
         m,
         n,
-        Qv.shape[0]+1,
-        nzi,
-        nzj
+        Qt.nnz,
+        li,
+        lj
     )
-    mi = to_python(mi)[:medges]
-    mj = to_python(mj)[:medges]
-    q = to_python(q, 0)
+    # print(q)
+    # print(mi)
+    # print(mj)
 
-    SM = sps.csr_matrix(([1]*medges, (mi, mj)), shape=Q.shape)
+    SM = sps.csr_matrix((np.ones(mi.shape[0]), (mi, mj)), shape=Q.shape)
     return q, SM
 
 
@@ -79,14 +76,8 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
     m = max(li) + 1
     n = max(lj) + 1
 
-    nzi = to_matlab(li)
-
-    nzj = to_matlab(lj)
-
-    ww = to_matlab(w, 0)
-
     rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
-        None, nzi, nzj, ww, m, n)
+        None, to_matlab(li), to_matlab(lj), to_matlab(w, 0), m, n)
 
     mperm1 = [x-1 for x in tripi if x > 0]
     mperm2 = [i for i, x in enumerate(tripi) if x > 0]
@@ -102,9 +93,9 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
 
     matching = ()
 
-    for it in range(maxiter):
+    for it in range(1, maxiter+1):
         print(f"({it:03d}/{maxiter})")
-        q, SM = maxrowmatch((b/2)*S + U-U.T, nzi, nzj, m, n)
+        q, SM = maxrowmatch((b/2)*S + U-U.T, li, lj, m, n)
         # print(q)
         # print(SM.A)
         # print(SM.shape)

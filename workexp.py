@@ -214,12 +214,14 @@ def main(Ae, Be, gma, gmb):
         eval_regal(),
         eval_eigenalign(),
         eval_conealign(),
-        # eval_netalign(),
         eval_NSD(),
-        # eval_klaus(),
-        # eval_gwl(),
-        # eval_isorank(),
         eval_grasp(),
+
+        # eval_gwl(),
+
+        # eval_netalign(),
+        # eval_klaus(),
+        # eval_isorank(),
     ])
 
     print("\n####################################\n\n")

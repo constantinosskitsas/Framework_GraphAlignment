@@ -137,7 +137,7 @@ def functional_maps_base_align(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, 
             V1_rot, V2_rot, C, icp_its, k, match, Cor1, Cor2, q)
     else:
         if match == 1:
-            matching = greedyNN()(G1_emb, G2_emb)
+            matching = greedyNN(G1_emb, G2_emb)
         if match == 2:
             matching = sort_greedy(G1_emb, G2_emb)
         if match == 3:

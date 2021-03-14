@@ -260,7 +260,7 @@ if __name__ == "__main__":
     data2 = "../../data/noise_level_1/edges_1.txt"
     gt = "../../data/noise_level_1/gt_1.txt"
 
-    # gma, gmb = ReadFile.gt1(gt)
+    gma, gmb = ReadFile.gt1(gt)
     # G1 = ReadFile.edgelist_to_adjmatrix1(data1)
     # G2 = ReadFile.edgelist_to_adjmatrix1(data2)
     # adj = ReadFile.edgelist_to_adjmatrixR(data1, data2)
@@ -283,7 +283,7 @@ if __name__ == "__main__":
     li, lj, w = scipy.sparse.find(L)
     a = 0.2
     b = 0.8
-    x, flag, reshist = isorank(S, w, a, b, li, lj, 0)
+    x, flag, reshist = main(S, w, a, b, li, lj, 0)
     print(x, flag, reshist)
     m, n, val, noute, match1 = (
         bipartiteMatching.bipartite_matching(None, li, lj, x))

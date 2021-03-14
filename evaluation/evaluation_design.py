@@ -19,9 +19,10 @@ def remove_edges_directed(adj):
             test12 = test1[0]
             test2 = len(test12)
             tixeros = random()
-            if tixeros <= 0.01 and megethos - o > 0 and test2 > 1:
+            if tixeros <= 0.25 and megethos - o > 0 and test2 > 1:
                 adj[i][j] = 0
                 adj[j][i] = 0
                 o = o + 1
                 count = count + 1
+    print(count)
     return adj

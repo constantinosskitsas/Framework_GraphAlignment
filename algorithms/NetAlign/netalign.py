@@ -7,6 +7,13 @@ from .. import bipartiteMatching
 #     pass
 
 
+def debug(arr):
+    print("###")
+    print(arr[:51])
+    print(arr[-50:])
+    print("$$$")
+
+
 def othermaxplus(dim, li, lj, lw, m, n):
 
     if dim == 1:
@@ -62,62 +69,26 @@ def accumarray(xij, xw, n):
     return sums
 
 
-def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm1, perm2):
-    # print("rm")
-    # print(len(perm1))
-    # print(len(perm2))
+def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm):
     ai = np.zeros(len(tripi))
-    ai[perm2] = messages[perm1]
-    ai = np.roll(ai, 1)
-    # %disp(ai)
-    # ai = np.zeros(len(ci))
-    # ai[:len(messages)] = messages
-    # print(m, n)
-    # print(rp)
-    # print(ci)
-    # print(ai)
-    # print(tripi)
-    # val ma mb mi
+    ai[tripi > 0] = messages[perm-1]
     _, _, val, noute, match1 = bipartite_matching_primal_dual(
         rp, ci, ai, tripi, m+1, n+1)
 
-    # print("pd")
-    # print(val)
-    # print(noute)
-    # print(match1)
-    mi = matching_indicator(rp, ci, match1, tripi, m, n)
-    mi = mi[1:]
-    # print(mi)
-    # print(match1.shape)
-    # print(match1)
-    ma, mb = edge_list(m+1, n+1, val, noute, match1)
-    # ma = ma[1:]
-    # mb = mb[1:]
-    # print(ma)
-    # print(mb)
-    # print(ma)
-    # print(mb)
-    # # print(mi)
-    matchweight = sum(w[mi])
+    mi = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
+
+    # ma, mb = edge_list(m+1, n+1, val, noute, match1)
+
+    matchweight = sum(w[mi > 0])
     cardinality = sum(mi)
-    # print(S.shape)
-    # print(S)
-    # print(S.todense().shape)
-    # print(mi.shape)
-    # print(S.dot(mi))
-    # print(np.dot(S, mi))
-    # print(S*mi)
-    # print(mi.transpose()*(S*mi))
-    # print(np.dot(mi.transpose(), (S*mi)))
+
     overlap = np.dot(mi.transpose(), (S*mi))/2
     f = alpha*matchweight + beta*overlap
-    # print(f)
-    # # return f, matchweight, cardinality, overlap
-    # print("VAL:", val)
-    return [f, ma, mb]
+
+    return f, matchweight, cardinality, overlap
 
 
-def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
+def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
     S = sps.csr_matrix(S)
 
     nedges = len(li)
@@ -130,10 +101,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     SI = sps.csr_matrix(
         (list(range(1, len(sui)+1)), (sui, suj)), shape=S.shape
     )
-    # print(S.nnz)
-    # print(sps.triu(S, 1).nnz)
-    # print(sps.tril(S, 1).nnz)
-    # return
+
     SI = SI + SI.transpose()
     si, sj, sind = sps.find(SI)
     sind = [x-1 for x in sind]
@@ -157,18 +125,12 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     alpha = a
     beta = b
 
-    # Initialize history
-    # hista = np.zeros((maxiter, 4))
-    # histb = np.zeros((maxiter, 4))
     fbest = 0
     fbestiter = 0
-    # print(li)
-    # print(lj)
-    # DA = sps.csc_matrix((w, (li, lj)))
-    # rp, ci, ai, tripi, matn, matm = bipartite_matching_setup(
-    #     DA, None, None, None, None, None)
-
-    # bipartite_matching(DA, li, lj, w)
+    if verbose:
+        print('{:4s}   {:4s}   {:7s} {:7s} {:7s} {:7s}   {:7s} {:7s} {:7s} {:7s}\n'.format(
+            'best', 'iter', 'obj_ma', 'wght_ma', 'card_ma', 'over_ma',
+            'obj_mb', 'wght_mb', 'card_mb', 'over_mb'))
 
     nzi = li.copy()
     nzi += 1
@@ -183,18 +145,9 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
     rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
         None, nzi, nzj, ww, m, n)
 
-    # rp, ci, ai, tripi, matn, matm = bipartite_matching_setupc(w, li, lj, m, n)
-    mperm1 = [x-1 for x in tripi if x > 0]
-    mperm2 = [i for i, x in enumerate(tripi) if x > 0]
-
-    # print(rp)
-    # print(ci)
-    # print(ai)
-    # print(tripi)
-    # return
+    mperm = tripi[tripi > 0]
 
     for it in range(1, maxiter+1):
-        print(f"({it:03d}/{maxiter})")
         prevma = ma
         prevmb = mb
         prevms = ms
@@ -215,31 +168,11 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
 
         sums = accumarray(sij, mymsflip, nedges)
 
-        # print(m)
-        # print(n)
-        # print(nedges)
-        # print(omaxa.size)
-        # print(omaxb.size)
-        # print(sums.size)
-
         ma = alpha*w - omaxb + sums
         mb = alpha*w - omaxa + sums
 
         ms = alpha*w[sij]-(omaxb[sij] + omaxa[sij])
         ms += othersum(sij, sijrs, mymsflip, nedges, nsquares)
-
-        # print(ma)
-        # print(mb)
-        # print(ms)
-        # print(sums)
-        # print(omaxa)
-        # print(omaxb)
-        # print(curdamp)
-        # print(1-curdamp)
-        # print(prevms)
-        # print(spair)
-        # print(prevms[spair])
-        # return
 
         if dtype == 1:
             ma = curdamp*(ma) + (1-curdamp)*(prevma)
@@ -254,25 +187,28 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=1):
             mb = curdamp*mb + (1-curdamp)*(prevmb+prevma-alpha*w+prevsums)
             ms = curdamp*ms + (1-curdamp)*(prevms+prevms[spair]-beta)
 
-        # print(ma)
-        # print(mb)
-        # print(ms)
-        # f, matchweight, cardinality, overlap
         hista = round_messages(ma, S, w, alpha, beta, rp,
-                               ci, tripi, n, m, mperm1, mperm2)
+                               ci, tripi, n, m, mperm)
         histb = round_messages(mb, S, w, alpha, beta, rp,
-                               ci, tripi, n, m, mperm1, mperm2)
+                               ci, tripi, n, m, mperm)
         if hista[0] > fbest:
-            # fbestiter = iter
+            fbestiter = it
             mbest = ma
-            # mbest = hista[1:]
             fbest = hista[0]
         if histb[0] > fbest:
-            # fbestiter = -iter
+            fbestiter = -it
             mbest = mb
-            # mbest = histb[1:]
             fbest = histb[0]
-        # return
+
+        if verbose:
+            if fbestiter == it:
+                bestchar = '*a'
+            elif fbestiter == -it:
+                bestchar = '*b'
+            else:
+                bestchar = ''
+            print('{:4s}   {:4d}   {:7.2f} {:7.2f} {:7.2f} {:7.2f}   {:7.2f} {:7.2f} {:7.2f} {:7.2f}\n'.format(
+                bestchar, it, *hista, *histb))
 
     xx = np.insert(mbest, [0], [0])
 

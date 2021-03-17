@@ -1,4 +1,4 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, isorank, grasp
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, isorank, grasp, isorank2
 from data import similarities_preprocess
 from sacred import Experiment
 import numpy as np
@@ -54,10 +54,10 @@ def G_to_Adj(G1, G2):
 def global_config():
     _lim = None
     maxiter = 100
-    lalpha = 4
+    lalpha = 15
 
-    noise_level = 5
-    edges = 2
+    noise_level = 1
+    edges = 1
 
     data = f"data/noise_level_{noise_level}/edges_{edges}.txt"
     target = "data/arenas_orig.txt"
@@ -128,15 +128,22 @@ def eval_conealign(Ae, Be, gma, gmb):
 
 @ex.capture
 def eval_netalign(Ae, Be, gma, gmb, maxiter, lalpha):
-    A = e_to_G(Ae)
-    B = e_to_G(Be)
-    L = similarities_preprocess.create_L(A, B, alpha=lalpha)
-    S = similarities_preprocess.create_S(A, B, L)
-    li, lj, w = sps.find(L)
+    # A = e_to_G(Ae)
+    # B = e_to_G(Be)
+    # L = similarities_preprocess.create_L(A, B, alpha=lalpha)
+    # S = similarities_preprocess.create_S(A, B, L)
+    # li, lj, w = sps.find(L)
+
+    from scipy.io import loadmat
+    data = loadmat('data/lcsh2wiki-small.mat')
+    S = data['S']
+    w = data['lw'].flatten()
+    li = data['li'].flatten() - 1
+    lj = data['lj'].flatten() - 1
 
     ma, mb = netalign.main(S, w, li, lj, a=0, maxiter=maxiter)
 
-    return evall(gma, gmb, ma-1, mb-1)
+    # return evall(gma, gmb, ma-1, mb-1)
 
 
 @ex.capture
@@ -166,16 +173,42 @@ def eval_klaus(Ae, Be, gma, gmb, maxiter, lalpha):
 def eval_gwl(Ae, Be, gma, gmb):
     n = np.amax(Ae) + 1
     m = np.amax(Be) + 1
-
+    # print({float(i): i for i in range(n)})
     data = {
         'src_index': {float(i): i for i in range(n)},
-        'src_interactions': Ae.tolist(),
+        # 'src_index': {float(x): i for i, x in enumerate(gmb)},
+        'src_interactions': np.repeat(Be, 3, axis=0).tolist(),
         'tar_index': {float(i): i for i in range(m)},
-        'tar_interactions': Be.tolist(),
+        # 'tar_index': {float(i): x for i, x in enumerate(gma)},
+        'tar_interactions': np.repeat(Be, 3, axis=0).tolist(),
         'mutual_interactions': None
     }
 
-    gwl.main(data)
+    index_s, index_t, trans, cost = gwl.main(data, epochs=5)
+    # print(trans)
+    # print(cost)
+    tr = trans.argmax(axis=0)
+    co = cost.argmin(axis=0)
+    mb1 = index_t[tr]
+    mb2 = index_t[co]
+    print(mb1.cpu().data.numpy())
+    # print(mb1.cpu().data.numpy()[0])
+    print(mb2.cpu().data.numpy())
+
+    ma = np.arange(n)
+
+    evall(gma, gmb, ma, mb1)
+    evall(gma, gmb, mb1, ma)
+    evall(gma, gmb, ma, mb2)
+    evall(gma, gmb, mb2, ma)
+
+    # acc = []
+    # for ma, mb in matches:
+    #     # acc.append(evall(gma, gmb, ma, mb))
+    #     # acc.append(evall(gma, gmb, mb, ma))
+    #     acc.append(evall(gma, gma, ma, mb))
+    #     acc.append(evall(gma, gma, mb, ma))
+    # print(acc)
 
     return (0, 0)
 
@@ -207,25 +240,51 @@ def eval_grasp(Ae, Be, gma, gmb):
 
 @ex.automain
 def main(Ae, Be, gma, gmb):
-    np.set_printoptions(threshold=np.inf)
+    # np.set_printoptions(threshold=np.inf)
     print(np.array([gma, gmb]).T)
 
     results = np.array([
-        eval_regal(),
-        eval_eigenalign(),
-        eval_conealign(),
-        eval_NSD(),
-        eval_grasp(),
+        # eval_regal(),
+        # eval_eigenalign(),
+        # eval_conealign(),
+        # eval_NSD(),
+        # eval_grasp(),
 
         # eval_gwl(),
 
-        # eval_netalign(),
+        eval_netalign(),
         # eval_klaus(),
         # eval_isorank(),
     ])
 
     print("\n####################################\n\n")
     print(results)
+
+    # from scipy.io import loadmat
+    # dat = loadmat('data/lcsh2wiki-small.mat')
+    # A = dat['A']
+    # B = dat['B']
+    # S = dat['S']
+    # L = dat['L']
+    # w = dat['lw'].flatten()
+    # li = dat['li'].flatten()
+    # lj = dat['lj'].flatten()
+
+    # print(A)
+    # print(B)
+    # print(S)
+    # print(L)
+    # print(w)
+    # print(li)
+    # print(lj)
+
+    # print(A.shape)
+    # print(B.shape)
+    # print(S.shape)
+    # print(L.shape)
+    # print(w.shape)
+    # print(li.shape)
+    # print(lj.shape)
 
     # S = "data/karol/S.txt"
     # li = "data/karol/li.txt"

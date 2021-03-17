@@ -509,6 +509,16 @@ class GromovWassersteinLearning(object):
                                 batch_size=hyperpara_dict['batch_size'],
                                 shuffle=True,
                                 **kwargs)
+
+        nc1_best = -1
+        nc1_match = []
+        ec1_best = -1
+        ec1_match = []
+        nc2_best = -1
+        nc2_match = []
+        ec2_best = -1
+        ec2_match = []
+
         for epoch in range(hyperpara_dict['epochs']):
             gw = 0
             trans_tmp = np.zeros(self.trans.shape)
@@ -600,9 +610,21 @@ class GromovWassersteinLearning(object):
                                                                   mask_s.cpu().data.numpy(),
                                                                   mask_t.cpu().data.numpy())
                     self.NC1.append(nc1)
+                    if nc1 > nc1_best:
+                        nc1_best = nc1
+                        nc1_match = [index_s, index_t]
                     self.NC2.append(nc2)
+                    if nc2 > nc2_best:
+                        nc2_best = nc2
+                        nc2_match = [index_s, index_t]
                     self.EC1.append(ec1)
+                    if ec1 > ec1_best:
+                        ec1_best = ec1
+                        ec1_match = [index_s, index_t]
                     self.EC2.append(ec2)
+                    if ec2 > ec2_best:
+                        ec2_best = ec2
+                        ec2_match = [index_s, index_t]
 
                     logger.info('Train Epoch: {}'.format(epoch))
                     logger.info(
@@ -618,6 +640,9 @@ class GromovWassersteinLearning(object):
             trans_tmp /= np.max(trans_tmp)
             self.trans = trans_tmp
             self.d_gw.append(gw/len(src_loader))
+
+        return [index_s, index_t, trans_np, self.gwl_model.mutual_cost_mat(
+            index_s, index_t).cpu().data.numpy()]
 
     def train_with_prior(self, database, optimizer, hyperpara_dict, scheduler=None):
         """

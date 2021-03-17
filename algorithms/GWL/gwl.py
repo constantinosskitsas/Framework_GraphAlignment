@@ -7,7 +7,7 @@ import torch
 import matplotlib.pyplot as plt
 
 
-def main(data):
+def main(data, epochs=5):
     data_name = 'data'
     result_folder = 'results'
     c = 'cosine'
@@ -31,7 +31,7 @@ def main(data):
     plt.savefig('{}/{}_tar.png'.format(result_folder, data_name))
     plt.close('all')
 
-    opt_dict = {'epochs': 5,
+    opt_dict = {'epochs': epochs,
                 'batch_size': 10000,
                 'use_cuda': False,
                 'strategy': 'soft',
@@ -61,8 +61,10 @@ def main(data):
     # print(gwd_model.obtain_embedding(
     #     opt_dict, torch.LongTensor([0, 1]), 0))
 
+    print(data_mc3)
+
     # Gromov-Wasserstein learning
-    gwd_model.train_without_prior(
+    ret = gwd_model.train_without_prior(
         data_mc3, optimizer, opt_dict, scheduler=None)
     # print(data_mc3)
     # print(optimizer)
@@ -86,7 +88,9 @@ def main(data):
     # print(gwd_model.gwl_model.emb_model)
     # print(gwd_model.gwl_model.emb_model[0])
     # # print(gwd_model.gwl_model.emb_model[1])
-    # print(gwd_model.d_gw)
+    print(gwd_model.d_gw)
     # print(gwd_model.d_gw[0])
     # print(gwd_model.gwl_model.emb_model[0](gwd_model.d_gw[0]))
     # print(gwd_model.gwl_model.emb_model[1](0))
+
+    return ret

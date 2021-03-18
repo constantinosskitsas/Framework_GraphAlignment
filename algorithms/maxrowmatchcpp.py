@@ -160,8 +160,8 @@ def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
     mi = []
     mj = []
 
-    ili = li - 1
-    ilj = lj - 1
+    ili = li  # - 1
+    ilj = lj  # - 1
 
     lwork1 = np.zeros(m, int)
     lwork2 = np.zeros(n, int)

@@ -51,16 +51,21 @@ def to_python(array, diff=1):
 
 def maxrowmatch(Q, li, lj, m, n):
     Qt = Q.T
-
+    # print(Qt.shape)
+    # print(Qt.nnz)
+    # print(li.shape)
     q, mi, mj = column_maxmatchsum(
-        li.shape[0],
-        lj.shape[0],
+        # li.shape[0],
+        # lj.shape[0],
+        Qt.shape[1],
+        Qt.shape[0],
         Qt.indptr,
         Qt.indices,
         Qt.data,
         m,
         n,
-        Qt.nnz,
+        # Qt.nnz,
+        li.shape[0],
         li,
         lj
     )
@@ -72,15 +77,26 @@ def maxrowmatch(Q, li, lj, m, n):
     return q, SM
 
 
-def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=1):
+def debugm(U):
+    uu = np.array(sps.find(U), float).T
+    debug(uu[:, uu[1].argsort()])
+
+
+def debug(arr):
+    print("###")
+    print(arr[:51])
+    print(arr[-50:])
+    print("$$$")
+
+
+def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=True):
     m = max(li) + 1
     n = max(lj) + 1
 
     rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
         None, to_matlab(li), to_matlab(lj), to_matlab(w, 0), m, n)
 
-    mperm1 = [x-1 for x in tripi if x > 0]
-    mperm2 = [i for i, x in enumerate(tripi) if x > 0]
+    mperm = tripi[tripi > 0]
 
     S = sps.csr_matrix(S, dtype=float)
     U = sps.csr_matrix(S.shape)
@@ -91,18 +107,20 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
     fupper = np.inf
     next_reduction_iteration = stepm
 
-    # matching = ()
+    if verbose:
+        print('{:5s}   {:4s}   {:8s}   {:7s} {:7s} {:7s}  {:7s} {:7s} {:7s} {:7s}'.format(
+            'best', 'iter', 'norm-u', 'lower', 'upper', 'cur', 'obj', 'weight', 'card', 'overlap'))
 
     for it in range(1, maxiter+1):
-        print(f"({it:03d}/{maxiter})")
+        # print((b/2)*S + U-U.T)
         q, SM = maxrowmatch((b/2)*S + U-U.T, li, lj, m, n)
         # print(q)
         # print(SM.A)
         # print(SM.shape)
-
+        # return
         x = a*w + q
         ai = np.zeros(len(tripi))
-        ai[mperm2] = x[mperm1]
+        ai[tripi > 0] = x[mperm-1]
         _, _, val, noute, match1 = bipartite_matching_primal_dual(
             rp, ci, ai, tripi, m+1, n+1)
 
@@ -114,13 +132,18 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         # print(noute)
         # print(match1)
 
-        mi = matching_indicator(rp, ci, match1, tripi, m, n)
-        mi = mi[1:]
-        ma, mb = edge_list(m+1, n+1, val, noute, match1)
+        mi = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
 
-        matchval = np.dot(mi, w)
-        overlap = np.dot(mi, S*mi/2)
-        card = len(ma)
+        # ma, mb = edge_list(m+1, n+1, val, noute, match1)
+        # matchval = np.dot(mi, w)
+        # overlap = np.dot(mi, S*mi/2)
+        # card = len(ma)
+        # f = a*matchval + b*overlap
+
+        matchval = sum(w[mi > 0])
+        card = sum(mi)
+
+        overlap = np.dot(mi.T, (S*mi))/2
         f = a*matchval + b*overlap
 
         # print(ma)
@@ -136,8 +159,11 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
             next_reduction_iteration = it+stepm
         if f > flower:
             flower = f
+            itermark = '*'
             xbest = mi
             # matching = (ma, mb)
+        else:
+            itermark = ' '
 
         if rtype == 1:
             pass
@@ -150,20 +176,28 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
             _, _, val, noute, match1 = bipartite_matching_primal_dual(
                 rp, ci, ai, tripi, m+1, n+1)
 
-            mx = matching_indicator(rp, ci, match1, tripi, m, n)
-            mx = mx[1:]
+            mx = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
             ma, mb = edge_list(m, n, val, noute, match1)
 
             matchval = np.dot(mx, w)
-            overlap = np.dot(mx, S*mx/2)
+            # overlap = np.dot(mx, S*mx/2)
+            overlap = np.dot(mi.T, (S*mi))/2
             card = len(ma)
             f = a*matchval + b*overlap
 
             if f > flower:
                 flower = f
+                itermark = '**'
                 mi = mx
                 xbest = mw
                 # matching = (ma, mb)
+
+        if verbose:
+            print('{:5s}   {:4d}   {:8.1e}   {:5.2f} {:5.2f} {:5.2f}  {:5.2f} {:5.2f} {:5.2f} {:5.2f}'.format(
+                itermark, it, np.linalg.norm(U.nnz),
+                flower, fupper, val,
+                f, matchval, card, overlap
+            ))
 
         if it == next_reduction_iteration:
             gamma = gamma*0.5
@@ -189,6 +223,8 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         # print(U)
 
         U.data = U.data.clip(-0.5, 0.5)
+
+        debugm(U)
 
     m, n, val, noute, match1 = bipartite_matching(
         None, to_matlab(li), to_matlab(lj), to_matlab(xbest, 0))

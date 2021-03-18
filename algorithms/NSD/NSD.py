@@ -17,7 +17,7 @@ def print(*args):
     pass
 
 
-def normout_rowstochastic(P, file):
+def normout_rowstochastic(P):
     n = np.shape(P)[0]
     colsums = sum(P, 1)-1
     pi, pj, pv = findnz_alt(P)
@@ -50,8 +50,8 @@ def makesparse(D):
 
 
 def nsd(A, B, alpha, iters, Zvecs, Wvecs):
-    A = normout_rowstochastic(A, "data/noise_level_1/arenas_orig.txt")
-    B = normout_rowstochastic(B, "data/noise_level_1/edges_1.txt")
+    A = normout_rowstochastic(A)
+    B = normout_rowstochastic(B)
     nB = np.shape(B)[0]
     nA = np.shape(A)[0]
     # A and B are now row stochastic, so no need for A'x or B'x anywhere

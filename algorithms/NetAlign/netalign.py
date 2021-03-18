@@ -7,13 +7,6 @@ from .. import bipartiteMatching
 #     pass
 
 
-def debug(arr):
-    print("###")
-    print(arr[:51])
-    print(arr[-50:])
-    print("$$$")
-
-
 def othermaxplus(dim, li, lj, lw, m, n):
 
     if dim == 1:
@@ -82,7 +75,7 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm):
     matchweight = sum(w[mi > 0])
     cardinality = sum(mi)
 
-    overlap = np.dot(mi.transpose(), (S*mi))/2
+    overlap = np.dot(mi.T, (S*mi))/2
     f = alpha*matchweight + beta*overlap
 
     return f, matchweight, cardinality, overlap
@@ -128,7 +121,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True)
     fbest = 0
     fbestiter = 0
     if verbose:
-        print('{:4s}   {:4s}   {:7s} {:7s} {:7s} {:7s}   {:7s} {:7s} {:7s} {:7s}\n'.format(
+        print('{:4s}   {:4s}   {:7s} {:7s} {:7s} {:7s}   {:7s} {:7s} {:7s} {:7s}'.format(
             'best', 'iter', 'obj_ma', 'wght_ma', 'card_ma', 'over_ma',
             'obj_mb', 'wght_mb', 'card_mb', 'over_mb'))
 
@@ -207,7 +200,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True)
                 bestchar = '*b'
             else:
                 bestchar = ''
-            print('{:4s}   {:4d}   {:7.2f} {:7.2f} {:7.2f} {:7.2f}   {:7.2f} {:7.2f} {:7.2f} {:7.2f}\n'.format(
+            print('{:4s}   {:4d}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}'.format(
                 bestchar, it, *hista, *histb))
 
     xx = np.insert(mbest, [0], [0])

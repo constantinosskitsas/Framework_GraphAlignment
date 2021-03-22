@@ -5,11 +5,21 @@ import numpy as np
 import scipy.sparse as sps
 from scipy.io import loadmat
 import inspect
+import matplotlib.pyplot as plt
 
 ex = Experiment("experiment")
 
 # def print(*args):
 #     pass
+
+
+def plot(cx, filename):
+    connects = np.zeros(cx.shape)
+    for row, col in zip(cx.row, cx.col):
+        connects[row, col] += 1
+    plt.imshow(connects)
+    plt.savefig(f'results/{filename}.png')
+    plt.close('all')
 
 
 def fast2(l2):
@@ -252,46 +262,25 @@ def eval_grasp(Gt, Tar, Src):
 
 @ex.capture
 def eval_gwl(Gt, Tar, Src):
-    # n = np.amax(Ae) + 1
-    # m = np.amax(Be) + 1
-    # # print({float(i): i for i in range(n)})
-    # data = {
-    #     'src_index': {float(i): i for i in range(n)},
-    #     # 'src_index': {float(x): i for i, x in enumerate(gmb)},
-    #     'src_interactions': np.repeat(Be, 3, axis=0).tolist(),
-    #     'tar_index': {float(i): i for i in range(m)},
-    #     # 'tar_index': {float(i): x for i, x in enumerate(gma)},
-    #     'tar_interactions': np.repeat(Be, 3, axis=0).tolist(),
-    #     'mutual_interactions': None
-    # }
 
-    # index_s, index_t, trans, cost = gwl.main(data, epochs=5)
-    # # print(trans)
-    # # print(cost)
-    # tr = trans.argmax(axis=0)
-    # co = cost.argmin(axis=0)
-    # mb1 = index_t[tr]
-    # mb2 = index_t[co]
-    # print(mb1.cpu().data.numpy())
-    # # print(mb1.cpu().data.numpy()[0])
-    # print(mb2.cpu().data.numpy())
+    opt_dict = {
+        'epochs': 1,            # the more u study the worse the grade man
+        'batch_size': 100000,   # should be all data I guess?
+        'use_cuda': False,
+        'strategy': 'soft',
+        'beta': 1e-1,
+        'outer_iteration': 400,
+        'inner_iteration': 1,
+        'sgd_iteration': 300,
+        'prior': False,
+        'prefix': 'results',
+        'display': False
+    }
 
-    # ma = np.arange(n)
+    ma, mb = gwl.main(Tar, Src, opt_dict)
 
-    # evall(gma, gmb, ma, mb1)
-    # evall(gma, gmb, mb1, ma)
-    # evall(gma, gmb, ma, mb2)
-    # evall(gma, gmb, mb2, ma)
-
-    # # acc = []
-    # # for ma, mb in matches:
-    # #     # acc.append(evall(gma, gmb, ma, mb))
-    # #     # acc.append(evall(gma, gmb, mb, ma))
-    # #     acc.append(evall(gma, gma, ma, mb))
-    # #     acc.append(evall(gma, gma, mb, ma))
-    # # print(acc)
-
-    return (0, 0)
+    return evall(Gt, ma, mb,
+                 alg=inspect.currentframe().f_code.co_name, eval_type=0)
 
 
 @ex.capture
@@ -300,7 +289,7 @@ def eval_isorank(Gt, Tar, Src, L, S, w, li, lj, maxiter):
     # ma, mb = isorank.main(S, w, li, lj, a=0.2, b=0.8,
     #                       alpha=None, rtype=1, maxiter=maxiter)
 
-    alignment_matrix = isorank2.main(Tar.A, Src.A, maxiter=maxiter)
+    alignment_matrix = isorank2.main(Tar.A, Src.A, maxiter=1)
     ma, mb = fast2(alignment_matrix)
 
     return evall(Gt, ma, mb,
@@ -327,8 +316,11 @@ def eval_klaus(Gt, S, w, li, lj, maxiter):
 
 @ex.automain
 def main(Gt, Tar, Src, S, w, li, lj):
-    # with np.printoptions(threshold=np.inf) as a:
-    #     print(np.array(list(enumerate(Gt))))
+    with np.printoptions(threshold=np.inf) as a:
+        print(np.array(list(enumerate(Gt))))
+
+    plot(sps.coo_matrix(Src), "Src")
+    plot(sps.coo_matrix(Tar), "Tar")
 
     results = np.array([
         eval_regal(),
@@ -336,11 +328,10 @@ def main(Gt, Tar, Src, S, w, li, lj):
         eval_conealign(),
         eval_NSD(),
         eval_grasp(),
-
-        # eval_gwl(),
+        eval_gwl(),
 
         eval_isorank(),
-        # eval_netalign(),
+        eval_netalign(),
 
         # eval_klaus(),
     ])

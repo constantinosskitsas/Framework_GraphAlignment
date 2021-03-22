@@ -2,6 +2,7 @@ import scipy.sparse as sps
 import numpy as np
 from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator, bipartite_matching
 from ..maxrowmatchcpp import column_maxmatchsum
+from ..NetAlign.netalign import round_messages
 
 
 def maxrowmatch_mock(Q, li, lj, m, n):
@@ -50,15 +51,16 @@ def to_python(array, diff=1):
 
 
 def maxrowmatch(Q, li, lj, m, n):
-    Qt = Q.T
-    # print(Qt.shape)
-    # print(Qt.nnz)
-    # print(li.shape)
+
+    # Qt = Q.T
+    Qt = sps.csr_matrix(Q.T)
+    # Qt = Q
+
     q, mi, mj = column_maxmatchsum(
         # li.shape[0],
         # lj.shape[0],
-        Qt.shape[1],
         Qt.shape[0],
+        Qt.shape[1],
         Qt.indptr,
         Qt.indices,
         Qt.data,
@@ -67,13 +69,10 @@ def maxrowmatch(Q, li, lj, m, n):
         # Qt.nnz,
         li.shape[0],
         li,
-        lj
+        lj,
     )
-    # print(q)
-    # print(mi)
-    # print(mj)
 
-    SM = sps.csr_matrix((np.ones(mi.shape[0]), (mi, mj)), shape=Q.shape)
+    SM = sps.csr_matrix((np.ones(mi.shape[0]), (mj, mi)), shape=Qt.shape)
     return q, SM
 
 
@@ -112,47 +111,47 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
             'best', 'iter', 'norm-u', 'lower', 'upper', 'cur', 'obj', 'weight', 'card', 'overlap'))
 
     for it in range(1, maxiter+1):
-        # print((b/2)*S + U-U.T)
+
         q, SM = maxrowmatch((b/2)*S + U-U.T, li, lj, m, n)
-        # print(q)
+        # q, SM = maxrowmatch((b/2)*S + U.T-U, li, lj, m, n)
+
+        # if it == 2:
+        #     debugm(U)
+        #     print(U.nnz)
+        #     print(U.A.sum())
+
         # print(SM.A)
         # print(SM.shape)
         # return
         x = a*w + q
-        ai = np.zeros(len(tripi))
-        ai[tripi > 0] = x[mperm-1]
-        _, _, val, noute, match1 = bipartite_matching_primal_dual(
-            rp, ci, ai, tripi, m+1, n+1)
+        # print(((b/2)*S).nnz)
+        # print(((b/2)*S).sum())
+        # print((U-U.T).nnz)
+        # print((U-U.T).sum())
 
-        # print(rp)
-        # print(ci)
-        # print(ai)
-        # print(tripi)
-        # print(val)
-        # print(noute)
-        # print(match1)
+        # print(((b/2)*S + U-U.T).nnz)
+        # print(((b/2)*S + U-U.T).sum())
+        # print(x.size)
+        # print(x.sum())
+        # print(SM.nnz)
+        # print(SM.sum())
 
-        mi = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
+        f, matchval, card, overlap, val, mi = round_messages(
+            x, S, w, a, b, rp, ci, tripi, n, m, mperm)
 
-        # ma, mb = edge_list(m+1, n+1, val, noute, match1)
+        # ai = np.zeros(len(tripi))
+        # ai[tripi > 0] = x[mperm-1]
+
+        # _, _, val, noute, match1 = bipartite_matching_primal_dual(
+        #     rp, ci, ai, tripi, m+1, n+1)
+
+        # mi = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
+
         # matchval = np.dot(mi, w)
         # overlap = np.dot(mi, S*mi/2)
-        # card = len(ma)
+        # card = sum(mi)
+
         # f = a*matchval + b*overlap
-
-        matchval = sum(w[mi > 0])
-        card = sum(mi)
-
-        overlap = np.dot(mi.T, (S*mi))/2
-        f = a*matchval + b*overlap
-
-        # print(ma)
-        # print(mb)
-        # print(mi)
-        # print(f)
-        # print(val)
-
-        # return
 
         if val < fupper:
             fupper = val
@@ -194,7 +193,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
 
         if verbose:
             print('{:5s}   {:4d}   {:8.1e}   {:5.2f} {:5.2f} {:5.2f}  {:5.2f} {:5.2f} {:5.2f} {:5.2f}'.format(
-                itermark, it, np.linalg.norm(U.nnz),
+                itermark, it, np.linalg.norm(U.data, 1),
                 flower, fupper, val,
                 f, matchval, card, overlap
             ))
@@ -211,7 +210,8 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         # print((gamma*mi))
         # print(sps.diags(gamma*mi))
         # print(sps.triu(SM))
-        GM = sps.diags(gamma*mi)
+        GM = sps.diags(gamma*mi, format="csr")
+        # GM.eliminate_zeros()
         # print(GM)
         # print()
         # print(GM * sps.triu(SM))
@@ -224,7 +224,12 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
 
         U.data = U.data.clip(-0.5, 0.5)
 
-        debugm(U)
+        # debugm(U)
+
+        # print(mi.size)
+        # print(GM.nnz)
+        # print(U.nnz)
+        # print(np.linalg.norm(U.data, 1))
 
     m, n, val, noute, match1 = bipartite_matching(
         None, to_matlab(li), to_matlab(lj), to_matlab(xbest, 0))

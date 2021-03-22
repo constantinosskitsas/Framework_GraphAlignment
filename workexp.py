@@ -121,8 +121,7 @@ def preprocess(Tar, Src, lalpha):
 def global_config():
     noise_level = 1
     edges = 1
-    _preprocess = True
-    # _preprocess = False
+    _preprocess = False
     maxiter = 100
     lalpha = 15
 
@@ -145,12 +144,18 @@ def global_config():
 
     _lim = None
     dat = {
-        val: None for val in ['A', 'B', 'S', 'L', 'lw', 'li', 'lj']
+        val: None for val in ['A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj']
     }
 
 
 @ex.named_config
+def prep():
+    _preprocess = True
+
+
+@ex.named_config
 def demo():
+    _preprocess = False
     _lim = 200
     maxiter = 10
     lalpha = 10
@@ -174,15 +179,22 @@ def demo():
 @ex.named_config
 def load():
 
+    _preprocess = False
+
+    # dat = {
+    #     k: v for k, v in loadmat("data/example-overlap.mat").items() if k in {'A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj'}
+    # }
+
     dat = {
-        k: v for k, v in loadmat('data/lcsh2wiki-small.mat').items() if k in {'A', 'B', 'S', 'L', 'lw', 'li', 'lj'}
+        k: v for k, v in loadmat("data/lcsh2wiki-small.mat").items() if k in {'A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj'}
     }
 
     Src = dat['A']
     Tar = dat['B']
     S = dat['S']
     L = dat['L']
-    w = dat['lw'].flatten()
+    w = dat['w'] if 'w' in dat else dat['lw']
+    w = w.flatten()
     li = dat['li'].flatten() - 1
     lj = dat['lj'].flatten() - 1
 
@@ -307,7 +319,7 @@ def eval_netalign(Gt, S, w, li, lj, maxiter):
 @ex.capture
 def eval_klaus(Gt, S, w, li, lj, maxiter):
 
-    ma, mb = klaus.main(S, w, li, lj, a=0, maxiter=1)
+    ma, mb = klaus.main(S, w, li, lj, a=0, maxiter=maxiter)
 
     return evall(Gt, ma, mb,
                  alg=inspect.currentframe().f_code.co_name, eval_type=3)
@@ -315,8 +327,8 @@ def eval_klaus(Gt, S, w, li, lj, maxiter):
 
 @ex.automain
 def main(Gt, Tar, Src, S, w, li, lj):
-    with np.printoptions(threshold=np.inf) as a:
-        print(np.array(list(enumerate(Gt))))
+    # with np.printoptions(threshold=np.inf) as a:
+    #     print(np.array(list(enumerate(Gt))))
 
     results = np.array([
         eval_regal(),
@@ -328,8 +340,9 @@ def main(Gt, Tar, Src, S, w, li, lj):
         # eval_gwl(),
 
         eval_isorank(),
-        eval_netalign(),
-        eval_klaus(),
+        # eval_netalign(),
+
+        # eval_klaus(),
     ])
 
     print("\n\n\n")

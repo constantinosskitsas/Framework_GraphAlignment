@@ -65,12 +65,10 @@ def accumarray(xij, xw, n):
 def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm):
     ai = np.zeros(len(tripi))
     ai[tripi > 0] = messages[perm-1]
-    _, _, val, noute, match1 = bipartite_matching_primal_dual(
+    _, _, val, _, match1 = bipartite_matching_primal_dual(
         rp, ci, ai, tripi, m+1, n+1)
 
     mi = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
-
-    # ma, mb = edge_list(m+1, n+1, val, noute, match1)
 
     matchweight = sum(w[mi > 0])
     cardinality = sum(mi)
@@ -78,7 +76,7 @@ def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm):
     overlap = np.dot(mi.T, (S*mi))/2
     f = alpha*matchweight + beta*overlap
 
-    return f, matchweight, cardinality, overlap
+    return f, matchweight, cardinality, overlap, val, mi
 
 
 def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
@@ -181,9 +179,9 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True)
             ms = curdamp*ms + (1-curdamp)*(prevms+prevms[spair]-beta)
 
         hista = round_messages(ma, S, w, alpha, beta, rp,
-                               ci, tripi, n, m, mperm)
+                               ci, tripi, n, m, mperm)[:-2]
         histb = round_messages(mb, S, w, alpha, beta, rp,
-                               ci, tripi, n, m, mperm)
+                               ci, tripi, n, m, mperm)[:-2]
         if hista[0] > fbest:
             fbestiter = it
             mbest = ma

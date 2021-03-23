@@ -108,7 +108,7 @@ def create_L(A, B, alpha=1):
 
     ab_m = [0] * n
     s = 0
-    e = alpha * floor(log2(m))
+    e = floor(alpha * log2(m))
     for ap in a_p:
         while(e < m and
               abs(b_p[e][1] - ap[1]) <= abs(b_p[s][1] - ap[1])
@@ -126,7 +126,8 @@ def create_L(A, B, alpha=1):
             # if (d >= 0):
             li.append(i)
             lj.append(j)
-            lw.append(0.0001 if d <= 0 else d)
+            # lw.append(0.0001 if d <= 0 else d)
+            lw.append(d)
 
     # print(len(li))
     # print(len(lj))

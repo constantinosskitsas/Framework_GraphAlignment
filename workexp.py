@@ -131,8 +131,9 @@ def preprocess(Tar, Src, lalpha):
 def global_config():
     noise_level = 1
     edges = 1
-    _preprocess = False
     maxiter = 100
+
+    _preprocess = False
     lalpha = 15
 
     target = "data/arenas_orig.txt"
@@ -150,7 +151,13 @@ def global_config():
     if _preprocess:
         L, S, li, lj, w = preprocess(Tar, Src, lalpha)
     else:
-        L = S = li = lj = w = []
+        try:
+            L = sps.load_npz(f"data/L_{noise_level}_{edges}_{lalpha}.npz")
+            S = sps.load_npz(f"data/S_{noise_level}_{edges}_{lalpha}.npz")
+        except:
+            L = sps.load_npz(f"data/L_1_1_15.npz")
+            S = sps.load_npz(f"data/S_1_1_15.npz")
+        li, lj, w = sps.find(L)
 
     _lim = None
     dat = {
@@ -166,14 +173,23 @@ def prep():
 @ex.named_config
 def demo():
     _preprocess = False
-    _lim = 200
+    _lim = 100
     maxiter = 10
-    lalpha = 10
+    # lalpha = 1/15
+    lalpha = 100
 
     Src_e = np.loadtxt("data/arenas_orig.txt", int)
+    # print(Src_e)
+    # print(np.amax(Src_e))
     # Src_e = np.random.permutation(np.amax(Src_e)+1)[Src_e]
+    # print(Src_e)
+    # print(np.amax(Src_e))
+    # Src_e = np.arange(np.amax(Src_e)+1)[Src_e]
 
     Src_e = Src_e[np.where(Src_e < _lim, True, False).all(axis=1)]
+    # print(Src_e)
+    # print(np.amax(Src_e))
+    # print(Src_e.shape)
     Gt = np.random.permutation(_lim)
     Tar_e = Gt[Src_e]
 
@@ -183,7 +199,11 @@ def demo():
     # Src = Tar.copy()
     # Gt = np.arange(_lim)
 
-    L, S, li, lj, w = preprocess(Tar, Src, lalpha)
+    # L, S, li, lj, w = preprocess(Tar, Src, lalpha)
+
+    L = sps.csr_matrix(np.ones((Tar.shape[0], Src.shape[0])))
+    S = similarities_preprocess.create_S(Tar, Src, L)
+    li, lj, w = sps.find(L)
 
 
 @ex.named_config
@@ -207,6 +227,11 @@ def load():
     w = w.flatten()
     li = dat['li'].flatten() - 1
     lj = dat['lj'].flatten() - 1
+
+    gt_e = np.loadtxt("data/lcsh_gt.txt", int) - 1
+
+    Gt = np.zeros(Src.shape[0], int) - 1
+    Gt[gt_e[:, 0]] = gt_e[:, 1]
 
 
 @ex.capture
@@ -302,7 +327,7 @@ def eval_netalign(Gt, S, w, li, lj, maxiter):
     ma, mb = netalign.main(S, w, li, lj, a=0, maxiter=maxiter)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=3)
+                 alg=inspect.currentframe().f_code.co_name, eval_type=2)
 
 
 @ex.capture
@@ -315,22 +340,30 @@ def eval_klaus(Gt, S, w, li, lj, maxiter):
 
 
 @ex.automain
-def main(Gt, Tar, Src, S, w, li, lj):
-    with np.printoptions(threshold=np.inf) as a:
-        print(np.array(list(enumerate(Gt))))
+def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha):
+    # with np.printoptions(threshold=np.inf) as a:
+    #     print(np.array(list(enumerate(Gt))))
 
-    plot(sps.coo_matrix(Src), "Src")
-    plot(sps.coo_matrix(Tar), "Tar")
+    try:
+        plot(sps.coo_matrix(Src), "Src")
+        plot(sps.coo_matrix(Tar), "Tar")
+        plot(sps.coo_matrix(L), "L")
+        # plot(sps.coo_matrix(S), "S")
+    except:
+        pass
+
+    # sps.save_npz(f"S_{noise_level}_{edges}_{lalpha}.npz", S)
+    # sps.save_npz(f"L_{noise_level}_{edges}_{lalpha}.npz", L)
 
     results = np.array([
-        eval_regal(),
-        eval_eigenalign(),
-        eval_conealign(),
-        eval_NSD(),
-        eval_grasp(),
-        eval_gwl(),
+        # eval_regal(),
+        # eval_eigenalign(),
+        # eval_conealign(),
+        # eval_NSD(),
+        # eval_grasp(),
+        # eval_gwl(),
 
-        eval_isorank(),
+        # eval_isorank(),
         eval_netalign(),
 
         # eval_klaus(),

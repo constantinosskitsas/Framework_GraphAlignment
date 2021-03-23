@@ -6,6 +6,7 @@ import scipy.sparse as sps
 from scipy.io import loadmat
 import inspect
 import matplotlib.pyplot as plt
+from data import ReadFile
 
 ex = Experiment("experiment")
 
@@ -51,7 +52,7 @@ def eval_align(ma, mb, gmb):
         mab = np.zeros(mb.size, int) - 1
         gacc = acc = -1.0
     alignment = np.array([ma, mb, mab]).T
-    alignment = alignment[alignment[:, 0].argsort()]
+    # alignment = alignment[alignment[:, 0].argsort()]
     return gacc, acc, alignment
 
 
@@ -65,11 +66,23 @@ def evall(gmb, ma, mb, alg=np.random.rand(), eval_type=None):
 
     assert ma.size == mb.size
 
+    # gt="data/noise_level_1/gt_1.txt"
+    # gmb, gma = ReadFile.gt1(gt)
+    # gma= gma.astype(int)
+    # gmb=gmb.astype(int)
+    gmb1 = np.zeros(len(gmb))
+    for i in range(len(gmb)):
+        gmb1[gmb[i]] = i
+
     res = np.array([
         eval_align(ma, mb, gmb),
         eval_align(mb, ma, gmb),
         eval_align(ma-1, mb-1, gmb),
-        eval_align(mb-1, ma-1, gmb)
+        eval_align(mb-1, ma-1, gmb),
+        eval_align(ma, mb, gmb1),
+        eval_align(mb, ma, gmb1),
+        eval_align(ma-1, mb-1, gmb1),
+        eval_align(mb-1, ma-1, gmb1)
     ], dtype=object)
 
     accs = res[:, 0]
@@ -150,13 +163,14 @@ def global_config():
 
     if _preprocess:
         L, S, li, lj, w = preprocess(Tar, Src, lalpha)
+        # L, S, li, lj, w = preprocess(Src, Tar, lalpha)
     else:
         try:
             L = sps.load_npz(f"data/L_{noise_level}_{edges}_{lalpha}.npz")
             S = sps.load_npz(f"data/S_{noise_level}_{edges}_{lalpha}.npz")
         except:
-            L = sps.load_npz(f"data/L_1_1_15.npz")
-            S = sps.load_npz(f"data/S_1_1_15.npz")
+            L = sps.load_npz(f"data/L_1_1_5.npz")
+            S = sps.load_npz(f"data/S_1_1_5.npz")
         li, lj, w = sps.find(L)
 
     _lim = None
@@ -269,7 +283,8 @@ def eval_conealign(Gt, Tar, Src):
 @ex.capture
 def eval_NSD(Gt, Tar, Src):
 
-    ma, mb = NSD.run(Tar.A, Src.A)
+    # ma, mb = NSD.run(Tar.A, Src.A)
+    ma, mb = NSD.run(Src.A, Tar.A)
 
     return evall(Gt, ma, mb,
                  alg=inspect.currentframe().f_code.co_name, eval_type=0)
@@ -314,7 +329,8 @@ def eval_isorank(Gt, Tar, Src, L, S, w, li, lj, maxiter):
     # ma, mb = isorank.main(S, w, li, lj, a=0.2, b=0.8,
     #                       alpha=None, rtype=1, maxiter=maxiter)
 
-    alignment_matrix = isorank2.main(Tar.A, Src.A, maxiter=1)
+    alignment_matrix = isorank2.main(Tar.A, Src.A, maxiter=10)
+    # alignment_matrix = isorank2.main(Src.A, Tar.A, maxiter=10)
     ma, mb = fast2(alignment_matrix)
 
     return evall(Gt, ma, mb,
@@ -363,11 +379,24 @@ def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha):
         # eval_grasp(),
         # eval_gwl(),
 
-        # eval_isorank(),
-        eval_netalign(),
+        eval_isorank(),
+        # eval_netalign(),
 
         # eval_klaus(),
     ])
+
+    # gt = "data/noise_level_1/gt_1.txt"
+    # gmb, gma = ReadFile.gt1(gt)
+    # gma = gma.astype(int)
+    # gmb = gmb.astype(int)
+    # gma1 = np.zeros(len(gma))
+    # gmb1 = np.zeros(len(gma))
+    # for i in range(len(gma)):
+    #     gma1[i] = i
+    #     gmb1[gma[i]] = gmb[i]
+
+    # print(gma1)
+    # print(gmb1)
 
     print("\n\n\n")
     print(results)

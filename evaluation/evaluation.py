@@ -6,7 +6,7 @@ import time
 import os
 import sys
 import scipy.sparse as sp
-
+from sklearn.metrics import jaccard_score
 try:
     import cPickle as pickle
 except ImportError:
@@ -94,3 +94,99 @@ def transformRAtoNormalALign(alignment_matrix):
                np.vstack((range(n_nodes), mb)).T, fmt="%i")
     mar = range(0, len(mb))
     return mar, mb
+
+#works
+def S3(A,B,mb):
+    A1=np.sum(A,1)
+    B1=np.sum(B,1)
+    EdA1=np.sum(A1)
+    EdB1=np.sum(B1)
+    Ce=0
+    source=0
+    target=0
+    res=0
+    for i in range(len(mb)):
+        source=A1[i]
+        target=B1[mb[i]]
+        if source==target:#equality goes in either of the cases below, different case for...
+            Ce=Ce+source
+        elif source<target:
+            Ce=Ce+source
+        elif source>target:
+            Ce=Ce+target
+    div=EdA1+EdB1-Ce
+    res=Ce/div
+    return res    
+#works
+def ICorS3GT(A,B,mb,gmb,IC):
+    A1=np.sum(A,1)
+    B1=np.sum(B,1)
+    EdA1=np.sum(A1)
+    EdB1=np.sum(B1)
+    Ce=0
+    source=0
+    target=0
+    res=0
+    for i in range(len(mb)):
+        if (gmb[i]==mb[i]):
+            source=A1[i]
+            target=B1[mb[i]]
+            if source==target: #equality goes in either of the cases below, different case for...
+                Ce=Ce+source
+            elif source<target:
+                Ce=Ce+source
+            elif source>target:
+                Ce=Ce+target
+    if IC==True:
+        res=Ce/EdA1
+    else:
+        div=EdA1+EdB1-Ce
+        res=Ce/div
+    return res  
+
+def permute(B,mb):
+    S=np.zeros(len(mb))
+    for i in range(len(mb)):
+        S[mb[i]]=i
+    print(S)
+    S.astype(int)
+    k=S[B]
+    print(k)
+    return k
+#needs correct perm
+def jacardSim(A,B1,mb):
+    B = mb[B1]
+    #B=permute(B1,mb)
+    print(B)
+    print(A)
+    #B.astype(int)
+    JI=0
+    for i in range(len(mb)):
+        #print(jaccard_score(A[i,:],B[mb[i],:]))
+        #JI=JI+jaccard_score(A[i,:],B[mb[i],:])
+        JI=JI+jaccard_score(A[:,i],B[:,i],average='macro')
+    return JI/len(mb)
+
+#needs correct perm
+def jacardSimSepCm(A,B1,mb,gmb):
+    #B=permute(B1,mb)
+    B=mb[B1]
+    B.astype(int)
+    JIC=0
+    JIW=0
+    countercorr=0
+    counterwrong=0
+    for i in range(len(mb)):
+        if ( mb[i]==gmb[i]):
+            #JIC=JIC+jaccard_score(A[:,i],B[:,mb[i]])
+            JIC=JIC+jaccard_score(A[i,:],B[i,:],average='weighted')
+            countercorr=countercorr+1
+        else:
+            #JIW=JIW+jaccard_score(A[:,i],B[:,mb[i]])
+            JIW=JIW+jaccard_score(A[i,:],B[i,:],average='weighted')
+            counterwrong=counterwrong+1
+    if countercorr==0:
+        countercorr=1
+    if counterwrong==0:
+        counterwrong=1
+    return JIC/countercorr,JIW/counterwrong

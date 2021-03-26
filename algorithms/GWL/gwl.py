@@ -21,7 +21,7 @@ def main(Tar, Src, opt_dict):
     hyperpara_dict = {
         'src_number': len(data['src_index']),
         'tar_number': len(data['tar_index']),
-        'dimension': 20,
+        'dimension': 100,
         'loss_type': 'L2',
         'cost_type': 'cosine',
         'ot_method': 'proximal'
@@ -38,7 +38,4 @@ def main(Tar, Src, opt_dict):
     # Gromov-Wasserstein learning
     gwd_model.train_without_prior(data, optimizer, opt_dict, scheduler=None)
 
-    ma = np.arange(gwd_model.trans.shape[0])
-    mb = gwd_model.trans.argmax(1)
-
-    return ma, mb
+    return gwd_model.trans

@@ -1,10 +1,6 @@
 import scipy.sparse as sps
 import numpy as np
-from ..bipartiteMatching import bipartite_matching_setup, bipartite_matching_primal_dual, edge_list, matching_indicator
-from .. import bipartiteMatching
-
-# def print(*args):
-#     pass
+from .. import bipartitewrapper as bmw
 
 
 def othermaxplus(dim, li, lj, lw, m, n):
@@ -49,12 +45,6 @@ def othersum(si, sj, s, m, n):
 
 def accumarray(xij, xw, n):
     sums = np.zeros(n)
-    # sums = np.zeros(max(xij)+1)
-    # print(xij)
-    # print(xw)
-    # print(xij.shape)
-    # print(len(xw))
-    # print(n)
 
     for i in range(len(xij)):
         sums[xij[i]] += xw[i]
@@ -62,30 +52,11 @@ def accumarray(xij, xw, n):
     return sums
 
 
-def round_messages(messages, S, w, alpha, beta, rp, ci, tripi, n, m, perm):
-    ai = np.zeros(len(tripi))
-    ai[tripi > 0] = messages[perm-1]
-    _, _, val, _, match1 = bipartite_matching_primal_dual(
-        rp, ci, ai, tripi, m+1, n+1)
-
-    mi = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
-
-    matchweight = sum(w[mi > 0])
-    cardinality = sum(mi)
-
-    overlap = np.dot(mi.T, (S*mi))/2
-    f = alpha*matchweight + beta*overlap
-
-    return f, matchweight, cardinality, overlap, val, mi
-
-
 def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
     S = sps.csr_matrix(S)
 
     nedges = len(li)
     nsquares = S.count_nonzero() // 2
-    m = max(li) + 1
-    n = max(lj) + 1
 
     # compute a vector that allows us to transpose data between squares.
     sui, suj, _ = sps.find(sps.triu(S, 1))
@@ -123,20 +94,7 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True)
             'best', 'iter', 'obj_ma', 'wght_ma', 'card_ma', 'over_ma',
             'obj_mb', 'wght_mb', 'card_mb', 'over_mb'))
 
-    nzi = li.copy()
-    nzi += 1
-    nzi = np.insert(nzi, [0], [0])
-
-    nzj = lj.copy()
-    nzj += 1
-    nzj = np.insert(nzj, [0], [0])
-
-    ww = np.insert(w, [0], [0])
-
-    rp, ci, ai, tripi, _, _ = bipartite_matching_setup(
-        None, nzi, nzj, ww, m, n)
-
-    mperm = tripi[tripi > 0]
+    setup, m, n = bmw.bipartite_setup(li, lj, w)
 
     for it in range(1, maxiter+1):
         prevma = ma
@@ -178,10 +136,12 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True)
             mb = curdamp*mb + (1-curdamp)*(prevmb+prevma-alpha*w+prevsums)
             ms = curdamp*ms + (1-curdamp)*(prevms+prevms[spair]-beta)
 
-        hista = round_messages(ma, S, w, alpha, beta, rp,
-                               ci, tripi, n, m, mperm)[:-2]
-        histb = round_messages(mb, S, w, alpha, beta, rp,
-                               ci, tripi, n, m, mperm)[:-2]
+        hista = bmw.round_messages(
+            ma, S, w, alpha, beta, setup, m, n)[:-2]
+
+        histb = bmw.round_messages(
+            mb, S, w, alpha, beta, setup, m, n)[:-2]
+
         if hista[0] > fbest:
             fbestiter = it
             mbest = ma
@@ -201,11 +161,4 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True)
             print('{:4s}   {:4d}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}'.format(
                 bestchar, it, *hista, *histb))
 
-    xx = np.insert(mbest, [0], [0])
-
-    m, n, val, noute, match1 = bipartiteMatching.bipartite_matching(
-        None, nzi, nzj, xx)
-    ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
-
-    return ma, mb
-    # return np.array(mbest)
+    return bmw.getmatchings(li, lj, mbest)

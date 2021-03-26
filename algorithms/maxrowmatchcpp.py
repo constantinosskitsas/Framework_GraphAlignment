@@ -12,6 +12,11 @@ import numpy as np
 
 
 def intmatch(n,  m, nedges,  v1,  v2,  weight):
+    # print("intmatch")
+    # print(n, m, nedges)
+    # print(v1)
+    # print(v2)
+    # print(weight)
 
     l1 = np.zeros(n)
     l2 = np.zeros(n+m)
@@ -56,7 +61,8 @@ def intmatch(n,  m, nedges,  v1,  v2,  weight):
     match2 = np.zeros(n+m, int)-1
     t = np.zeros(n+m, int)-1
 
-    for i in range(n):
+    i = 0
+    while i < n:
         for j in range(ntmod):
             t[tmod[j]] = -1
         ntmod = 0
@@ -84,7 +90,7 @@ def intmatch(n,  m, nedges,  v1,  v2,  weight):
                             j = p
                         break
             p += 1
-
+        # p -= 1
         if (match1[i] < 0):
             al = 1e20
             for j in range(p):
@@ -101,8 +107,10 @@ def intmatch(n,  m, nedges,  v1,  v2,  weight):
             for j in range(ntmod):
                 l2[tmod[j]] += al
 
-            i -= 1
-            continue
+        else:
+            i += 1
+            # i -= 1
+            # continue
 
     ret = 0
     for i in range(n):
@@ -116,6 +124,10 @@ def intmatch(n,  m, nedges,  v1,  v2,  weight):
             for j in range(deg[i]):
                 if (listt[offset[i] + j] == match1[i]):
                     mi[index[offset[i]+j]] = 1
+
+    # print(ret)
+    # print(mi)
+
     return ret, mi
 
 
@@ -146,15 +158,15 @@ def intmatch(n,  m, nedges,  v1,  v2,  weight):
 def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
     # print(M, N, m, n, nedges)
     # print(Qp)
-    # print(Qp.shape)
+    # # print(Qp.shape)
     # print(Qr)
-    # print(Qr.shape)
+    # # print(Qr.shape)
     # print(Qv)
-    # print(Qv.shape)
+    # # print(Qv.shape)
     # print(li)
-    # print(li.shape)
+    # # print(li.shape)
     # print(lj)
-    # print(lj.shape)
+    # # print(lj.shape)
 
     q = np.zeros(N)
     mi = []
@@ -235,30 +247,43 @@ def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
     return q, np.array(mi), np.array(mj)
 
 
-if __name__ == "__main__":
-    # M = 6
-    # N = 5
-    M = 12
-    N = 12
-    nedges = 31
-    li = np.array([1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6])
-    lj = np.array([1, 2, 3, 4, 1, 2, 1, 3, 1, 4, 5, 2])
-    m = 6
-    n = 5
-    # Qp = np.array([0, 6, 8, 10, 11, 12, 5, 7, 9, 5, 7, 9, 5, 7,
-    #             9, 2, 3, 4, 12, 1, 2, 3, 4, 1, 2, 3, 4, 1, 1, 1, 5])
-    # Qr = np.array([0, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4,
-    #              5, 5, 5, 5, 6, 7, 7, 7, 8, 9, 9, 9, 10, 11, 12, 12])
-    Qv = np.array(
-        [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-         0.5, 0.5,
-         0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-    )
-    Qp = np.array([0, 5, 8, 11, 14, 18, 19, 22, 23, 26, 27, 28, 30])
-    Qr = np.array([5, 7, 9, 10, 11, 4, 6, 8, 4, 6, 8, 4, 6, 8,
-                   1, 2, 3, 11, 0, 1, 2, 3, 0, 1, 2, 3, 0, 0, 0, 4])
-    print(column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj))
+def test1():
+    li = np.array([1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6])-1
+    lj = np.array([1, 2, 3, 4, 1, 2, 1, 3, 1, 4, 5, 2])-1
 
-# [2., 0.5, 0.5, 0.5, 1., 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-# [6,  8, 10, 11,  5,  5,  5,  3, 12,  1,  2,  1,  2,  1,  1,  1]
-# [1,  1,  1,  1,  2,  3,  4,  5,  5,  6,  7,  8,  9, 10, 11, 12]
+    Qp = np.array([0, 5, 8, 11, 14, 18, 19, 22, 23, 26, 27, 28, 30])
+    Qr = np.array(
+        [
+            5, 7, 9, 10, 11, 4, 6, 8, 4, 6,
+            8, 4, 6, 8, 1, 2, 3, 11, 0, 1,
+            2, 3, 0, 1, 2, 3, 0, 0, 0, 4
+        ]
+    )
+    Qv = np.array(
+        [
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
+        ]
+    )
+    print(column_maxmatchsum(12, 12, Qp, Qr, Qv, 6, 5, 31, li, lj))
+
+    # (array([2. , 0.5, 0.5, 0.5, 1. , 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]),
+    # array([ 5,  7,  9, 10,  4,  4,  4,  2, 11,  0,  1,  0,  1,  0,  0,  0]),
+    # array([ 0,  0,  0,  0,  1,  2,  3,  4,  4,  5,  6,  7,  8,  9, 10, 11]))
+
+
+def test2():
+
+    v1 = [0, 1, 2, 3, 2, 3, 4]
+    v2 = [0, 0, 0, 1, 2, 2, 3]
+    w = [0.1, 0.5, 0.5, 0.5, 0.1, 0.9, 0.5]
+
+    print(intmatch(3, 1, 3, v1, v2, w))
+
+    # (0.5, array([0., 1., 0.]))
+
+
+if __name__ == "__main__":
+    test1()
+    test2()

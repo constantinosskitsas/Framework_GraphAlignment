@@ -7,6 +7,7 @@ from scipy.io import loadmat
 import inspect
 import matplotlib.pyplot as plt
 from data import ReadFile
+import pandas as pd
 
 ex = Experiment("experiment")
 
@@ -52,7 +53,7 @@ def eval_align(ma, mb, gmb):
         mab = np.zeros(mb.size, int) - 1
         gacc = acc = -1.0
     alignment = np.array([ma, mb, mab]).T
-    # alignment = alignment[alignment[:, 0].argsort()]
+    alignment = alignment[alignment[:, 0].argsort()]
     return gacc, acc, alignment
 
 
@@ -169,8 +170,12 @@ def global_config():
             L = sps.load_npz(f"data/L_{noise_level}_{edges}_{lalpha}.npz")
             S = sps.load_npz(f"data/S_{noise_level}_{edges}_{lalpha}.npz")
         except:
-            L = sps.load_npz(f"data/L_1_1_5.npz")
-            S = sps.load_npz(f"data/S_1_1_5.npz")
+            try:
+                L = sps.load_npz(f"data/L_1_1_full.npz")
+                S = sps.load_npz(f"data/S_1_1_full.npz")
+            except:
+                L = sps.load_npz(f"data/L_1_1_5.npz")
+                S = sps.load_npz(f"data/S_1_1_5.npz")
         li, lj, w = sps.find(L)
 
     _lim = None
@@ -190,7 +195,7 @@ def demo():
     _lim = 100
     maxiter = 10
     # lalpha = 1/15
-    lalpha = 100
+    lalpha = 10
 
     Src_e = np.loadtxt("data/arenas_orig.txt", int)
     # print(Src_e)
@@ -225,16 +230,16 @@ def load():
 
     _preprocess = False
 
-    # dat = {
-    #     k: v for k, v in loadmat("data/example-overlap.mat").items() if k in {'A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj'}
-    # }
+    # dat = "data/example-overlap.mat"
+    # dat = "data/example-overlapv2.mat"
+    dat = "data/lcsh2wiki-small.mat"
 
     dat = {
-        k: v for k, v in loadmat("data/lcsh2wiki-small.mat").items() if k in {'A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj'}
+        k: v for k, v in loadmat(dat).items() if k in {'A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj'}
     }
 
-    Src = dat['A']
-    Tar = dat['B']
+    Src = dat['A'] if 'A' in dat else None
+    Tar = dat['B'] if 'B' in dat else None
     S = dat['S']
     L = dat['L']
     w = dat['w'] if 'w' in dat else dat['lw']
@@ -242,10 +247,10 @@ def load():
     li = dat['li'].flatten() - 1
     lj = dat['lj'].flatten() - 1
 
-    gt_e = np.loadtxt("data/lcsh_gt.txt", int) - 1
+    # gt_e = np.loadtxt("data/lcsh_gt.txt", int) - 1
 
-    Gt = np.zeros(Src.shape[0], int) - 1
-    Gt[gt_e[:, 0]] = gt_e[:, 1]
+    # Gt = np.zeros(Src.shape[0], int) - 1
+    # Gt[gt_e[:, 0]] = gt_e[:, 1]
 
 
 @ex.capture
@@ -283,8 +288,8 @@ def eval_conealign(Gt, Tar, Src):
 @ex.capture
 def eval_NSD(Gt, Tar, Src):
 
-    # ma, mb = NSD.run(Tar.A, Src.A)
-    ma, mb = NSD.run(Src.A, Tar.A)
+    ma, mb = NSD.run(Tar.A, Src.A)
+    # ma, mb = NSD.run(Src.A, Tar.A)
 
     return evall(Gt, ma, mb,
                  alg=inspect.currentframe().f_code.co_name, eval_type=0)
@@ -317,7 +322,12 @@ def eval_gwl(Gt, Tar, Src):
         'display': False
     }
 
-    ma, mb = gwl.main(Tar, Src, opt_dict)
+    alignmatrix = gwl.main(Tar, Src, opt_dict)
+
+    # ma = np.arange(alignmatrix.shape[0])
+    # mb = alignmatrix.argmax(1)
+
+    ma, mb = fast2(alignmatrix)
 
     return evall(Gt, ma, mb,
                  alg=inspect.currentframe().f_code.co_name, eval_type=0)
@@ -329,7 +339,7 @@ def eval_isorank(Gt, Tar, Src, L, S, w, li, lj, maxiter):
     # ma, mb = isorank.main(S, w, li, lj, a=0.2, b=0.8,
     #                       alpha=None, rtype=1, maxiter=maxiter)
 
-    alignment_matrix = isorank2.main(Tar.A, Src.A, maxiter=10)
+    alignment_matrix = isorank2.main(Tar.A, Src.A, maxiter=1)
     # alignment_matrix = isorank2.main(Src.A, Tar.A, maxiter=10)
     ma, mb = fast2(alignment_matrix)
 
@@ -360,30 +370,55 @@ def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha):
     # with np.printoptions(threshold=np.inf) as a:
     #     print(np.array(list(enumerate(Gt))))
 
-    try:
-        plot(sps.coo_matrix(Src), "Src")
-        plot(sps.coo_matrix(Tar), "Tar")
-        plot(sps.coo_matrix(L), "L")
-        # plot(sps.coo_matrix(S), "S")
-    except:
-        pass
+    # print(L)
+    # print(li)
+    # print(lj)
+    # print(w)
+
+    # L = sps.csr_matrix(np.ones((Tar.shape[0], Src.shape[0])))
+    # S = similarities_preprocess.create_S(Tar, Src, L)
+    # print(Src.shape)
+    # print(Tar.size)
+    # print(L.shape)
+    # print(L.size)
+    # print(S.shape)
+    # print(S.size)
+    # # li, lj, w = sps.find(L)
+    # lalpha = "full"
+
+    # Srcx = sps.coo_matrix(Src)
+    # permuted = sps.csr_matrix((Srcx.data, (gm[Srcx.row], gm[Srcx.col]))
+
+    # try:
+    #     plot(sps.coo_matrix(Src), "Src")
+    #     plot(sps.coo_matrix(Tar), "Tar")
+    #     plot(sps.coo_matrix(L), "L")
+    #     # plot(sps.coo_matrix(S), "S")
+    # except:
+    #     pass
 
     # sps.save_npz(f"S_{noise_level}_{edges}_{lalpha}.npz", S)
     # sps.save_npz(f"L_{noise_level}_{edges}_{lalpha}.npz", L)
 
+    # q, M = klaus.maxrowmatch(S, li, lj, 6, 5)
+    # print(q)
+    # print(M)
+
     results = np.array([
-        # eval_regal(),
-        # eval_eigenalign(),
-        # eval_conealign(),
-        # eval_NSD(),
-        # eval_grasp(),
-        # eval_gwl(),
+        eval_regal(),
+        eval_eigenalign(),
+        eval_conealign(),
+        eval_NSD(),
+        eval_grasp(),
+        eval_gwl(),
 
         eval_isorank(),
-        # eval_netalign(),
-
+        eval_netalign(),
         # eval_klaus(),
     ])
+
+    # df = pd.DataFrame(results)
+    # df.to_csv(f'results/exp_{noise_level}_{edges}.csv', index=False)
 
     # gt = "data/noise_level_1/gt_1.txt"
     # gmb, gma = ReadFile.gt1(gt)

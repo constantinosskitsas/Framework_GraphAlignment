@@ -71,6 +71,7 @@ def create_S(A, B, L):
     wv = np.full(m, -1)
     ri1 = 0
     for i in range(n):
+        print(f'{i}/{n}')
         for ri1 in range(rpAB[i], rpAB[i+1]):
             wv[ciAB[ri1]] = ri1
 

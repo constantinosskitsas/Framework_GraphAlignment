@@ -111,4 +111,5 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, ver
         U = U - GM * sps.triu(SM) + sps.tril(SM).T * GM
         U.data = U.data.clip(-0.5, 0.5)
 
-    return bmw.getmatchings(li, lj, xbest)
+    # return bmw.getmatchings(li, lj, xbest)
+    return sps.csr_matrix((xbest, (lj, li)))

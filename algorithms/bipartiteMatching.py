@@ -2,18 +2,23 @@ import scipy
 import numpy as np
 
 
-def print(*args):
-    pass
+# def print(*args):
+#     pass
 
 
 def bipartite_matching(A, nzi, nzj, nzv):
     # return bipartite_matching_primal_dual(bipartite_matching_setup(A,nzi,nzj,nzv))
     rp, ci, ai, tripi, m, n = bipartite_matching_setup(A, nzi, nzj, nzv)
-    print("hi7")
+    # print("hi7")
     return bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n)
 
 
 def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
+    # print(m, n)
+    # print(rp.tolist())
+    # print(ci.tolist())
+    # print(ai.tolist())
+    # print(tripi.tolist())
     # variables used for the primal-dual algorithm
     # normalize ai values # updated on 2-19-2019
     # ai = ai/np.amax(abs(ai))
@@ -27,7 +32,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
     ntmod = 0
 
     # initialize the primal and dual variables
-    print("jo")
+    # print("jo")
     for i in range(1, m):
         for rpi in range(rp[i], rp[i+1]):
             if ai[rpi] > alpha[i]:
@@ -35,7 +40,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
 
     # dual variables (bt) are initialized to 0 already
     # match1 and match2 are both 0, which indicates no matches
-    print("to")
+    # print("to")
     i = 1
     while i < m:
         for j in range(1, ntmod+1):
@@ -54,7 +59,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
 
                 if t[j] == 0:
                     tail = tail+1
-                    if tail <= m:
+                    if tail < m:
                         queue[tail] = match2[j]
                     t[j] = k
                     ntmod = ntmod+1
@@ -83,7 +88,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
             continue
         i = i+1
     val = 0
-    print("po")
+    # print("po")
     for i in range(1, m):
         for rpi in range(rp[i], rp[i+1]):
             if ci[rpi] == match1[i]:
@@ -106,11 +111,11 @@ def bipartite_matching_setup(A, nzi, nzj, nzv, m=None, n=None):
         m = max(nzi) + 1
     if n is None:
         n = max(nzj) + 1
-    print(nzi)
-    print(nzj)
-    print(nzv)
-    print(m, n)
-    print("hi-setup")
+    # print(nzi)
+    # print(nzj)
+    # print(nzv)
+    # print(m, n)
+    # print("hi-setup")
     nedges = len(nzi)
     rp = np.ones(m+2, int)  # csr matrix with extra edges
     ci = np.zeros(nedges+m, int)
@@ -252,3 +257,24 @@ def bipartite_matching_setupc(x, ei, ej, m, n):
             colind[ci[rpi]] = 0
 
     return rp, ci, ai, tripi, m, n
+
+
+def test1():
+    rp = [1, 1, 7, 13, 19, 25, 31, 37]
+    ci = [0, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 7, 1, 2, 3, 4, 5,
+          8, 1, 2, 3, 4, 5, 9, 1, 2, 3, 4, 5, 10, 1, 2, 3, 4, 5, 11]
+    ai = [0.0, 2.8, 0.19999999999999996, 0.5, 0.5, 0.5, 0.0, 3.3, 1.0, 0.5, 0.5, 1.8, 0.0, 0.4999999999999999, 1.4, 0.5, 0.9,
+          0.5, 0.0, 2.5, 1.0, 0.9, 0.5, 0.5, 0.0, 2.5, 0.9, 0.5, 0.09999999999999998, 0.5, 0.0, 1.4, 0.5, 0.5, 0.5, 0.5, 0.0]
+    # ai = [0.0, 2.8, 0.2, 0.5, 0.5, 0.5, 0.0, 3.3, 1.0, 0.5, 0.5, 1.8, 0.0, 0.5, 1.4, 0.5, 0.9,
+    #       0.5, 0.0, 2.5, 1.0, 0.9, 0.5, 0.5, 0.0, 2.5, 0.9, 0.5, 0.1, 0.5, 0.0, 1.4, 0.5, 0.5, 0.5, 0.5, 0.0]
+    tripi = [0, 1, 7, 13, 19, 25, -1, 2, 8, 14, 20, 26, -1, 3, 9, 15, 21, 27, -
+             1, 4, 10, 16, 22, 28, -1, 5, 11, 17, 23, 29, -1, 6, 12, 18, 24, 30, -1]
+
+    print(bipartite_matching_primal_dual(np.array(rp), np.array(
+        ci), np.array(ai), np.array(tripi), 7, 6))
+
+    #(7, 6, 7.4, 5, array([ 0,  1,  5,  2,  3, 10,  4]))
+
+
+if __name__ == "__main__":
+    test1()

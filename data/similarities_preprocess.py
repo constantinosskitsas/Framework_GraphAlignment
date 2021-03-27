@@ -3,7 +3,16 @@ import numpy as np
 import scipy.sparse as sps
 
 
-def test():
+def e_to_G(e):
+    n = np.amax(e) + 1
+    nedges = e.shape[0]
+    G = sps.csr_matrix((np.ones(nedges), e.T), shape=(n, n), dtype=int)
+    G += G.T
+    G.data = G.data.clip(0, 1)
+    return G
+
+
+def test1():
     A = sps.csr_matrix(
         [
             [0, 1, 1, 1, 1, 1],
@@ -71,7 +80,7 @@ def create_S(A, B, L):
     wv = np.full(m, -1)
     ri1 = 0
     for i in range(n):
-        print(f'{i}/{n}')
+        # print(f'{i}/{n}')
         for ri1 in range(rpAB[i], rpAB[i+1]):
             wv[ciAB[ri1]] = ri1
 
@@ -91,12 +100,15 @@ def create_S(A, B, L):
         for ri1 in range(rpAB[i], rpAB[i+1]):
             wv[ciAB[ri1]] = -1
 
-    return sps.csr_matrix(([1]*len(Si), (Si, Sj)), shape=(nedges, nedges), dtype=int)
+    return sps.csr_matrix(([1]*len(Si), (Sj, Si)), shape=(nedges, nedges), dtype=int)
 
 
-def create_L(A, B, alpha=1):
+def create_L(A, B, alpha=1, mind=0.00001):
     n = A.shape[0]
     m = B.shape[0]
+
+    if alpha is None:
+        return sps.csr_matrix(np.ones((n, m)))
 
     a = A.sum(1)
     b = B.sum(1)
@@ -118,28 +130,34 @@ def create_L(A, B, alpha=1):
             s += 1
         ab_m[ap[0]] = [bp[0] for bp in b_p[s:e]]
 
+    # print(ab_m)
+
     li = []
     lj = []
     lw = []
     for i, bj in enumerate(ab_m):
         for j in bj:
             d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
-            # if (d >= 0):
-            li.append(i)
-            lj.append(j)
-            # lw.append(0.0001 if d <= 0 else d)
-            lw.append(d)
+            if mind is None:
+                if d > 0:
+                    li.append(i)
+                    lj.append(j)
+                    lw.append(d)
+            else:
+                li.append(i)
+                lj.append(j)
+                lw.append(mind if d <= 0 else d)
+                # lw.append(0.0 if d <= 0 else d)
+                # lw.append(d)
 
-    # print(len(li))
-    # print(len(lj))
-    # print(len(lj))
+                # print(len(li))
+                # print(len(lj))
+                # print(len(lj))
 
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
 
 
-if __name__ == "__main__":
-    A, B, L, S = test()
-
+def test2():
     for i in range(2, 8):
         print(f"### {i} ###")
 
@@ -158,3 +176,63 @@ if __name__ == "__main__":
         print(B.shape)
         print(L.shape)
         print(S.shape)
+
+
+def test3():
+    _lim = 6
+
+    Src_e = np.loadtxt("data/arenas_orig.txt", int)
+    # perm = np.random.permutation(np.amax(Src_e)+1)
+    # print(perm)
+    # print(perm[Src_e])
+    # Src_e = perm[Src_e]
+    # print(Src_e)
+    # print(np.random.permutation(np.amax(Src_e)+1)[Src_e])
+
+    # Src_e = np.random.permutation(np.amax(Src_e)+1)[Src_e]
+    # print(Src_e)
+
+    # print(np.amax(Src_e))
+    # Src_e = np.arange(np.amax(Src_e)+1)[Src_e]
+
+    Src_e = Src_e[np.where(Src_e < _lim, True, False).all(axis=1)]
+    # print(Src_e)
+    # print(np.amax(Src_e))
+    # print(Src_e.shape)
+    Gt = np.random.permutation(_lim)
+    Tar_e = Gt[Src_e]
+
+    Tar = e_to_G(Tar_e)
+    Src = e_to_G(Src_e)
+
+    print(Tar.A)
+    print(Tar.sum(1))
+    print(Src.A)
+    print(Src.sum(1))
+    # print(create_L(Src, Tar, 1).A)
+    print(create_L(Tar, Src, 1, None).A)
+
+
+if __name__ == "__main__":
+    # A, B, L, S = test1()
+    # # test2()
+
+    _lim = 5
+    Src_e = np.loadtxt("data/arenas_orig.txt", int)
+    Src_e = Src_e[np.where(Src_e < _lim, True, False).all(axis=1)]
+    Gt = np.random.permutation(_lim)
+    Tar_e = Gt[Src_e]
+
+    Tar = e_to_G(Tar_e)
+    Src = e_to_G(Src_e)
+
+    # L = create_L(Src, Tar)
+    # S = create_S(Src, Tar, L)
+
+    print(create_S(Src, Tar, create_L(Src, Tar)).A)
+    print(create_S(Tar, Src, create_L(Tar, Src)).A)
+
+    # print(A.A)
+    # print(B.A)
+    # print(create_L(A, B, 1).A)
+    # print(create_L(B, A, 1).A)

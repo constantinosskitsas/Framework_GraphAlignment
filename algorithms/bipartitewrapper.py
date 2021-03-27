@@ -1,6 +1,9 @@
-from . import bipartiteMatching as bm
+try:
+    from . import bipartiteMatching as bm
+except:
+    import bipartiteMatching as bm
 import numpy as np
-
+import scipy.sparse as sps
 
 # def debugm(U):
 #     uu = np.array(sps.find(U), float).T
@@ -26,6 +29,11 @@ def to_python(array, diff=1):
 
 
 def bipartite_setup(li, lj, w):
+
+    # print(li.tolist())
+    # print(lj.tolist())
+    # print(w.tolist())
+
     m = max(li) + 1
     n = max(lj) + 1
 
@@ -38,6 +46,8 @@ def bipartite_setup(li, lj, w):
 
 
 def round_messages(messages, S, w, alpha, beta, setup, m, n):
+    # print(messages.size)
+    # print(messages)
     rp, ci, _, tripi, mperm = setup
 
     ai = np.zeros(len(tripi))
@@ -56,9 +66,40 @@ def round_messages(messages, S, w, alpha, beta, setup, m, n):
     return f, matchweight, cardinality, overlap, val, mi
 
 
-def getmatchings(li, lj, xbest):
+def getmatchings(matrix):
+    coo = sps.coo_matrix(matrix)
+    li = coo.row
+    lj = coo.col
+    lv = coo.data
+
     m, n, val, noute, match1 = bm.bipartite_matching(
-        None, to_matlab(li), to_matlab(lj), to_matlab(xbest, 0))
+        None, to_matlab(li), to_matlab(lj), to_matlab(lv, 0))
     ma, mb = bm.edge_list(m, n, val, noute, match1)
 
-    return ma, mb
+    return ma - 1, mb - 1
+
+
+if __name__ == "__main__":
+    li = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7,
+          8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    lj = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6,
+          6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+    w = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    L = sps.csr_matrix((w, (li, lj)))
+
+    print(L.A)
+
+    (rp, ci, ai, tripi, mperm), m, n = bipartite_setup(
+        np.array(li, int), np.array(lj, int), np.array(w))
+
+    print(L.indptr)
+    print(L.indices)
+    print(L.data)
+    print()
+    print(rp)
+    print(ci)
+    print(ai)
+    # print(tripi)
+    # print(mperm)

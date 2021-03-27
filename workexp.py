@@ -1,4 +1,4 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, isorank, grasp, isorank2
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, isorank, grasp, isorank2, bipartitewrapper as bmw
 from data import similarities_preprocess
 from sacred import Experiment
 import numpy as np
@@ -8,11 +8,10 @@ import inspect
 import matplotlib.pyplot as plt
 from data import ReadFile
 import pandas as pd
+from math import log2
+import builtins
 
 ex = Experiment("experiment")
-
-# def print(*args):
-#     pass
 
 
 def plot(cx, filename):
@@ -24,18 +23,24 @@ def plot(cx, filename):
     plt.close('all')
 
 
-def fast2(l2):
+def colmax(matrix):
+    ma = np.arange(matrix.shape[0])
+    mb = matrix.argmax(1).A1
+    return ma, mb
+
+
+def fast3(l2):
     num = np.shape(l2)[0]
     ma = np.zeros(num)
     mb = np.zeros(num)
     for _ in range(num):
         hi = np.where(l2 == np.amax(l2))
-        hia = hi[1][0]
-        hib = hi[0][0]
+        hia = hi[0][0]
+        hib = hi[1][0]
         ma[hia] = hia
         mb[hia] = hib
-        l2[:, hia] = 0
-        l2[hib, :] = 0
+        l2[:, hib] = 0
+        l2[hia, :] = 0
     return ma, mb
 
 
@@ -57,7 +62,9 @@ def eval_align(ma, mb, gmb):
     return gacc, acc, alignment
 
 
-def evall(gmb, ma, mb, alg=np.random.rand(), eval_type=None):
+def evall(gmb, ma, mb, alg=np.random.rand(), eval_type=0, verbose=True):
+    print = builtins.print if verbose else lambda *args, **kwargs: 0
+
     np.set_printoptions(threshold=100)
     # np.set_printoptions(threshold=np.inf)
     print(f"\n\n\n#### {alg} ####\n")
@@ -133,9 +140,11 @@ def G_to_Adj(G1, G2):
     return adj
 
 
-def preprocess(Tar, Src, lalpha):
-    L = similarities_preprocess.create_L(Tar, Src, alpha=lalpha)
+def preprocess(Src, Tar, lalpha=1, mind=0.00001):
+    L = similarities_preprocess.create_L(Tar, Src, alpha=lalpha, mind=mind)
+    # L = similarities_preprocess.create_L(Src, Tar, alpha=lalpha, mind=mind)
     S = similarities_preprocess.create_S(Tar, Src, L)
+    # S = similarities_preprocess.create_S(Src, Tar, L)
     li, lj, w = sps.find(L)
 
     return L, S, li, lj, w
@@ -145,10 +154,11 @@ def preprocess(Tar, Src, lalpha):
 def global_config():
     noise_level = 1
     edges = 1
+    verbose = True
     maxiter = 100
 
     _preprocess = False
-    lalpha = 15
+    lalpha = 1
 
     target = "data/arenas_orig.txt"
     source = f"data/noise_level_{noise_level}/edges_{edges}.txt"
@@ -160,25 +170,28 @@ def global_config():
 
     Tar = e_to_G(Tar_e)
     Src = e_to_G(Src_e)
-    Gt = gt_e[:, gt_e[0].argsort()][1]
+
+    Gt = gt_e[:, gt_e[1].argsort()][0]  # source -> target
+    # Gt2 = gt_e[:, gt_e[0].argsort()][1]  # target -> source
 
     if _preprocess:
         L, S, li, lj, w = preprocess(Tar, Src, lalpha)
         # L, S, li, lj, w = preprocess(Src, Tar, lalpha)
     else:
-        try:
-            L = sps.load_npz(f"data/L_{noise_level}_{edges}_{lalpha}.npz")
-            S = sps.load_npz(f"data/S_{noise_level}_{edges}_{lalpha}.npz")
-        except:
-            try:
-                L = sps.load_npz(f"data/L_1_1_full.npz")
-                S = sps.load_npz(f"data/S_1_1_full.npz")
-            except:
-                L = sps.load_npz(f"data/L_1_1_5.npz")
-                S = sps.load_npz(f"data/S_1_1_5.npz")
-        li, lj, w = sps.find(L)
+        L = S = li = lj = w = np.empty(1)
+        # try:
+        #     L = sps.load_npz(f"data/L_{noise_level}_{edges}_{lalpha}.npz")
+        #     S = sps.load_npz(f"data/S_{noise_level}_{edges}_{lalpha}.npz")
+        # except:
+        #     try:
+        #         L = sps.load_npz(f"data/L_1_1_full.npz")
+        #         S = sps.load_npz(f"data/S_1_1_full.npz")
+        #     except:
+        #         L = sps.load_npz(f"data/L_1_1_5.npz")
+        #         S = sps.load_npz(f"data/S_1_1_5.npz")
+        # li, lj, w = sps.find(L)
 
-    _lim = None
+    _lim = args = arg = None
     dat = {
         val: None for val in ['A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj']
     }
@@ -192,24 +205,16 @@ def prep():
 @ex.named_config
 def demo():
     _preprocess = False
+    args = 1
     _lim = 100
     maxiter = 10
-    # lalpha = 1/15
-    lalpha = 10
+    lalpha = 1
 
     Src_e = np.loadtxt("data/arenas_orig.txt", int)
-    # print(Src_e)
-    # print(np.amax(Src_e))
-    # Src_e = np.random.permutation(np.amax(Src_e)+1)[Src_e]
-    # print(Src_e)
-    # print(np.amax(Src_e))
-    # Src_e = np.arange(np.amax(Src_e)+1)[Src_e]
-
+    # Src_e = np.loadtxt("data/noise_level_5/edges_1.txt", int)
     Src_e = Src_e[np.where(Src_e < _lim, True, False).all(axis=1)]
-    # print(Src_e)
-    # print(np.amax(Src_e))
-    # print(Src_e.shape)
-    Gt = np.random.permutation(_lim)
+
+    Gt = np.random.RandomState(seed=55).permutation(_lim)
     Tar_e = Gt[Src_e]
 
     Tar = e_to_G(Tar_e)
@@ -217,12 +222,32 @@ def demo():
 
     # Src = Tar.copy()
     # Gt = np.arange(_lim)
+    arg = [
+        [None],
+        [_lim * _lim],
+        [_lim * _lim, 0.0],
+        [_lim * _lim, None],
+        [_lim/2/log2(_lim)],
+        [_lim/2/log2(_lim), 0.0],
+        [_lim/2/log2(_lim), None],
+        [lalpha],
+        [lalpha, 0.0],
+        [lalpha, None],
+    ][args]
 
-    # L, S, li, lj, w = preprocess(Tar, Src, lalpha)
+    L, S, li, lj, w = preprocess(Src, Tar, *arg)
 
-    L = sps.csr_matrix(np.ones((Tar.shape[0], Src.shape[0])))
-    S = similarities_preprocess.create_S(Tar, Src, L)
-    li, lj, w = sps.find(L)
+    # L, S, li, lj, w = preprocess(Src, Tar, None)
+    # L, S, li, lj, w = preprocess(Src, Tar, 1)
+    # L, S, li, lj, w = preprocess(Src, Tar, 1, mind=None)
+    # L, S, li, lj, w = preprocess(Src, Tar, _lim/2/log2(_lim))
+    # L, S, li, lj, w = preprocess(Src, Tar, _lim/2/log2(_lim), mind=None)
+    # L, S, li, lj, w = preprocess(Src, Tar, 999)
+    # L, S, li, lj, w = preprocess(Src, Tar, 999, mind=None)
+    # print(L.A)
+    # L = sps.csr_matrix(np.ones((Src.shape[0], Tar.shape[0])))
+    # S = similarities_preprocess.create_S(Src, Tar, L)
+    # li, lj, w = sps.find(L)
 
 
 @ex.named_config
@@ -230,9 +255,9 @@ def load():
 
     _preprocess = False
 
-    # dat = "data/example-overlap.mat"
+    dat = "data/example-overlap.mat"
     # dat = "data/example-overlapv2.mat"
-    dat = "data/lcsh2wiki-small.mat"
+    # dat = "data/lcsh2wiki-small.mat"
 
     dat = {
         k: v for k, v in loadmat(dat).items() if k in {'A', 'B', 'S', 'L', 'w', 'lw', 'li', 'lj'}
@@ -247,6 +272,10 @@ def load():
     li = dat['li'].flatten() - 1
     lj = dat['lj'].flatten() - 1
 
+    L = sps.csr_matrix(np.ones((Src.shape[0], Tar.shape[0])))
+    S = similarities_preprocess.create_S(Src, Tar, L)
+    li, lj, w = sps.find(L)
+
     # gt_e = np.loadtxt("data/lcsh_gt.txt", int) - 1
 
     # Gt = np.zeros(Src.shape[0], int) - 1
@@ -254,59 +283,70 @@ def load():
 
 
 @ex.capture
-def eval_regal(Gt, Tar, Src):
-    # adj = G_to_Adj(Tar, Src)
-    adj = G_to_Adj(Src, Tar)
+def eval_regal(Gt, Tar, Src, verbose):
+    adj = G_to_Adj(Tar, Src)
 
-    alignmatrix = regal.main(adj.A)
-    ma = np.arange(alignmatrix.shape[0])
-    mb = alignmatrix.argmax(1).A1
+    matrix = regal.main(adj.A)
+
+    ma, mb = colmax(matrix)
+    # ma, mb = fast3(matrix.A)
+    # ma, mb = bmw.getmatchings(matrix)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=0)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_eigenalign(Gt, Tar, Src):
-    ma, mb, _, _ = eigenalign.main(Tar.A, Src.A, 8, "lowrank_svd_union", 3)
+def eval_eigenalign(Gt, Tar, Src, verbose):
+    matrix = eigenalign.main(Tar.A, Src.A, 8, "lowrank_svd_union", 3)
+
+    # ma, mb = colmax(matrix)
+    # ma, mb = fast3(matrix.A)
+    ma, mb = bmw.getmatchings(matrix)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=3)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_conealign(Gt, Tar, Src):
+def eval_conealign(Gt, Tar, Src, verbose):
 
-    alignmatrix = conealign.main(Src.A, Tar.A)
-    ma = np.arange(alignmatrix.shape[0])
-    mb = alignmatrix.argmax(1).A1
+    matrix = conealign.main(Tar.A, Src.A)
+
+    # ma, mb = colmax(matrix)
+    # ma, mb = fast3(matrix.A)
+    ma, mb = bmw.getmatchings(matrix)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=0)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_NSD(Gt, Tar, Src):
+def eval_NSD(Gt, Tar, Src, verbose):
 
-    ma, mb = NSD.run(Tar.A, Src.A)
+    matrix = NSD.run(Tar.A, Src.A)
     # ma, mb = NSD.run(Src.A, Tar.A)
 
+    # ma, mb = colmax(sps.csr_matrix(matrix))
+    ma, mb = fast3(matrix)
+    # ma, mb = bmw.getmatchings(matrix)
+
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=0)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_grasp(Gt, Tar, Src):
+def eval_grasp(Gt, Tar, Src, verbose):
 
-    ma, mb = grasp.main(Tar.A, Src.A, alg=2, base_align=True)
-    # ma, mb = grasp.main(Tar, Src, alg=2, base_align=True)
+    ma, mb = grasp.main(Src.A, Tar.A, alg=2, base_align=True)
+    # ma, mb = grasp.main(Src, Tar, alg=2, base_align=True)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=0)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_gwl(Gt, Tar, Src):
+def eval_gwl(Gt, Tar, Src, verbose):
 
     opt_dict = {
         'epochs': 1,            # the more u study the worse the grade man
@@ -322,58 +362,76 @@ def eval_gwl(Gt, Tar, Src):
         'display': False
     }
 
-    alignmatrix = gwl.main(Tar, Src, opt_dict)
+    matrix = gwl.main(Tar, Src, opt_dict)
 
-    # ma = np.arange(alignmatrix.shape[0])
-    # mb = alignmatrix.argmax(1)
-
-    ma, mb = fast2(alignmatrix)
+    # ma, mb = colmax(sps.csr_matrix(matrix))
+    ma, mb = fast3(matrix)
+    # ma, mb = bmw.getmatchings(matrix)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=0)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_isorank(Gt, Tar, Src, L, S, w, li, lj, maxiter):
+def eval_isorank(Gt, Tar, Src, L, S, w, li, lj, maxiter, verbose):
 
     # ma, mb = isorank.main(S, w, li, lj, a=0.2, b=0.8,
     #                       alpha=None, rtype=1, maxiter=maxiter)
 
-    alignment_matrix = isorank2.main(Tar.A, Src.A, maxiter=1)
-    # alignment_matrix = isorank2.main(Src.A, Tar.A, maxiter=10)
-    ma, mb = fast2(alignment_matrix)
+    matrix = isorank2.main(Tar.A, Src.A, maxiter=1)
+
+    # ma, mb = colmax(sps.csr_matrix(matrix))
+    ma, mb = fast3(matrix)
+    # ma, mb = bmw.getmatchings(matrix)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=0)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_netalign(Gt, S, w, li, lj, maxiter):
+def eval_netalign(Gt, S, w, li, lj, maxiter, verbose):
 
-    ma, mb = netalign.main(S, w, li, lj, a=0, maxiter=maxiter)
+    matrix = netalign.main(S, w, li, lj, a=1, b=1,
+                           gamma=0.999, maxiter=maxiter, verbose=verbose)
+
+    # ma, mb = colmax(matrix)
+    # ma, mb = fast3(matrix.A)
+    ma, mb = bmw.getmatchings(matrix)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=2)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.capture
-def eval_klaus(Gt, S, w, li, lj, maxiter):
+def eval_klaus(Gt, S, w, li, lj, maxiter, verbose):
 
-    ma, mb = klaus.main(S, w, li, lj, a=0, maxiter=maxiter)
+    matrix = klaus.main(S, w, li, lj, a=1, b=1, gamma=0.9,
+                        maxiter=maxiter, verbose=verbose)
+
+    # ma, mb = colmax(matrix)
+    # ma, mb = fast3(matrix.A)
+    ma, mb = bmw.getmatchings(matrix)
 
     return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, eval_type=3)
+                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
 
 
 @ex.automain
-def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha):
+def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha, gt_e, Src_e, Tar_e):
     # with np.printoptions(threshold=np.inf) as a:
     #     print(np.array(list(enumerate(Gt))))
+
+    # print(Src_e)
+    # print(Tar_e)
+    # abc = Gt[Src_e]
+
+    # print(abc[abc[:, 0].argsort()])
 
     # print(L)
     # print(li)
     # print(lj)
     # print(w)
+    # print(S)
 
     # L = sps.csr_matrix(np.ones((Tar.shape[0], Src.shape[0])))
     # S = similarities_preprocess.create_S(Tar, Src, L)
@@ -404,6 +462,8 @@ def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha):
     # print(q)
     # print(M)
 
+    # print(gt_e[:, gt_e[1].argsort()][0])
+
     results = np.array([
         eval_regal(),
         eval_eigenalign(),
@@ -414,7 +474,7 @@ def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha):
 
         eval_isorank(),
         eval_netalign(),
-        # eval_klaus(),
+        eval_klaus(),
     ])
 
     # df = pd.DataFrame(results)

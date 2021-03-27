@@ -173,8 +173,8 @@ def run(A, B, matches=None):
     #   (nzv1, (nzi1, nzj1)), shape=(asa, asa))
     print("hey4")
     # print(DA)
-    x1 = np.copy(X)
-    ma1, mb1 = fast2(x1)
+    # x1 = np.copy(X)
+    # ma1, mb1 = fast2(x1)
     # newarr,pr=makesparse(X)
     #np.savetxt("array1.txt", pr, fmt="%s")
     print("hey5")
@@ -189,7 +189,7 @@ def run(A, B, matches=None):
     # m, n, val, noute, match1 = (
     # bipartiteMatching.bipartite_matching(newarr, nzi, nzj, nzv))
     #ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
-    return ma1, mb1
+    return X
 
 
 if __name__ == "__main__":

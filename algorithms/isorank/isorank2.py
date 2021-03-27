@@ -41,8 +41,7 @@ def main(A, B, L=None, alpha=0.5, tol=1e-12, maxiter=1, verbose=True):
         if delta < tol:
             break
 
-    alignment_matrix = S.T
-    return alignment_matrix
+    return S.T
 
 
 if __name__ == "__main__":

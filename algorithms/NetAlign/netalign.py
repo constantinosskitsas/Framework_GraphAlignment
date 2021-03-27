@@ -161,4 +161,5 @@ def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True)
             print('{:4s}   {:4d}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}'.format(
                 bestchar, it, *hista, *histb))
 
-    return bmw.getmatchings(li, lj, mbest)
+    # return bmw.getmatchings(li, lj, mbest)
+    return sps.csr_matrix((mbest, (lj, li)))

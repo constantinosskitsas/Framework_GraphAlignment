@@ -7,7 +7,8 @@ from scipy.linalg import lu
 from scipy.linalg._expm_frechet import vec
 
 from . import decomposeX, newbound_methods
-from .. import bipartiteMatching
+# from .. import bipartiteMatching
+from .. import bipartitewrapper as bmw
 
 
 def main(A, B, iters, method, bmatch, default_params=True):
@@ -46,15 +47,19 @@ def main(A, B, iters, method, bmatch, default_params=True):
         avgdeg = np.array(list(avgdeg))
         avgdeg = np.mean(avgdeg)  # keep1
         # Matching = bipartite_Matching.edge_list(bipartite_Matching.bipartite_matching(X))  # 1
-        m, n, val, noute, match1 = (
-            bipartiteMatching.bipartite_matching(X, nzi, nzj, nzv))
-        ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
+
+        # m, n, val, noute, match1 = (
+        #     bipartiteMatching.bipartite_matching(X, nzi, nzj, nzv))
+        # ma, mb = bipartiteMatching.edge_list(m, n, val, noute, match1)
+
+        # ma, mb = bmw.getmatchings(nzi, nzj, nzv)
+
         # Matching=bipartite_Matching.edge_list(bipartite_Matching.bipartite_matching1(nzi,nzj,nzv))
         D = avgdeg  # nnz(X)/prod(size(X))
     else:
         print(
             "method should be one of the following: (1)eigenalign,(2)lowrank_unbalanced_best, (3)lowrank_unbalanced_union,(4)lowrank_balanced_best, (5)lowrank_balanced_union,(6)lowrank_Wkdecomposed_best, (7)lowrank_Wkdecomposed_union")
-    return ma, mb, D, timematching
+    return scipy.sparse.csr_matrix((nzv, (nzi, nzj)))
 
 
 def find_parameters(A, B):

@@ -2,10 +2,6 @@ import scipy
 import numpy as np
 
 
-# def print(*args):
-#     pass
-
-
 def bipartite_matching(A, nzi, nzj, nzv):
     # return bipartite_matching_primal_dual(bipartite_matching_setup(A,nzi,nzj,nzv))
     rp, ci, ai, tripi, m, n = bipartite_matching_setup(A, nzi, nzj, nzv)

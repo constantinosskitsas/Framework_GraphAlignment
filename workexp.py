@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 from data import ReadFile
 import pandas as pd
 from math import log2
-import builtins
+import sys
+import os
 
 ex = Experiment("experiment")
 
@@ -62,35 +63,25 @@ def eval_align(ma, mb, gmb):
     return gacc, acc, alignment
 
 
-def evall(gmb, ma, mb, alg=np.random.rand(), eval_type=0, verbose=True):
-    print = builtins.print if verbose else lambda *args, **kwargs: 0
-
+@ex.capture
+def evall(ma, mb, Gt, eval_type=0, alg=np.random.rand(), verbose=True):
+    sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=100)
     # np.set_printoptions(threshold=np.inf)
-    print(f"\n\n\n#### {alg} ####\n")
+
+    gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
+    gmb1 = np.array(gmb1, int)
     ma = np.array(ma, int)
     mb = np.array(mb, int)
 
     assert ma.size == mb.size
 
-    # gt="data/noise_level_1/gt_1.txt"
-    # gmb, gma = ReadFile.gt1(gt)
-    # gma= gma.astype(int)
-    # gmb=gmb.astype(int)
-    gmb1 = np.zeros(len(gmb))
-    for i in range(len(gmb)):
-        gmb1[gmb[i]] = i
-
     res = np.array([
         eval_align(ma, mb, gmb),
         eval_align(mb, ma, gmb),
-        eval_align(ma-1, mb-1, gmb),
-        eval_align(mb-1, ma-1, gmb),
         eval_align(ma, mb, gmb1),
         eval_align(mb, ma, gmb1),
-        eval_align(ma-1, mb-1, gmb1),
-        eval_align(mb-1, ma-1, gmb1)
     ], dtype=object)
 
     accs = res[:, 0]
@@ -98,27 +89,30 @@ def evall(gmb, ma, mb, alg=np.random.rand(), eval_type=0, verbose=True):
 
     if max(accs) < 0:
         if eval_type:
-            best = eval_type
             prefix = "#"
         else:
-            print("misleading evaluation")
+            # print("misleading evaluation")
             prefix = "!"
     elif eval_type and eval_type != best:
-        print("eval_type mismatch")
+        # print("eval_type mismatch")
         prefix = "%"
     else:
         prefix = ""
 
-    acc, acc2, alignment = res[best]
+    acc, acc2, alignment = res[eval_type]
 
-    print(alignment, end="\n\n")
-    print(res[:, :2])
-    print("\n###############")
+    print(f"{' ' + alg +' ':#^25}")
+    # print(alignment, end="\n\n")
+    print(res[:, :2].astype(float))
+    print(f"{'#':#^25}")
 
     with open(f'results/{prefix}{alg}_{best}_.txt', 'wb') as f:
         np.savetxt(f, res[:, :2], fmt='%2.2f', newline="\n\n")
         np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
         np.savetxt(f, alignment, fmt='%5d')
+
+    if not verbose:
+        sys.stdout = open(os.devnull, 'w')
 
     return acc, acc2
 
@@ -171,8 +165,10 @@ def global_config():
     Tar = e_to_G(Tar_e)
     Src = e_to_G(Src_e)
 
-    Gt = gt_e[:, gt_e[1].argsort()][0]  # source -> target
-    # Gt2 = gt_e[:, gt_e[0].argsort()][1]  # target -> source
+    Gt = (
+        gt_e[:, gt_e[1].argsort()][0],  # source -> target
+        gt_e[:, gt_e[0].argsort()][1]   # target -> source
+    )
 
     if _preprocess:
         L, S, li, lj, w = preprocess(Tar, Src, lalpha)
@@ -215,7 +211,12 @@ def demo():
     Src_e = Src_e[np.where(Src_e < _lim, True, False).all(axis=1)]
 
     Gt = np.random.RandomState(seed=55).permutation(_lim)
+
     Tar_e = Gt[Src_e]
+    Gt = (
+        Gt,
+        Gt
+    )
 
     Tar = e_to_G(Tar_e)
     Src = e_to_G(Src_e)
@@ -283,7 +284,7 @@ def load():
 
 
 @ex.capture
-def eval_regal(Gt, Tar, Src, verbose):
+def eval_regal(Tar, Src):
     adj = G_to_Adj(Tar, Src)
 
     matrix = regal.main(adj.A)
@@ -292,24 +293,24 @@ def eval_regal(Gt, Tar, Src, verbose):
     # ma, mb = fast3(matrix.A)
     # ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_eigenalign(Gt, Tar, Src, verbose):
+def eval_eigenalign(Tar, Src):
     matrix = eigenalign.main(Tar.A, Src.A, 8, "lowrank_svd_union", 3)
 
     # ma, mb = colmax(matrix)
     # ma, mb = fast3(matrix.A)
     ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_conealign(Gt, Tar, Src, verbose):
+def eval_conealign(Tar, Src):
 
     matrix = conealign.main(Tar.A, Src.A)
 
@@ -317,12 +318,12 @@ def eval_conealign(Gt, Tar, Src, verbose):
     # ma, mb = fast3(matrix.A)
     ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_NSD(Gt, Tar, Src, verbose):
+def eval_NSD(Tar, Src):
 
     matrix = NSD.run(Tar.A, Src.A)
     # ma, mb = NSD.run(Src.A, Tar.A)
@@ -331,22 +332,22 @@ def eval_NSD(Gt, Tar, Src, verbose):
     ma, mb = fast3(matrix)
     # ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_grasp(Gt, Tar, Src, verbose):
+def eval_grasp(Tar, Src):
 
     ma, mb = grasp.main(Src.A, Tar.A, alg=2, base_align=True)
     # ma, mb = grasp.main(Src, Tar, alg=2, base_align=True)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_gwl(Gt, Tar, Src, verbose):
+def eval_gwl(Tar, Src):
 
     opt_dict = {
         'epochs': 1,            # the more u study the worse the grade man
@@ -368,12 +369,12 @@ def eval_gwl(Gt, Tar, Src, verbose):
     ma, mb = fast3(matrix)
     # ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_isorank(Gt, Tar, Src, L, S, w, li, lj, maxiter, verbose):
+def eval_isorank(Tar, Src, L, S, w, li, lj, maxiter):
 
     # ma, mb = isorank.main(S, w, li, lj, a=0.2, b=0.8,
     #                       alpha=None, rtype=1, maxiter=maxiter)
@@ -384,68 +385,41 @@ def eval_isorank(Gt, Tar, Src, L, S, w, li, lj, maxiter, verbose):
     ma, mb = fast3(matrix)
     # ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_netalign(Gt, S, w, li, lj, maxiter, verbose):
+def eval_netalign(S, w, li, lj, maxiter):
 
     matrix = netalign.main(S, w, li, lj, a=1, b=1,
-                           gamma=0.999, maxiter=maxiter, verbose=verbose)
+                           gamma=0.999, maxiter=maxiter)
 
     # ma, mb = colmax(matrix)
     # ma, mb = fast3(matrix.A)
     ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.capture
-def eval_klaus(Gt, S, w, li, lj, maxiter, verbose):
+def eval_klaus(S, w, li, lj, maxiter):
 
     matrix = klaus.main(S, w, li, lj, a=1, b=1, gamma=0.9,
-                        maxiter=maxiter, verbose=verbose)
+                        maxiter=maxiter)
 
     # ma, mb = colmax(matrix)
     # ma, mb = fast3(matrix.A)
     ma, mb = bmw.getmatchings(matrix)
 
-    return evall(Gt, ma, mb,
-                 alg=inspect.currentframe().f_code.co_name, verbose=verbose)
+    return evall(ma, mb,
+                 alg=inspect.currentframe().f_code.co_name)
 
 
 @ex.automain
-def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha, gt_e, Src_e, Tar_e):
-    # with np.printoptions(threshold=np.inf) as a:
-    #     print(np.array(list(enumerate(Gt))))
-
-    # print(Src_e)
-    # print(Tar_e)
-    # abc = Gt[Src_e]
-
-    # print(abc[abc[:, 0].argsort()])
-
-    # print(L)
-    # print(li)
-    # print(lj)
-    # print(w)
-    # print(S)
-
-    # L = sps.csr_matrix(np.ones((Tar.shape[0], Src.shape[0])))
-    # S = similarities_preprocess.create_S(Tar, Src, L)
-    # print(Src.shape)
-    # print(Tar.size)
-    # print(L.shape)
-    # print(L.size)
-    # print(S.shape)
-    # print(S.size)
-    # # li, lj, w = sps.find(L)
-    # lalpha = "full"
-
-    # Srcx = sps.coo_matrix(Src)
-    # permuted = sps.csr_matrix((Srcx.data, (gm[Srcx.row], gm[Srcx.col]))
+def main(verbose, Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha, gt_e, Src_e, Tar_e):
+    print()
 
     # try:
     #     plot(sps.coo_matrix(Src), "Src")
@@ -458,40 +432,29 @@ def main(Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha, gt_e, Src_e,
     # sps.save_npz(f"S_{noise_level}_{edges}_{lalpha}.npz", S)
     # sps.save_npz(f"L_{noise_level}_{edges}_{lalpha}.npz", L)
 
-    # q, M = klaus.maxrowmatch(S, li, lj, 6, 5)
-    # print(q)
-    # print(M)
+    if not verbose:
+        sys.stdout = open(os.devnull, 'w')
 
-    # print(gt_e[:, gt_e[1].argsort()][0])
+    # with np.printoptions(threshold=np.inf) as a:
+    with np.printoptions(threshold=100) as a:
+        print(np.array(list(enumerate(Gt[0]))))
 
     results = np.array([
-        eval_regal(),
-        eval_eigenalign(),
-        eval_conealign(),
+        # eval_regal(),           # non-stable
+        # eval_eigenalign(),
+        # eval_conealign(),
         eval_NSD(),
-        eval_grasp(),
-        eval_gwl(),
+        # eval_grasp(),
+        # eval_gwl(),             # non-stable
 
-        eval_isorank(),
-        eval_netalign(),
-        eval_klaus(),
+        # eval_isorank(),
+        # eval_netalign(),
+        # eval_klaus(),
     ])
 
     # df = pd.DataFrame(results)
     # df.to_csv(f'results/exp_{noise_level}_{edges}.csv', index=False)
 
-    # gt = "data/noise_level_1/gt_1.txt"
-    # gmb, gma = ReadFile.gt1(gt)
-    # gma = gma.astype(int)
-    # gmb = gmb.astype(int)
-    # gma1 = np.zeros(len(gma))
-    # gmb1 = np.zeros(len(gma))
-    # for i in range(len(gma)):
-    #     gma1[i] = i
-    #     gmb1[gma[i]] = gmb[i]
-
-    # print(gma1)
-    # print(gmb1)
-
-    print("\n\n\n")
+    sys.stdout = sys.__stdout__
+    print("\n")
     print(results)

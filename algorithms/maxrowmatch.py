@@ -1,8 +1,5 @@
 import numpy as np
 
-# def print(*args):
-#     pass
-
 
 def intmatch(n, m, nedges, v1, v2, weight):
     print(n, m, nedges)

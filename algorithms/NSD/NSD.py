@@ -13,10 +13,6 @@ from scipy.sparse import csc_matrix
 scipy.sparse.csgraph
 
 
-def print(*args):
-    pass
-
-
 def normout_rowstochastic(P):
     n = np.shape(P)[0]
     colsums = sum(P, 1)-1

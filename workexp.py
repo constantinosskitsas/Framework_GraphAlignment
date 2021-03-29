@@ -28,7 +28,10 @@ def colmax(matrix):
     ma = np.arange(matrix.shape[0])
     mb = matrix.argmax(1).A1
     return ma, mb
-
+def colmin(matrix):
+    ma = np.arange(matrix.shape[0])
+    mb = matrix.argmin(1).A1
+    return ma, mb
 
 def fast3(l2):
     num = np.shape(l2)[0]
@@ -40,8 +43,22 @@ def fast3(l2):
         hib = hi[1][0]
         ma[hia] = hia
         mb[hia] = hib
-        l2[:, hib] = 0
-        l2[hia, :] = 0
+        l2[:, hib] = -100
+        l2[hia, :] = -100
+    return ma, mb
+
+def fast4(l2):
+    num = np.shape(l2)[0]
+    ma = np.zeros(num)
+    mb = np.zeros(num)
+    for _ in range(num):
+        hi = np.where(l2 == np.amin(l2))
+        hia = hi[0][0]
+        hib = hi[1][0]
+        ma[hia] = hia
+        mb[hia] = hib
+        l2[:, hib] = 1000
+        l2[hia, :] = 1000
     return ma, mb
 
 
@@ -290,8 +307,8 @@ def eval_regal(Tar, Src):
     matrix = regal.main(adj.A)
 
     ma, mb = colmax(matrix)
-    # ma, mb = fast3(matrix.A)
-    # ma, mb = bmw.getmatchings(matrix)
+    #ma, mb = fast3(matrix.A)
+    #ma, mb = bmw.getmatchings(matrix)
 
     return evall(ma, mb,
                  alg=inspect.currentframe().f_code.co_name)
@@ -350,7 +367,7 @@ def eval_grasp(Tar, Src):
 def eval_gwl(Tar, Src):
 
     opt_dict = {
-        'epochs': 1,            # the more u study the worse the grade man
+        'epochs': 18,            # the more u study the worse the grade man
         'batch_size': 100000,   # should be all data I guess?
         'use_cuda': False,
         'strategy': 'soft',
@@ -363,10 +380,12 @@ def eval_gwl(Tar, Src):
         'display': False
     }
 
-    matrix = gwl.main(Tar, Src, opt_dict)
+    matrix,cost = gwl.main(Tar, Src, opt_dict)
 
-    # ma, mb = colmax(sps.csr_matrix(matrix))
-    ma, mb = fast3(matrix)
+    #ma, mb = colmax(sps.csr_matrix(matrix))
+    #ma, mb = colmin(sps.csr_matrix(cost))
+    #ma, mb = fast3(matrix)
+    ma, mb = fast4(cost)
     # ma, mb = bmw.getmatchings(matrix)
 
     return evall(ma, mb,
@@ -440,16 +459,16 @@ def main(verbose, Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha, gt_
         print(np.array(list(enumerate(Gt[0]))))
 
     results = np.array([
-        # eval_regal(),           # non-stable
-        # eval_eigenalign(),
-        # eval_conealign(),
-        eval_NSD(),
-        # eval_grasp(),
-        # eval_gwl(),             # non-stable
+        #eval_regal(),           # non-stable
+        #eval_eigenalign(),
+        #eval_conealign(),
+        #eval_NSD(),
+        #eval_grasp(),
+        eval_gwl(),             # non-stable
 
-        # eval_isorank(),
-        # eval_netalign(),
-        # eval_klaus(),
+        #eval_isorank(),
+        #eval_netalign(),
+        #eval_klaus(),
     ])
 
     # df = pd.DataFrame(results)

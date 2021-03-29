@@ -312,25 +312,33 @@ class GromovWassersteinLearning(object):
         ec2 = ec2 / num_edges * 100.
         return nc1, ec1, nc2, ec2
 
+
+    def getCostm(self):
+        index_s = torch.LongTensor(list(range(self.src_num)))
+        index_t = torch.LongTensor(list(range(self.tar_num)))
+        cost_st = self.gwl_model.mutual_cost_mat(index_s, index_t)
+        cost_st = cost_st.cpu().data.numpy()
+        return cost_st
+        
     def evaluation_recommendation1(self):
         index_s = torch.LongTensor(list(range(self.src_num)))
         index_t = torch.LongTensor(list(range(self.tar_num)))
         cost_st = self.gwl_model.mutual_cost_mat(index_s, index_t)
         cost_st = cost_st.cpu().data.numpy()
-        print(ma)
-        print(mb)
         prec = 0
         tops = 1
         num = 0
-        mb1=np.zeros(len(mb))
+        mb=np.zeros((self.src_num))
         for n in range(len(mb)):
             items = cost_st[n, :]
             idx = np.argsort(items)
             top = 1
+            print(idx)
             top_items = idx[:1]
+            print(top_items)
             recommend_item=top_items[0]
-            mb1[n]=recommend_item
-        return mb1
+            mb[n]=recommend_item
+        return mb
 
 
     def evaluation_recommendation(self, database):

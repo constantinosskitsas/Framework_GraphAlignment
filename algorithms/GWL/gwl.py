@@ -37,5 +37,6 @@ def main(Tar, Src, opt_dict):
 
     # Gromov-Wasserstein learning
     gwd_model.train_without_prior(data, optimizer, opt_dict, scheduler=None)
-
-    return gwd_model.trans.T
+    cost12=gwd_model.getCostm()
+    #gwd_model.evaluation_recommendation1()
+    return gwd_model.trans.T,cost12.T

@@ -35,8 +35,8 @@ def colmin(matrix):
 
 def fast3(l2):
     num = np.shape(l2)[0]
-    ma = np.zeros(num)
-    mb = np.zeros(num)
+    ma = np.zeros(num,int)
+    mb = np.zeros(num,int)
     for _ in range(num):
         hi = np.where(l2 == np.amax(l2))
         hia = hi[0][0]
@@ -79,13 +79,104 @@ def eval_align(ma, mb, gmb):
     alignment = alignment[alignment[:, 0].argsort()]
     return gacc, acc, alignment
 
+def S3(A,B,mb):
+    A1=np.sum(A,1)
+    B1=np.sum(B,1)
+    EdA1=np.sum(A1)
+    EdB1=np.sum(B1)
+    Ce=0
+    source=0
+    target=0
+    res=0
+    for i in range(len(mb)):
+        source=A1[i]
+        target=B1[mb[i]]
+        if source==target:#equality goes in either of the cases below, different case for...
+            Ce=Ce+source
+        elif source<target:
+            Ce=Ce+source
+        elif source>target:
+            Ce=Ce+target
+    div=EdA1+EdB1-Ce
+    res=Ce/div
+    return res   
+def get_counterpart(alignment_matrix):
+    counterpart_dict = {}
 
+    if not sps.issparse(alignment_matrix):
+        sorted_indices = np.argsort(alignment_matrix)
+
+    n_nodes = alignment_matrix.shape[0]
+    for node_index in range(n_nodes):
+
+        if sps.issparse(alignment_matrix):
+            row, possible_alignments, possible_values = sps.find(alignment_matrix[node_index])
+            node_sorted_indices = possible_alignments[possible_values.argsort()]
+        else:
+            node_sorted_indices = sorted_indices[node_index]
+        counterpart = node_sorted_indices[-1]
+        counterpart_dict[node_index] = counterpart
+    return counterpart_dict
+def score_MNC(alignment_matrix, adj1, adj2,counter_dict):
+    mnc = 0
+    if sps.issparse(alignment_matrix): alignment_matrix = alignment_matrix.toarray()
+    if sps.issparse(adj1): adj1 = adj1.toarray()
+    if sps.issparse(adj2): adj2 = adj2.toarray()
+    #counter_dict = get_counterpart(alignment_matrix)
+    node_num = alignment_matrix.shape[0]
+
+    for i in range(node_num):
+        a = np.array(adj1[i, :])
+        one_hop_neighbor = np.flatnonzero(a)
+        b = np.array(adj2[counter_dict[i], :])
+        # neighbor of counterpart
+        new_one_hop_neighbor = np.flatnonzero(b)
+
+        one_hop_neighbor_counter = []
+
+        for count in one_hop_neighbor:
+            one_hop_neighbor_counter.append(counter_dict[count])
+
+        num_stable_neighbor = np.intersect1d(new_one_hop_neighbor, np.array(one_hop_neighbor_counter)).shape[0]
+        union_align = np.union1d(new_one_hop_neighbor, np.array(one_hop_neighbor_counter)).shape[0]
+
+        sim = float(num_stable_neighbor) / union_align
+        mnc += sim
+
+    mnc /= node_num
+    return mnc
+def ICorS3GT(A,B,mb,gmb,IC):
+    A1=np.sum(A,1)
+    B1=np.sum(B,1)
+    EdA1=np.sum(A1)
+    EdB1=np.sum(B1)
+    Ce=0
+    source=0
+    target=0
+    res=0
+    for i in range(len(mb)):
+        if (gmb[i]==mb[i]):
+            source=A1[i]
+            target=B1[mb[i]]
+            if source==target: #equality goes in either of the cases below, different case for...
+                Ce=Ce+source
+            elif source<target:
+                Ce=Ce+source
+            elif source>target:
+                Ce=Ce+target
+    if IC==True:
+        res=Ce/EdA1
+    else:
+        div=EdA1+EdB1-Ce
+        res=Ce/div
+    return res  
 @ex.capture
 def evall(ma, mb, Gt, eval_type=0, alg=np.random.rand(), verbose=True):
     sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=100)
     # np.set_printoptions(threshold=np.inf)
-
+    A=ReadFile.edgelist_to_adjmatrix1("data/arenas_orig.txt")
+    B=ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/edges_1.txt")
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
     gmb1 = np.array(gmb1, int)
@@ -93,12 +184,14 @@ def evall(ma, mb, Gt, eval_type=0, alg=np.random.rand(), verbose=True):
     mb = np.array(mb, int)
 
     assert ma.size == mb.size
-
+    ic=True
     res = np.array([
         eval_align(ma, mb, gmb),
         eval_align(mb, ma, gmb),
         eval_align(ma, mb, gmb1),
         eval_align(mb, ma, gmb1),
+        #ICorS3GT(Tar, Src, mb,gmb,ic)
+        #ICorS3GT(Tar, Src, mb,gmb1,ic)
     ], dtype=object)
 
     accs = res[:, 0]
@@ -117,7 +210,10 @@ def evall(ma, mb, Gt, eval_type=0, alg=np.random.rand(), verbose=True):
         prefix = ""
 
     acc, acc2, alignment = res[eval_type]
-
+    print(mb)
+    acc3=S3(A, B, mb)
+    acc4=ICorS3GT(A,B,mb,gmb,True)
+    acc5=ICorS3GT(A,B,mb,gmb,False)
     print(f"{' ' + alg +' ':#^25}")
     # print(alignment, end="\n\n")
     print(res[:, :2].astype(float))
@@ -131,7 +227,7 @@ def evall(ma, mb, Gt, eval_type=0, alg=np.random.rand(), verbose=True):
     if not verbose:
         sys.stdout = open(os.devnull, 'w')
 
-    return acc, acc2
+    return acc, acc2,acc3,acc4,acc5
 
 
 def e_to_G(e):
@@ -305,8 +401,9 @@ def eval_regal(Tar, Src):
     adj = G_to_Adj(Tar, Src)
 
     matrix = regal.main(adj.A)
-
+    #print(score_MNC(matrix,Tar,Src)," MNC from refina")
     ma, mb = colmax(matrix)
+    print(score_MNC(matrix,Tar,Src,mb)," MNC from refina")
     #ma, mb = fast3(matrix.A)
     #ma, mb = bmw.getmatchings(matrix)
 
@@ -317,11 +414,11 @@ def eval_regal(Tar, Src):
 @ex.capture
 def eval_eigenalign(Tar, Src):
     matrix = eigenalign.main(Tar.A, Src.A, 8, "lowrank_svd_union", 3)
-
+    #print(score_MNC(matrix.T,Src,Tar)," MNC from refina")
     # ma, mb = colmax(matrix)
     # ma, mb = fast3(matrix.A)
     ma, mb = bmw.getmatchings(matrix)
-
+    print(score_MNC(matrix,Tar,Src,mb)," MNC from refina")
     return evall(ma, mb,
                  alg=inspect.currentframe().f_code.co_name)
 
@@ -330,11 +427,12 @@ def eval_eigenalign(Tar, Src):
 def eval_conealign(Tar, Src):
 
     matrix = conealign.main(Tar.A, Src.A)
-
-    # ma, mb = colmax(matrix)
+    #print(score_MNC(matrix,Tar,Src)," MNC from refina")
+    ma, mb = colmax(matrix)
     # ma, mb = fast3(matrix.A)
-    ma, mb = bmw.getmatchings(matrix)
-
+    #ma, mb = bmw.getmatchings(matrix)
+    print(len(mb))
+    print(score_MNC(matrix,Tar,Src,mb)," MNC from refina")
     return evall(ma, mb,
                  alg=inspect.currentframe().f_code.co_name)
 
@@ -344,9 +442,12 @@ def eval_NSD(Tar, Src):
 
     matrix = NSD.run(Tar.A, Src.A)
     # ma, mb = NSD.run(Src.A, Tar.A)
-
+    #print(score_MNC(matrix,Src,Tar)," MNC from refina")
     # ma, mb = colmax(sps.csr_matrix(matrix))
     ma, mb = fast3(matrix)
+    mb=mb.astype(int)
+    print(mb)
+    print(score_MNC(matrix,Tar,Src,mb)," MNC from refina")
     # ma, mb = bmw.getmatchings(matrix)
 
     return evall(ma, mb,
@@ -358,7 +459,7 @@ def eval_grasp(Tar, Src):
 
     ma, mb = grasp.main(Src.A, Tar.A, alg=2, base_align=True)
     # ma, mb = grasp.main(Src, Tar, alg=2, base_align=True)
-
+    print(score_MNC(matrix,Tar,Src,mb)," MNC from refina")
     return evall(ma, mb,
                  alg=inspect.currentframe().f_code.co_name)
 
@@ -367,7 +468,7 @@ def eval_grasp(Tar, Src):
 def eval_gwl(Tar, Src):
 
     opt_dict = {
-        'epochs': 18,            # the more u study the worse the grade man
+        'epochs': 1,            # the more u study the worse the grade man
         'batch_size': 100000,   # should be all data I guess?
         'use_cuda': False,
         'strategy': 'soft',
@@ -379,13 +480,15 @@ def eval_gwl(Tar, Src):
         'prefix': 'results',
         'display': False
     }
-
+    
     matrix,cost = gwl.main(Tar, Src, opt_dict)
-
+    #print(score_MNC(matrix,Tar,Src)," MNC from refina")
+    #print(score_MNC(cost,Tar,Src)," MNC from refina2")
     #ma, mb = colmax(sps.csr_matrix(matrix))
     #ma, mb = colmin(sps.csr_matrix(cost))
-    #ma, mb = fast3(matrix)
-    ma, mb = fast4(cost)
+    ma, mb = fast3(matrix)
+    print(score_MNC(matrix,Tar,Src,mb)," MNC from refina")
+    #ma, mb = fast4(cost)
     # ma, mb = bmw.getmatchings(matrix)
 
     return evall(ma, mb,
@@ -399,9 +502,10 @@ def eval_isorank(Tar, Src, L, S, w, li, lj, maxiter):
     #                       alpha=None, rtype=1, maxiter=maxiter)
 
     matrix = isorank2.main(Tar.A, Src.A, maxiter=1)
-
+    #print(score_MNC(matrix,Tar,Src)," MNC from refina")
     # ma, mb = colmax(sps.csr_matrix(matrix))
     ma, mb = fast3(matrix)
+    print(score_MNC(matrix,Tar,Src,mb)," MNC from refina")
     # ma, mb = bmw.getmatchings(matrix)
 
     return evall(ma, mb,
@@ -417,7 +521,7 @@ def eval_netalign(S, w, li, lj, maxiter):
     # ma, mb = colmax(matrix)
     # ma, mb = fast3(matrix.A)
     ma, mb = bmw.getmatchings(matrix)
-
+    #print(score_MNC(matrix,Tar,Src)," MNC from refina")
     return evall(ma, mb,
                  alg=inspect.currentframe().f_code.co_name)
 
@@ -427,7 +531,7 @@ def eval_klaus(S, w, li, lj, maxiter):
 
     matrix = klaus.main(S, w, li, lj, a=1, b=1, gamma=0.9,
                         maxiter=maxiter)
-
+    #print(score_MNC(matrix,Tar,Src)," MNC from refina")
     # ma, mb = colmax(matrix)
     # ma, mb = fast3(matrix.A)
     ma, mb = bmw.getmatchings(matrix)
@@ -464,9 +568,9 @@ def main(verbose, Gt, Tar, Src, S, L, w, li, lj, noise_level, edges, lalpha, gt_
         #eval_conealign(),
         #eval_NSD(),
         #eval_grasp(),
-        eval_gwl(),             # non-stable
+        #eval_gwl(),             # non-stable
 
-        #eval_isorank(),
+        eval_isorank(),
         #eval_netalign(),
         #eval_klaus(),
     ])

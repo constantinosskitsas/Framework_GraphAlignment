@@ -5,7 +5,7 @@ import numpy as np
 import scipy.sparse as sps
 
 
-def main(Tar, Src, opt_dict):
+def main(Tar, Src, opt_dict, hyperpara_dict):
 
     Se = np.array(sps.find(Src)[:2]).T
     Te = np.array(sps.find(Tar)[:2]).T
@@ -18,14 +18,10 @@ def main(Tar, Src, opt_dict):
         'mutual_interactions': None
     }
 
-    hyperpara_dict = {
+    hyperpara_dict.update({
         'src_number': len(data['src_index']),
         'tar_number': len(data['tar_index']),
-        'dimension': 100,
-        'loss_type': 'L2',
-        'cost_type': 'cosine',
-        'ot_method': 'proximal'
-    }
+    })
 
     gwd_model = GromovWassersteinLearning(hyperpara_dict)
 
@@ -37,6 +33,6 @@ def main(Tar, Src, opt_dict):
 
     # Gromov-Wasserstein learning
     gwd_model.train_without_prior(data, optimizer, opt_dict, scheduler=None)
-    cost12=gwd_model.getCostm()
-    #gwd_model.evaluation_recommendation1()
-    return gwd_model.trans.T,cost12.T
+    cost12 = gwd_model.getCostm()
+    # gwd_model.evaluation_recommendation1()
+    return gwd_model.trans.T, cost12.T

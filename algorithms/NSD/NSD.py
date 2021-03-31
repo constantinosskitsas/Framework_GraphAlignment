@@ -153,10 +153,13 @@ def fast2(l2):
     return ma, mb
 
 
-def run(A, B, matches=None):
+def run(A, B, alpha, iters):
     print("hey1")
-    X = nsd(A, B, 0.5, 10, np.ones(
-        (np.shape(A)[0], 1)), np.ones((np.shape(A)[0], 1)))
+    X = nsd(
+        A, B, alpha, iters,
+        np.ones((np.shape(A)[0], 1)),
+        np.ones((np.shape(A)[0], 1))
+    )
     print(X)
     #np.savetxt("array.txt",X, fmt="%s")
     asa = (np.shape(X))[0]

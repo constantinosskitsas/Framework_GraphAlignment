@@ -28,35 +28,35 @@ from sklearn.neighbors import NearestNeighbors
 # 			print('Noise level %d, round %d' %(i,j))
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="RUN GASP")
-    parser.add_argument('--graph', nargs='?', default='Sacch')
-    # 1:nn 2:sortgreedy 3: jv
-    # parser.add_argument('--laa', type=int, default=2,
-    #                     help='Linear assignment algorithm. 1=nn,2=sortgreedy, 3=jv')
-    parser.add_argument('--icp', type=bool, default=False)
-    parser.add_argument('--icp_its', type=int, default=3,
-                        help='how many iterations of iterative closest point')
-    parser.add_argument('--q', type=int, default=100)
-    parser.add_argument('--k', type=int, default=20)
-    parser.add_argument('--n_eig', type=int, default=1132,
-                        help="how many eigenvectors to compute")
-    parser.add_argument('--lower_t', type=float, default=1.0,
-                        help='smallest timestep for corresponding functions')
-    parser.add_argument('--upper_t', type=float, default=50.0,
-                        help='biggest timestep for corresponding functions')
-    parser.add_argument('--linsteps', type=bool, default=True,
-                        help='scaling of time steps of corresponding functions, logarithmically or linearly')
-    # parser.add_argument('--reps', type=int, default=5,
-    #                     help='number of repetitions per noise level')
-    # parser.add_argument('--noise_levels', type=list, default=[10])
-    # parser.add_argument('--base_align', type=bool, default=True)
-    return parser.parse_known_args()[0]
+# def parse_args():
+#     parser = argparse.ArgumentParser(description="RUN GASP")
+#     # parser.add_argument('--graph', nargs='?', default='Sacch')
+#     # 1:nn 2:sortgreedy 3: jv
+#     # parser.add_argument('--laa', type=int, default=2,
+#     #                     help='Linear assignment algorithm. 1=nn,2=sortgreedy, 3=jv')
+#     parser.add_argument('--icp', type=bool, default=False)
+#     parser.add_argument('--icp_its', type=int, default=3,
+#                         help='how many iterations of iterative closest point')
+#     parser.add_argument('--q', type=int, default=100)
+#     parser.add_argument('--k', type=int, default=20)
+#     parser.add_argument('--n_eig', type=int, default=1132,
+#                         help="how many eigenvectors to compute")
+#     parser.add_argument('--lower_t', type=float, default=1.0,
+#                         help='smallest timestep for corresponding functions')
+#     parser.add_argument('--upper_t', type=float, default=50.0,
+#                         help='biggest timestep for corresponding functions')
+#     parser.add_argument('--linsteps', type=bool, default=True,
+#                         help='scaling of time steps of corresponding functions, logarithmically or linearly')
+#     # parser.add_argument('--reps', type=int, default=5,
+#     #                     help='number of repetitions per noise level')
+#     # parser.add_argument('--noise_levels', type=list, default=[10])
+#     # parser.add_argument('--base_align', type=bool, default=True)
+#     return parser.parse_known_args()[0]
 
 
-def main(A1, A2, alg=2, base_align=True):
+def main(A1, A2, args):  # alg=2, base_align=True):
 
-    args = parse_args()
+    # args = parse_args()
 
     # # edge list first graph
     # edge_list_G1 = 'arenas_orig.txt'
@@ -76,10 +76,11 @@ def main(A1, A2, alg=2, base_align=True):
 
     # A2 = edgelist_to_adjmatrix(edge_list_G2)
 
-    func_maps = functional_maps_base_align if base_align else functional_maps
+    # func_maps = functional_maps_base_align if base_align else functional_maps
 
-    matching = func_maps(A1, A2, args.q, args.k, args.n_eig, alg, args.icp,
-                         args.icp_its, args.lower_t, args.upper_t, args.linsteps, args.graph)
+    G1_emb, G2_emb = functional_maps_gen(A1, A2, **args)
+    # matching = func_maps(A1, A2, args.q, args.k, args.n_eig, args.laa, args.icp,
+    #                      args.icp_its, args.lower_t, args.upper_t, args.linsteps)
 
     # if(args.base_align):
     #     matching = functional_maps_base_align(A1, A2, args.q, args.k, args.n_eig, alg,
@@ -91,10 +92,11 @@ def main(A1, A2, alg=2, base_align=True):
     # acc = eval_matching(matching, gt)
     # print('accuracy: %f' % acc)
     # print('\n')
-    return np.array(list(matching.items()), dtype=int).T
+    # return np.array(list(matching.items()), dtype=int).T
+    return sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
 
 
-def functional_maps_base_align(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t, linsteps, graph_name):
+def functional_maps_gen(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t, linsteps, base_align):
 
     # 1:nn 2:sortgreedy 3: jv
     match = laa
@@ -115,85 +117,102 @@ def functional_maps_base_align(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, 
     Cor2 = calc_corresponding_functions(n, q, t, D2, V2)
 
     # calculate base alignment matrix
-    B = ba.optimize_AB(Cor1, Cor2, n, V1, V2, D1, D2, k)
+    if base_align:
+        B = ba.optimize_AB(Cor1, Cor2, n, V1, V2, D1, D2, k)
 
-    # align bases with base alignment matrix
-    V1_rot = V1[:, 0:k]
-    V2_rot = V2[:, 0:k] @ B
+        # align bases with base alignment matrix
+        V1_rot = V1[:, 0:k]
+        V2_rot = V2[:, 0:k] @ B
 
-    # calculate correspondence matrix C
-    C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1_rot, V2_rot, k, q)
-    print(np.diagonal(C))
+        # calculate correspondence matrix C
+        C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1_rot, V2_rot, k, q)
+        print(np.diagonal(C))
 
-    # use eigenvectors for alignment
-    G1_emb = C @ V1_rot.T  # [:, 0: k].T;
+        # use eigenvectors for alignment
+        G1_emb = C @ V1_rot.T  # [:, 0: k].T;
 
-    G2_emb = V2_rot.T  # [:, 0: k].T;
-    matching = []
-
-    # matching
-    if (icp):
-        matching = iterative_closest_point(
-            V1_rot, V2_rot, C, icp_its, k, match, Cor1, Cor2, q)
+        G2_emb = V2_rot.T  # [:, 0: k].T;
     else:
-        if match == 1:
-            matching = greedyNN(G1_emb, G2_emb)
-        if match == 2:
-            matching = sort_greedy(G1_emb, G2_emb)
-        if match == 3:
-            matching = hungarian_matching(G1_emb, G2_emb)
+        A = calc_coefficient_matrix(Cor1, V1, k, q)
 
-        matching = dict(matching.astype(int))
+        B = calc_coefficient_matrix(Cor2, V2, k, q)
 
-    return matching
+        C = calc_correspondence_matrix_ortho(A, B, k)
+        #C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1[:,0:k], V2[:,0:k], k, q)
+        print(np.diagonal(C))
+
+        G1_emb = C @ V1[:, 0: k].T
+
+        G2_emb = V2[:, 0: k].T
+
+    # matching = []
+
+    # # matching
+    # if (icp):
+    #     matching = iterative_closest_point(
+    #         V1_rot, V2_rot, C, icp_its, k, match, Cor1, Cor2, q)
+    # else:
+    #     if match == 1:
+    #         matching = greedyNN(G1_emb, G2_emb)
+    #     if match == 2:
+    #         matching = sort_greedy(G1_emb, G2_emb)
+    #     if match == 3:
+    #         matching = hungarian_matching(G1_emb, G2_emb)
+
+    #     matching = dict(matching.astype(int))
+
+    # return matching
+
+    return G1_emb, G2_emb
 
 
-def functional_maps(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t, linsteps, graph_name):
+# def functional_maps(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t, linsteps):
 
-    # 1:nn 2:sortgreedy 3: jv
-    match = laa
+#     # 1:nn 2:sortgreedy 3: jv
+#     match = laa
 
-    t = np.linspace(lower_t, upper_t, q)
-    if(not linsteps):
-        t = np.logspace(lower_t, upper_t, q)
+#     t = np.linspace(lower_t, upper_t, q)
+#     if(not linsteps):
+#         t = np.logspace(lower_t, upper_t, q)
 
-    n = np.shape(A1)[0]
+#     n = np.shape(A1)[0]
 
-    D1, V1 = decompose_laplacian(A1, True, n_eig)
-  # #  print(V1[20,200])
-    D2, V2 = decompose_laplacian(A2, True, n_eig)
-   # print(V2[20, 200])
+#     D1, V1 = decompose_laplacian(A1, True, n_eig)
+#   # #  print(V1[20,200])
+#     D2, V2 = decompose_laplacian(A2, True, n_eig)
+#    # print(V2[20, 200])
 
-    Cor1 = calc_corresponding_functions(n, q, t, D1, V1)
-    Cor2 = calc_corresponding_functions(n, q, t, D2, V2)
+#     Cor1 = calc_corresponding_functions(n, q, t, D1, V1)
+#     Cor2 = calc_corresponding_functions(n, q, t, D2, V2)
 
-    A = calc_coefficient_matrix(Cor1, V1, k, q)
+#     A = calc_coefficient_matrix(Cor1, V1, k, q)
 
-    B = calc_coefficient_matrix(Cor2, V2, k, q)
+#     B = calc_coefficient_matrix(Cor2, V2, k, q)
 
-    C = calc_correspondence_matrix_ortho(A, B, k)
-    #C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1[:,0:k], V2[:,0:k], k, q)
-    print(np.diagonal(C))
+#     C = calc_correspondence_matrix_ortho(A, B, k)
+#     #C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1[:,0:k], V2[:,0:k], k, q)
+#     print(np.diagonal(C))
 
-    G1_emb = C @ V1[:, 0: k].T
+#     G1_emb = C @ V1[:, 0: k].T
 
-    G2_emb = V2[:, 0: k].T
-    matching = []
+#     G2_emb = V2[:, 0: k].T
 
-    if(icp):
-        matching = iterative_closest_point(
-            V1, V2, C, icp_its, k, match, Cor1, Cor2, q)
-    else:
-        if match == 1:
-            matching = greedyNN(G1_emb, G2_emb)
-        if match == 2:
-            matching = sort_greedy(G1_emb, G2_emb)
-        if match == 3:
-            matching = hungarian_matching(G1_emb, G2_emb)
+#     matching = []
 
-        matching = dict(matching.astype(int))
+#     if(icp):
+#         matching = iterative_closest_point(
+#             V1, V2, C, icp_its, k, match, Cor1, Cor2, q)
+#     else:
+#         if match == 1:
+#             matching = greedyNN(G1_emb, G2_emb)
+#         if match == 2:
+#             matching = sort_greedy(G1_emb, G2_emb)
+#         if match == 3:
+#             matching = hungarian_matching(G1_emb, G2_emb)
 
-    return matching
+#         matching = dict(matching.astype(int))
+
+#     return matching
 
 
 def edgelist_to_adjmatrix(edgeList_file):

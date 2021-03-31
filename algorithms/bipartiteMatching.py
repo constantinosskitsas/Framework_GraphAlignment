@@ -28,7 +28,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
     ntmod = 0
 
     # initialize the primal and dual variables
-    # print("jo")
+
     for i in range(1, m):
         for rpi in range(rp[i], rp[i+1]):
             if ai[rpi] > alpha[i]:
@@ -36,9 +36,10 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
 
     # dual variables (bt) are initialized to 0 already
     # match1 and match2 are both 0, which indicates no matches
-    # print("to")
+
     i = 1
     while i < m:
+        print(f"{i} < {m}")
         for j in range(1, ntmod+1):
             t[tmod[j]] = 0
         ntmod = 0

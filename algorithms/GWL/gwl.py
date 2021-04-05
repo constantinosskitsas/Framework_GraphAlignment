@@ -5,7 +5,10 @@ import numpy as np
 import scipy.sparse as sps
 
 
-def main(Tar, Src, opt_dict, hyperpara_dict):
+def main(data, opt_dict, hyperpara_dict):
+
+    Tar = data['Tar']
+    Src = data['Src']
 
     Se = np.array(sps.find(Src)[:2]).T
     Te = np.array(sps.find(Tar)[:2]).T
@@ -18,12 +21,13 @@ def main(Tar, Src, opt_dict, hyperpara_dict):
         'mutual_interactions': None
     }
 
-    hyperpara_dict.update({
+    hyperpara_dictt = {
         'src_number': len(data['src_index']),
         'tar_number': len(data['tar_index']),
-    })
+        **hyperpara_dict
+    }
 
-    gwd_model = GromovWassersteinLearning(hyperpara_dict)
+    gwd_model = GromovWassersteinLearning(hyperpara_dictt)
 
     # initialize optimizer
     optimizer = optim.Adam(gwd_model.gwl_model.parameters(), lr=1e-3)

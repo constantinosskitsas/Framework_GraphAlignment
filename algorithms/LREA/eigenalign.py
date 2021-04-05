@@ -11,9 +11,14 @@ from . import decomposeX, newbound_methods
 from .. import bipartitewrapper as bmw
 
 
-def main(A, B, iters, method, bmatch, default_params=True):
-    D = 0
-    s1, s2, s3 = find_parameters(A, B)
+# def main(A, B, iters, method, bmatch, default_params=True):
+def main(data, iters, method, bmatch, default_params=True):
+
+    Tar = data['Tar'].A
+    Src = data['Src'].A
+
+    # D = 0
+    s1, s2, s3 = find_parameters(Tar, Src)
 
     if not default_params:
         s1 += 100
@@ -23,11 +28,11 @@ def main(A, B, iters, method, bmatch, default_params=True):
     c2 = s3 - s2
     c3 = s2
     Uk, Vk, Wk, W1, W2 = decomposeX.decomposeX_balance_allfactors(
-        A, B, iters + 1, c1, c2, c3)  # okay
+        Tar, Src, iters + 1, c1, c2, c3)  # okay
     Un, Vn = split_balanced_decomposition(Uk, Wk, Vk)  # okay
     timematching = 0
-    nA = len(A[0])
-    nB = len(B[0])
+    nA = len(Tar[0])
+    nB = len(Src[0])
 
     if method == "lowrank_svd_union":
 
@@ -55,7 +60,7 @@ def main(A, B, iters, method, bmatch, default_params=True):
         # ma, mb = bmw.getmatchings(nzi, nzj, nzv)
 
         # Matching=bipartite_Matching.edge_list(bipartite_Matching.bipartite_matching1(nzi,nzj,nzv))
-        D = avgdeg  # nnz(X)/prod(size(X))
+        # D = avgdeg  # nnz(X)/prod(size(X))
     else:
         print(
             "method should be one of the following: (1)eigenalign,(2)lowrank_unbalanced_best, (3)lowrank_unbalanced_union,(4)lowrank_balanced_best, (5)lowrank_balanced_union,(6)lowrank_Wkdecomposed_best, (7)lowrank_Wkdecomposed_union")

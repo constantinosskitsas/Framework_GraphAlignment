@@ -25,7 +25,13 @@ def maxrowmatch(Q, li, lj, m, n):
     return q, SM
 
 
-def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=True):
+# def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=True):
+def main(data, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=True):
+
+    S = data['S']
+    li = data['li']
+    lj = data['lj']
+    w = data['w']
 
     setup, m, n = bmw.bipartite_setup(li, lj, w)
 

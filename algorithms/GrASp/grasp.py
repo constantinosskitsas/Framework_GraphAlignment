@@ -54,7 +54,13 @@ from sklearn.neighbors import NearestNeighbors
 #     return parser.parse_known_args()[0]
 
 
-def main(A1, A2, args):  # alg=2, base_align=True):
+def main(data, **args):  # alg=2, base_align=True):
+
+    Tar = data['Tar']
+    Src = data['Src']
+
+    if args['n_eig'] is None:
+        args['n_eig'] = Src.shape[0]
 
     # args = parse_args()
 
@@ -77,8 +83,7 @@ def main(A1, A2, args):  # alg=2, base_align=True):
     # A2 = edgelist_to_adjmatrix(edge_list_G2)
 
     # func_maps = functional_maps_base_align if base_align else functional_maps
-
-    G1_emb, G2_emb = functional_maps_gen(A1, A2, **args)
+    G1_emb, G2_emb = functional_maps_gen(Tar.A, Src.A, **args)
     # matching = func_maps(A1, A2, args.q, args.k, args.n_eig, args.laa, args.icp,
     #                      args.icp_its, args.lower_t, args.upper_t, args.linsteps)
 
@@ -93,7 +98,7 @@ def main(A1, A2, args):  # alg=2, base_align=True):
     # print('accuracy: %f' % acc)
     # print('\n')
     # return np.array(list(matching.items()), dtype=int).T
-    return sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
+    return None, sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
 
 
 def functional_maps_gen(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t, linsteps, base_align):

@@ -52,7 +52,14 @@ def accumarray(xij, xw, n):
     return sums
 
 
-def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
+# def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
+def main(data, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
+
+    S = data['S']
+    li = data['li']
+    lj = data['lj']
+    w = data['w']
+
     S = sps.csr_matrix(S)
 
     nedges = len(li)

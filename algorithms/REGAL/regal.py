@@ -56,23 +56,27 @@ def G_to_Adj(G1, G2):
     return adj
 
 
-def main(Tar, Src, REGAL_args) -> object:
+# def main(Tar, Src, REGAL_args) -> object:
+def main(data, **args) -> object:
+
+    Tar = data['Tar']
+    Src = data['Src']
 
     adj = G_to_Adj(Tar, Src)
 
     # global REGAL_args
     # REGAL_args = parse_args()
 
-    if REGAL_args['attributes'] is not None:
+    if args['attributes'] is not None:
         # load vector of attributes in from file
-        REGAL_args['attributes'] = np.load(REGAL_args['attributes'])
+        args['attributes'] = np.load(args['attributes'])
 
-    embed = learn_representations(adj.A, REGAL_args)
+    embed = learn_representations(adj.A, args)
     emb1, emb2 = get_embeddings(embed)
-    if REGAL_args['numtop'] == 0:
-        REGAL_args['numtop'] = None
+    if args['numtop'] == 0:
+        args['numtop'] = None
     alignment_matrix = get_embedding_similarities(
-        emb1, emb2, num_top=REGAL_args['numtop'])
+        emb1, emb2, num_top=args['numtop'])
     return alignment_matrix
 
 

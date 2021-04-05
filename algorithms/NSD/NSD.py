@@ -9,7 +9,7 @@ from scipy.sparse.csgraph._matching import maximum_bipartite_matching
 from algorithms import bipartiteMatching
 from data import ReadFile
 from data.ReadFile import nonzeroentries, edgelist_to_adjmatrix1
-from scipy.sparse import csc_matrix
+from scipy.sparse import csc_matrix, csr_matrix
 scipy.sparse.csgraph
 
 
@@ -153,12 +153,17 @@ def fast2(l2):
     return ma, mb
 
 
-def run(A, B, alpha, iters):
+# def main(A, B, alpha, iters):
+def main(data, alpha, iters):
+
+    Tar = data['Tar']
+    Src = data['Src']
+
     print("hey1")
     X = nsd(
-        A, B, alpha, iters,
-        np.ones((np.shape(A)[0], 1)),
-        np.ones((np.shape(A)[0], 1))
+        Tar.A, Src.A, alpha, iters,
+        np.ones((np.shape(Tar)[0], 1)),
+        np.ones((np.shape(Src)[0], 1))
     )
     print(X)
     #np.savetxt("array.txt",X, fmt="%s")

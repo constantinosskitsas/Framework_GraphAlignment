@@ -177,30 +177,33 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=1
     return sparse_align_matrix.tocsr()
 
 
-def main(adjA, adjB, CONE_args):
-    # global CONE_args
-    # CONE_args = parse_args()
+def main(data, **args):
 
-    #node_num = int(adj.shape[0] / 2)
-    #adjA = adj[:node_num, :node_num]
-    #adjB = adj[node_num:, node_num:]
-    # adjA= ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/arenas_orig.txt")
-    # adjB = ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/edges_4.txt")
+    Tar = data['Tar']
+    Src = data['Src']
+    # global args
+    # args = parse_args()
+
+    # node_num = int(adj.shape[0] / 2)
+    # Tar = adj[:node_num, :node_num]
+    # Src = adj[node_num:, node_num:]
+    # Tar= ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/arenas_orig.txt")
+    # Src = ReadFile.edgelist_to_adjmatrix1("data/noise_level_1/edges_4.txt")
     start = time.time()
    # step1: obtain normalized proximity-preserving node embeddings
-    # if (CONE_args.embmethod == "netMF"):
+    # if (args.embmethod == "netMF"):
     emb_matrixA = embedding.netmf(
-        adjA, dim=CONE_args['dim'], window=CONE_args['window'], b=CONE_args['negative'], normalize=True)
+        Tar, dim=args['dim'], window=args['window'], b=args['negative'], normalize=True)
     emb_matrixB = embedding.netmf(
-        adjB, dim=CONE_args['dim'], window=CONE_args['window'], b=CONE_args['negative'], normalize=True)
+        Src, dim=args['dim'], window=args['window'], b=args['negative'], normalize=True)
 
     # step2 and 3: align embedding spaces and match nodes with similar embeddings
     alignment_matrix = align_embeddings(
         emb_matrixA,
         emb_matrixB,
-        CONE_args,
-        adj1=csr_matrix(adjA),
-        adj2=csr_matrix(adjB),
+        args,
+        adj1=csr_matrix(Tar),
+        adj2=csr_matrix(Src),
         struc_embed=None,
         struc_embed2=None
     )

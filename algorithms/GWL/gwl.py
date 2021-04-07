@@ -7,8 +7,8 @@ import scipy.sparse as sps
 
 def main(data, opt_dict, hyperpara_dict):
 
-    Tar = data['Tar']
     Src = data['Src']
+    Tar = data['Tar']
 
     Se = np.array(sps.find(Src)[:2]).T
     Te = np.array(sps.find(Tar)[:2]).T
@@ -39,4 +39,4 @@ def main(data, opt_dict, hyperpara_dict):
     gwd_model.train_without_prior(data, optimizer, opt_dict, scheduler=None)
     cost12 = gwd_model.getCostm()
     # gwd_model.evaluation_recommendation1()
-    return gwd_model.trans.T, cost12.T
+    return gwd_model.trans, cost12

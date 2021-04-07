@@ -14,11 +14,11 @@ from .. import bipartitewrapper as bmw
 # def main(A, B, iters, method, bmatch, default_params=True):
 def main(data, iters, method, bmatch, default_params=True):
 
-    Tar = data['Tar'].A
     Src = data['Src'].A
+    Tar = data['Tar'].A
 
     # D = 0
-    s1, s2, s3 = find_parameters(Tar, Src)
+    s1, s2, s3 = find_parameters(Src, Tar)
 
     if not default_params:
         s1 += 100
@@ -28,11 +28,11 @@ def main(data, iters, method, bmatch, default_params=True):
     c2 = s3 - s2
     c3 = s2
     Uk, Vk, Wk, W1, W2 = decomposeX.decomposeX_balance_allfactors(
-        Tar, Src, iters + 1, c1, c2, c3)  # okay
+        Src, Tar, iters + 1, c1, c2, c3)  # okay
     Un, Vn = split_balanced_decomposition(Uk, Wk, Vk)  # okay
     timematching = 0
-    nA = len(Tar[0])
-    nB = len(Src[0])
+    nA = len(Src[0])
+    nB = len(Tar[0])
 
     if method == "lowrank_svd_union":
 

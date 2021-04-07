@@ -59,10 +59,10 @@ def G_to_Adj(G1, G2):
 # def main(Tar, Src, REGAL_args) -> object:
 def main(data, **args) -> object:
 
-    Tar = data['Tar']
     Src = data['Src']
+    Tar = data['Tar']
 
-    adj = G_to_Adj(Tar, Src)
+    adj = G_to_Adj(Src, Tar)
 
     # global REGAL_args
     # REGAL_args = parse_args()

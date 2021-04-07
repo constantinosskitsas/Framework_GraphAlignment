@@ -179,8 +179,8 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=1
 
 def main(data, **args):
 
-    Tar = data['Tar']
     Src = data['Src']
+    Tar = data['Tar']
     # global args
     # args = parse_args()
 
@@ -192,18 +192,21 @@ def main(data, **args):
     start = time.time()
    # step1: obtain normalized proximity-preserving node embeddings
     # if (args.embmethod == "netMF"):
+    print("0")
     emb_matrixA = embedding.netmf(
-        Tar, dim=args['dim'], window=args['window'], b=args['negative'], normalize=True)
-    emb_matrixB = embedding.netmf(
         Src, dim=args['dim'], window=args['window'], b=args['negative'], normalize=True)
+    print("A")
+    emb_matrixB = embedding.netmf(
+        Tar, dim=args['dim'], window=args['window'], b=args['negative'], normalize=True)
+    print("B")
 
     # step2 and 3: align embedding spaces and match nodes with similar embeddings
     alignment_matrix = align_embeddings(
         emb_matrixA,
         emb_matrixB,
         args,
-        adj1=csr_matrix(Tar),
-        adj2=csr_matrix(Src),
+        adj1=csr_matrix(Src),
+        adj2=csr_matrix(Tar),
         struc_embed=None,
         struc_embed2=None
     )

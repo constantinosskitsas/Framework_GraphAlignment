@@ -118,4 +118,4 @@ def main(data, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=Tru
         U.data = U.data.clip(-0.5, 0.5)
 
     # return bmw.getmatchings(li, lj, xbest)
-    return sps.csr_matrix((xbest, (lj, li)))
+    return sps.csr_matrix((xbest, (li, lj)))

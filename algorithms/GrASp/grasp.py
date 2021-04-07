@@ -56,11 +56,12 @@ from sklearn.neighbors import NearestNeighbors
 
 def main(data, **args):  # alg=2, base_align=True):
 
-    Tar = data['Tar']
     Src = data['Src']
+    Tar = data['Tar']
 
     if args['n_eig'] is None:
-        args['n_eig'] = Src.shape[0]
+        args['n_eig'] = Src.shape[0] - 1
+        # args['n_eig'] = Src.shape[0]//100
 
     # args = parse_args()
 
@@ -83,7 +84,7 @@ def main(data, **args):  # alg=2, base_align=True):
     # A2 = edgelist_to_adjmatrix(edge_list_G2)
 
     # func_maps = functional_maps_base_align if base_align else functional_maps
-    G1_emb, G2_emb = functional_maps_gen(Tar.A, Src.A, **args)
+    G1_emb, G2_emb = functional_maps_gen(Src, Tar, **args)
     # matching = func_maps(A1, A2, args.q, args.k, args.n_eig, args.laa, args.icp,
     #                      args.icp_its, args.lower_t, args.upper_t, args.linsteps)
 
@@ -110,16 +111,21 @@ def functional_maps_gen(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t
     if (not linsteps):
         t = np.logspace(lower_t, upper_t, q)
 
-    n = np.shape(A1)[0]
+    # n = np.shape(A1)[0]
+    n = A1.shape[0]
 
     # decompose graph laplacians
+    print("aa1")
     D1, V1 = decompose_laplacian(A1, True, n_eig)
 
+    print("aa2")
     D2, V2 = decompose_laplacian(A2, True, n_eig)
 
     # calculate corresponding functions
     Cor1 = calc_corresponding_functions(n, q, t, D1, V1)
+    print("aac1")
     Cor2 = calc_corresponding_functions(n, q, t, D2, V2)
+    print("aac2")
 
     # calculate base alignment matrix
     if base_align:

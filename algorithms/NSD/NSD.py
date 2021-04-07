@@ -156,14 +156,14 @@ def fast2(l2):
 # def main(A, B, alpha, iters):
 def main(data, alpha, iters):
 
-    Tar = data['Tar']
     Src = data['Src']
+    Tar = data['Tar']
 
     print("hey1")
     X = nsd(
-        Tar.A, Src.A, alpha, iters,
-        np.ones((np.shape(Tar)[0], 1)),
-        np.ones((np.shape(Src)[0], 1))
+        Src.A, Tar.A, alpha, iters,
+        np.ones((np.shape(Src)[0], 1)),
+        np.ones((np.shape(Tar)[0], 1))
     )
     print(X)
     #np.savetxt("array.txt",X, fmt="%s")

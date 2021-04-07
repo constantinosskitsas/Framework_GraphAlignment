@@ -169,4 +169,4 @@ def main(data, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
                 bestchar, it, *hista, *histb))
 
     # return bmw.getmatchings(li, lj, mbest)
-    return sps.csr_matrix((mbest, (lj, li)))
+    return sps.csr_matrix((mbest, (li, lj)))

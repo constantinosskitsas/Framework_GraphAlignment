@@ -14,8 +14,8 @@ from evaluation.evaluation_design import remove_edges_directed
 # def main(A, B, L=None, alpha=0.5, tol=1e-12, maxiter=1, verbose=True):
 def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True):
 
-    Tar = data['Tar'].A
     Src = data['Src'].A
+    Tar = data['Tar'].A
 
     n1 = np.shape(Tar)[0]
     n2 = np.shape(Src)[0]
@@ -45,7 +45,7 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True):
         if delta < tol:
             break
 
-    return S.T
+    return S
 
 
 if __name__ == "__main__":

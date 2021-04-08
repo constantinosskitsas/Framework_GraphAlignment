@@ -321,13 +321,13 @@ def run_alg(_seed, data, Gt, i, algs, mtype, verbose):
 @ex.capture
 def init():
     # G = nx.newman_watts_strogatz_graph(1000, 4, 0.5)
-    # G = nx.watts_strogatz_graph(107, 3, 0.5)
+    # G = nx.watts_strogatz_graph(1070, 10, 0.5)
     # G = nx.watts_strogatz_graph(100, 3, 0.5)
     # G = nx.gnp_random_graph(10, 0.5)  # fast_gnp_random_graph for sparse
     # G = nx.barabasi_albert_graph(1000, 30)
-    # G = nx.powerlaw_cluster_graph(1000, 30, 0.5)
+    G = nx.powerlaw_cluster_graph(100, 10, 0.5)
 
-    G = 'data/arenas_old/source.txt'
+    # G = 'data/arenas_old/source.txt'
     # G = 'data/arenas/source.txt'
     # G = 'data/CA-AstroPh/source.txt'
     # G = 'data/facebook/source.txt'
@@ -337,7 +337,13 @@ def init():
     # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
 
-    return generate_graphs(G, noise=0.05)
+    noise = 0.05
+    return generate_graphs(
+        G,
+        # source_noise=noise,
+        target_noise=noise,
+        # refill=True
+    )
 
 
 @ex.automain

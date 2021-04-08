@@ -73,13 +73,37 @@ def load_as_nx(path):
     return np.array(G.edges)
 
 
-def generate_graphs(G, noise=0.05):
+def refill_e(e, n, amount):
+    if amount == 0:
+        return e
+    # print(e)
+    # ee = np.sort(e).tolist()
+    ee = {tuple(row) for row in np.sort(e).tolist()}
+    new_e = []
+    check = 0
+    while len(new_e) < amount:
+        _e = np.random.randint(n, size=2)
+        # _ee = np.sort(_e).tolist()
+        _ee = tuple(np.sort(_e).tolist())
+        check += 1
+        if not(_ee in ee) and _e[0] != _e[1]:
+            # ee.append(_ee)
+            ee.add(_ee)
+            new_e.append(_e)
+            check = 0
+            # print(f"refill - {len(new_e)}/{amount}")
+        if check % 1000 == 999:
+            print(f"refill - {check + 1} times in a row fail")
+    # print(new_e)
+    return np.append(e, new_e, axis=0)
+
+
+def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
 
     if isinstance(G, dict):
         dataset = G['dataset']
         edges = G['edges']
-        noise_level = G['noise_level'] if 'noise_level' in G else int(
-            100*noise)
+        noise_level = G['noise_level']
 
         source = f"data/{dataset}/source.txt"
         target = f"data/{dataset}/noise_level_{noise_level}/edges_{edges}.txt"
@@ -106,6 +130,7 @@ def generate_graphs(G, noise=0.05):
         return sps.csr_matrix([]), sps.csr_matrix([]), (np.empty(1), np.empty(1))
 
     n = np.amax(Src_e) + 1
+    nedges = Src_e.shape[0]
 
     gt_e = np.array((
         np.arange(n),
@@ -117,9 +142,14 @@ def generate_graphs(G, noise=0.05):
         gt_e[:, gt_e[0].argsort()][1]
     )
 
-    r = np.random.sample(Src_e.shape[0])
-    Tar_e = Src_e[r > noise]
-    Tar_e = Gt[0][Tar_e]
+    Tar_e = Gt[0][Src_e]
+
+    Src_e = Src_e[np.random.sample(nedges) >= source_noise]
+    Tar_e = Tar_e[np.random.sample(nedges) >= target_noise]
+
+    if refill:
+        Src_e = refill_e(Src_e, n, nedges - Src_e.shape[0])
+        Tar_e = refill_e(Tar_e, n, nedges - Tar_e.shape[0])
 
     return e_to_G(Src_e), e_to_G(Tar_e),  Gt
 

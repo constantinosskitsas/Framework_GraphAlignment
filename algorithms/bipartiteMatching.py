@@ -39,7 +39,6 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
 
     i = 1
     while i < m:
-        print(f"{i} < {m}")
         for j in range(1, ntmod+1):
             t[tmod[j]] = 0
         ntmod = 0
@@ -84,6 +83,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
                 bt[tmod[j]] += theta
             continue
         i = i+1
+        print(f"{i} < {m}")
     val = 0
     # print("po")
     for i in range(1, m):

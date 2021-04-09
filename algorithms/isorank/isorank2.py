@@ -16,6 +16,7 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True):
 
     Src = data['Src'].A
     Tar = data['Tar'].A
+    L = data['L'].A
 
     n1 = np.shape(Tar)[0]
     n2 = np.shape(Src)[0]

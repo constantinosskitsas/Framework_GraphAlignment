@@ -30,7 +30,7 @@ def global_config():
 
     GW_args = {
         'opt_dict': {
-            'epochs': 1,            # the more u study the worse the grade man
+            'epochs': 5,            # the more u study the worse the grade man
             'batch_size': 1000000,   # should be all data I guess?
             'use_cuda': False,
             'strategy': 'soft',
@@ -146,7 +146,7 @@ def global_config():
     ]
 
     mtype = [
-        1,      # gwl
+        4,      # gwl
         2,      # conealign
         3,      # grasp
         0,      # regal
@@ -320,24 +320,23 @@ def run_alg(_seed, data, Gt, i, algs, mtype, verbose):
 
 @ex.capture
 def init():
-    # G = nx.newman_watts_strogatz_graph(1000, 4, 0.5)
-    # G = nx.watts_strogatz_graph(1070, 10, 0.5)
-    # G = nx.watts_strogatz_graph(100, 3, 0.5)
-    # G = nx.gnp_random_graph(10, 0.5)  # fast_gnp_random_graph for sparse
-    # G = nx.barabasi_albert_graph(1000, 30)
-    G = nx.powerlaw_cluster_graph(100, 10, 0.5)
+    #G = nx.newman_watts_strogatz_graph(1133, 7, 0.5)
+    #G = nx.watts_strogatz_graph(1133, 10, 0.5)
+    #G = nx.gnp_random_graph(1133, 0.009)  # fast_gnp_random_graph for sparse
+    #G = nx.barabasi_albert_graph(1133, 5)
+    G = nx.powerlaw_cluster_graph(1133, 5, 0.5)
 
-    # G = 'data/arenas_old/source.txt'
+    #G = 'data/arenas_old/source.txt'
     # G = 'data/arenas/source.txt'
     # G = 'data/CA-AstroPh/source.txt'
     # G = 'data/facebook/source.txt'
 
-    # G = {'dataset': 'arenas_old', 'edges': 1, 'noise_level': 5}
+    #G = {'dataset': 'arenas_old', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'arenas', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
 
-    noise = 0.05
+    noise = 0.01
     return generate_graphs(
         G,
         # source_noise=noise,

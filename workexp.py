@@ -320,16 +320,6 @@ def run_alg(_seed, data, Gt, i, algs, mtype, verbose):
 
 
 @ex.capture
-<<<<<<< HEAD
-def init():
-    #G = nx.newman_watts_strogatz_graph(1133, 7, 0.5)
-    #G = nx.watts_strogatz_graph(1133, 10, 0.5)
-    #G = nx.gnp_random_graph(1133, 0.009)  # fast_gnp_random_graph for sparse
-    #G = nx.barabasi_albert_graph(1133, 5)
-    G = nx.powerlaw_cluster_graph(1133, 5, 0.5)
-
-    #G = 'data/arenas_old/source.txt'
-=======
 def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, verbose, _seed, filename="res"):
 
     if verbose:
@@ -398,7 +388,6 @@ def playground():
     # G = nx.powerlaw_cluster_graph(100, 10, 0.5)
 
     # G = 'data/arenas_old/source.txt'
->>>>>>> 44fca59 (exp1)
     # G = 'data/arenas/source.txt'
     # G = 'data/CA-AstroPh/source.txt'
     # G = 'data/facebook/source.txt'
@@ -408,13 +397,8 @@ def playground():
     # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
 
-<<<<<<< HEAD
-    noise = 0.01
-    return generate_graphs(
-=======
     noise = 0.05
     Src, Tar, Gt = generate_graphs(
->>>>>>> 44fca59 (exp1)
         G,
         # source_noise=noise,
         target_noise=noise,

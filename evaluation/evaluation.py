@@ -97,8 +97,8 @@ def transformRAtoNormalALign(alignment_matrix):
 
 #works
 def S3(A,B,mb):
-    A1=np.sum(A,1)
-    B1=np.sum(B,1)
+    A1=np.sum(A,0)
+    B1=np.sum(B,0)
     EdA1=np.sum(A1)
     EdB1=np.sum(B1)
     Ce=0
@@ -119,8 +119,8 @@ def S3(A,B,mb):
     return res    
 #works
 def ICorS3GT(A,B,mb,gmb,IC):
-    A1=np.sum(A,1)
-    B1=np.sum(B,1)
+    A1=np.sum(A,0)
+    B1=np.sum(B,0)
     EdA1=np.sum(A1)
     EdB1=np.sum(B1)
     Ce=0

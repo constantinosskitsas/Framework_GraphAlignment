@@ -17,6 +17,7 @@ import scipy.sparse as sps
 import sys
 import os
 import random
+import yaml
 
 from utils import *
 
@@ -30,13 +31,15 @@ def global_config():
 
     GW_args = {
         'opt_dict': {
-            'epochs': 1,            # the more u study the worse the grade man
-            'batch_size': 1000000,   # should be all data I guess?
+            'epochs': 5,
+            'batch_size': 1000000,
             'use_cuda': False,
             'strategy': 'soft',
-            'beta': 1e-1,
-            'outer_iteration': 400,
-            'inner_iteration': 1,
+            # 'strategy': 'hard',
+            'beta': 10,
+            # 'beta': 1e-1,
+            'outer_iteration': 30,  # M
+            'inner_iteration': 200,  # N
             'sgd_iteration': 300,
             'prior': False,
             'prefix': 'results',
@@ -44,14 +47,21 @@ def global_config():
         },
         'hyperpara_dict': {
             'dimension': 100,
-            'loss_type': 'L2',
+            'loss_type': 'MSE',
+            # 'loss_type': 'L2',
             'cost_type': 'cosine',
+            # 'cost_type': 'RBF',
             'ot_method': 'proximal'
-        }
+        },
+        'lr': 0.001,
+        # 'lr': 1e-3,
+        'gamma': 0.01,
+        # 'gamma': None,
+        # 'gamma': 0.8,
     }
 
     CONE_args = {
-        'dim': 64,
+        'dim': 128,
         'window': 10,
         'negative': 1.0,
         'niter_init': 10,
@@ -82,10 +92,10 @@ def global_config():
     REGAL_args = {
         'attributes': None,
         'attrvals': 2,
-        'dimensions': 128,
-        'k': 10,
-        'untillayer': 2,
-        'alpha': 0.01,
+        'dimensions': 128,  # useless
+        'k': 10,            # d = klogn
+        'untillayer': 2,    # k
+        'alpha': 0.01,      # delta
         'gammastruc': 1.0,
         'gammaattr': 1.0,
         'numtop': 10,
@@ -100,22 +110,22 @@ def global_config():
     }
 
     NSD_args = {
-        'alpha': 0.5,
+        'alpha': 0.8,
         'iters': 10
     }
 
     ISO_args = {
-        # 'alpha': 0.5,
-        'alpha': None,
+        'alpha': 0.6,
+        # 'alpha': None,
         'tol': 1e-12,
-        'maxiter': 1,
+        'maxiter': 100,
         'verbose': True
     }
 
     NET_args = {
         'a': 1,
-        'b': 1,
-        'gamma': 0.99,
+        'b': 2,
+        'gamma': 0.95,
         'dtype': 2,
         'maxiter': 100,
         'verbose': True
@@ -146,7 +156,7 @@ def global_config():
     ]
 
     mtype = [
-        1,      # gwl
+        4,      # gwl
         2,      # conealign
         3,      # grasp
         0,      # regal
@@ -319,41 +329,7 @@ def run_alg(_seed, data, Gt, i, algs, mtype, verbose):
 
 
 @ex.capture
-def init():
-    # G = nx.newman_watts_strogatz_graph(1000, 4, 0.5)
-    # G = nx.watts_strogatz_graph(1070, 10, 0.5)
-    # G = nx.watts_strogatz_graph(100, 3, 0.5)
-    # G = nx.gnp_random_graph(10, 0.5)  # fast_gnp_random_graph for sparse
-    # G = nx.barabasi_albert_graph(1000, 30)
-    G = nx.powerlaw_cluster_graph(100, 10, 0.5)
-
-    # G = 'data/arenas_old/source.txt'
-    # G = 'data/arenas/source.txt'
-    # G = 'data/CA-AstroPh/source.txt'
-    # G = 'data/facebook/source.txt'
-
-    # G = {'dataset': 'arenas_old', 'edges': 1, 'noise_level': 5}
-    # G = {'dataset': 'arenas', 'edges': 1, 'noise_level': 5}
-    # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
-    # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
-
-    noise = 0.05
-    return generate_graphs(
-        G,
-        # source_noise=noise,
-        target_noise=noise,
-        # refill=True
-    )
-
-
-@ex.automain
-def main(_config, algs, run, mtype, prep, lalpha, mind, verbose, _seed):
-    print()
-
-    if not verbose:
-        sys.stdout = open(os.devnull, 'w')
-
-    Src, Tar, Gt = init()
+def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, verbose, _seed, filename="res"):
 
     if verbose:
         plotG(Src, 'Src', False)
@@ -363,7 +339,8 @@ def main(_config, algs, run, mtype, prep, lalpha, mind, verbose, _seed):
     if prep == True:
         L, S, li, lj, w = preprocess(Src, Tar, lalpha, mind)
     else:
-        L = S = li = lj = w = np.empty(1)
+        L = S = sps.eye(1)
+        li = lj = w = np.empty(1)
 
     data = {
         'Src': Src,
@@ -375,26 +352,123 @@ def main(_config, algs, run, mtype, prep, lalpha, mind, verbose, _seed):
         'w': w
     }
 
-    results = []
-
-    for i in run:
-        # alg, args = algs[i]
-        # mt = mtype[i]
-        # res = alg.main(data=data, **args)
-        # matrix, cost = format_output(res)
-        # ma, mb = getmatching(matrix, cost, mt)
-        # results.append(
-        #     evall(ma, mb, data['Src'], data['Tar'], Gt,
-        #           alg=alg.__name__, verbose=verbose)
-        # )
-        results.append(run_alg(_seed, data, Gt, i))
+    results = [run_alg(_seed, data, Gt, i) for i in run]
 
     df = pd.DataFrame(results)
-    df.to_csv(f'results/res.csv', index=False)
+    df.to_csv(f'results/{filename}.csv', index=False)
+
+    return results
+
+
+def exp1():
+    n = 107
+    graphs = [
+        (nx.newman_watts_strogatz_graph, (n, 4, 0.5)),
+        (nx.watts_strogatz_graph, (n, 10, 0.5)),
+        (nx.gnp_random_graph, (n, 0.5)),
+        (nx.barabasi_albert_graph, (n, 30)),
+        (nx.powerlaw_cluster_graph, (n, 10, 0.5)),
+    ]
+
+    noise_level = 0.05
+
+    noises = [
+        {'target_noise': noise_level},
+        {'target_noise': noise_level, 'refill': True},
+        {'source_noise': noise_level, 'target_noise': noise_level},
+        # {'source_noise': noise, 'target_noise': noise, 'refill': True},
+    ]
+
+    G = [
+        [generate_graphs(alg(*args), **nargs) for nargs in noises] for alg, args in graphs
+    ]
+
+    for i, gsn in enumerate(G):
+        for j, g in enumerate(gsn):
+            run_algs(*g, filename=f'res_{i}_{j}', verbose=False)
+
+
+@ex.capture
+def playground():
+    # G = nx.newman_watts_strogatz_graph(1000, 4, 0.5)
+    G = nx.watts_strogatz_graph(1070, 10, 0.5)
+    # G = nx.gnp_random_graph(10, 0.5)  # fast_gnp_random_graph for sparse
+    # G = nx.barabasi_albert_graph(1000, 30)
+    # G = nx.powerlaw_cluster_graph(100, 10, 0.5)
+
+    # G = 'data/arenas_old/source.txt'
+    # G = 'data/arenas/source.txt'
+    # G = 'data/CA-AstroPh/source.txt'
+    # G = 'data/facebook/source.txt'
+
+    #G = {'dataset': 'arenas_old', 'edges': 1, 'noise_level': 5}
+    # G = {'dataset': 'arenas', 'edges': 1, 'noise_level': 5}
+    # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
+    # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
+
+    noise = 0.05
+    Src, Tar, Gt = generate_graphs(
+        G,
+        # source_noise=noise,
+        target_noise=noise,
+        # refill=True
+    )
+
+    results = run_algs(Src, Tar, Gt)
 
     sys.stdout = sys.__stdout__
-    print("\n")
-    print(_config)
-    print("\n\n")
     with np.printoptions(precision=4, suppress=True) as a:
         print(np.array(results))
+
+
+@ex.automain
+def main(_config, verbose):
+    print()
+
+    if not verbose:
+        sys.stdout = open(os.devnull, 'w')
+
+    playground()
+    # exp1()
+
+    # Src, Tar, Gt = init()
+
+    # if verbose:
+    #     plotG(Src, 'Src', False)
+    #     plotG(Tar, 'Tar')
+    #     # plotGs(Tar, Src, circular=True)
+
+    # if prep == True:
+    #     L, S, li, lj, w = preprocess(Src, Tar, lalpha, mind)
+    # else:
+    #     L = S = li = lj = w = np.empty(1)
+
+    # data = {
+    #     'Src': Src,
+    #     'Tar': Tar,
+    #     'L': L,
+    #     'S': S,
+    #     'li': li,
+    #     'lj': lj,
+    #     'w': w
+    # }
+
+    # results = []
+
+    # for i in run:
+    #     # alg, args = algs[i]
+    #     # mt = mtype[i]
+    #     # res = alg.main(data=data, **args)
+    #     # matrix, cost = format_output(res)
+    #     # ma, mb = getmatching(matrix, cost, mt)
+    #     # results.append(
+    #     #     evall(ma, mb, data['Src'], data['Tar'], Gt,
+    #     #           alg=alg.__name__, verbose=verbose)
+    #     # )
+    #     results.append(run_alg(_seed, data, Gt, i))
+
+    # df = pd.DataFrame(results)
+    # df.to_csv(f'results/res.csv', index=False)
+
+    with open("config.yaml", "w") as cy:
+        yaml.dump(_config, cy)

@@ -5,7 +5,7 @@ import numpy as np
 import scipy.sparse as sps
 
 
-def main(data, opt_dict, hyperpara_dict):
+def main(data, opt_dict, hyperpara_dict, lr, gamma):
 
     Src = data['Src']
     Tar = data['Tar']
@@ -30,13 +30,14 @@ def main(data, opt_dict, hyperpara_dict):
     gwd_model = GromovWassersteinLearning(hyperpara_dictt)
 
     # initialize optimizer
-    optimizer = optim.Adam(gwd_model.gwl_model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(gwd_model.gwl_model.parameters(), lr=lr)
 
-    # scheduler = lr_scheduler.ExponentialLR(
-    #     optimizer, gamma=0.8)
+    scheduler = lr_scheduler.ExponentialLR(
+        optimizer, gamma=gamma) if gamma else None
 
     # Gromov-Wasserstein learning
-    gwd_model.train_without_prior(data, optimizer, opt_dict, scheduler=None)
+    gwd_model.train_without_prior(
+        data, optimizer, opt_dict, scheduler=scheduler)
     cost12 = gwd_model.getCostm()
     # gwd_model.evaluation_recommendation1()
     return gwd_model.trans, cost12

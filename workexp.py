@@ -31,13 +31,15 @@ def global_config():
 
     GW_args = {
         'opt_dict': {
-            'epochs': 5,            # the more u study the worse the grade man
-            'batch_size': 1000000,   # should be all data I guess?
+            'epochs': 5,
+            'batch_size': 1000000,
             'use_cuda': False,
             'strategy': 'soft',
-            'beta': 1e-1,
-            'outer_iteration': 400,
-            'inner_iteration': 1,
+            # 'strategy': 'hard',
+            'beta': 10,
+            # 'beta': 1e-1,
+            'outer_iteration': 30,  # M
+            'inner_iteration': 200,  # N
             'sgd_iteration': 300,
             'prior': False,
             'prefix': 'results',
@@ -45,14 +47,21 @@ def global_config():
         },
         'hyperpara_dict': {
             'dimension': 100,
-            'loss_type': 'L2',
+            'loss_type': 'MSE',
+            # 'loss_type': 'L2',
             'cost_type': 'cosine',
+            # 'cost_type': 'RBF',
             'ot_method': 'proximal'
-        }
+        },
+        'lr': 0.001,
+        # 'lr': 1e-3,
+        'gamma': 0.01,
+        # 'gamma': None,
+        # 'gamma': 0.8,
     }
 
     CONE_args = {
-        'dim': 64,
+        'dim': 128,
         'window': 10,
         'negative': 1.0,
         'niter_init': 10,
@@ -83,10 +92,10 @@ def global_config():
     REGAL_args = {
         'attributes': None,
         'attrvals': 2,
-        'dimensions': 128,
-        'k': 10,
-        'untillayer': 2,
-        'alpha': 0.01,
+        'dimensions': 128,  # useless
+        'k': 10,            # d = klogn
+        'untillayer': 2,    # k
+        'alpha': 0.01,      # delta
         'gammastruc': 1.0,
         'gammaattr': 1.0,
         'numtop': 10,
@@ -101,7 +110,7 @@ def global_config():
     }
 
     NSD_args = {
-        'alpha': 0.5,
+        'alpha': 0.8,
         'iters': 10
     }
 
@@ -115,8 +124,8 @@ def global_config():
 
     NET_args = {
         'a': 1,
-        'b': 1,
-        'gamma': 0.99,
+        'b': 2,
+        'gamma': 0.95,
         'dtype': 2,
         'maxiter': 100,
         'verbose': True

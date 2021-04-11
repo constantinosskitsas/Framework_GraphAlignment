@@ -106,11 +106,9 @@ def global_config():
     }
 
     ISO_args = {
-        'alpha': 0.6,
-        # 'alpha': None,
+        'alpha': None,  # 0.6 in full
         'tol': 1e-12,
-        'maxiter': 100,
-        'verbose': True
+        'maxiter': 100
     }
 
     NET_args = {
@@ -182,10 +180,18 @@ def global_config():
     prep = False
     lalpha = mind = None
     verbose = True
+    graphs = noises = []
+    n = noise_level = iters = None
+    start = None
 
 
 @ex.named_config
 def full():
+
+    ISO_args = {
+        'alpha': 0.6
+    }
+
     prep = True
     lalpha = 1
 
@@ -208,34 +214,37 @@ def full():
 @ex.named_config
 def fast():
 
+    GW_args = {
+        'opt_dict': {
+            'epochs': 1,
+            'outer_iteration': 40,
+            'sgd_iteration': 30,
+        },
+        'hyperpara_dict': {
+            'dimension': 5
+        }
+    }
+
     GRASP_args = {
-        'laa': 2,
-        'icp': False,
-        'icp_its': 3,
-        'q': 100,
-        'k': 20,
-        'n_eig': 100,
-        'lower_t': 1.0,
-        'upper_t': 50.0,
-        'linsteps': True,
-        'base_align': True
+        'n_eig': 50,
+        'k': 5
+    }
+
+    CONE_args = {
+        'dim': 16
     }
 
     run = [
-        # 0,      # gwl
-        # 1,      # conealign,
+        0,      # gwl
+        1,      # conealign,
         2,      # grasp,
         3,      # regal,
-
-        # 4,      # eigenalign,
-        5,      # NSD,
-        6,      # isorank,
     ]
 
     fast = True
 
 
-@ex.capture
+@ ex.capture
 def evall(ma, mb, Src, Tar, Gt, eval_type=0, alg='NoName', verbose=True, fast=False):
     sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=100, precision=4, suppress=True)
@@ -289,12 +298,12 @@ def evall(ma, mb, Src, Tar, Gt, eval_type=0, alg='NoName', verbose=True, fast=Fa
 
     accs = (acc3, acc4, acc5, acc6)
 
-    with open(f'results/{prefix}{alg}_{best}_.txt', 'wb') as f:
-        np.savetxt(f, res[:, :2], fmt='%2.3f')
-        np.savetxt(f, [accs], fmt='%2.3f')
-        if not fast:
-            np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
-            np.savetxt(f, alignment, fmt='%5d')
+    # with open(f'results/{prefix}{alg}_{best}_.txt', 'wb') as f:
+    #     np.savetxt(f, res[:, :2], fmt='%2.3f')
+    #     np.savetxt(f, [accs], fmt='%2.3f')
+    #     if not fast:
+    #         np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
+    #         np.savetxt(f, alignment, fmt='%5d')
 
     print(f"{'#':#^35}")
 
@@ -304,7 +313,7 @@ def evall(ma, mb, Src, Tar, Gt, eval_type=0, alg='NoName', verbose=True, fast=Fa
     return acc, acc2, *accs
 
 
-@ex.capture
+@ ex.capture
 def run_alg(_seed, data, Gt, i, algs, mtype, verbose):
 
     random.seed(_seed)
@@ -319,7 +328,7 @@ def run_alg(_seed, data, Gt, i, algs, mtype, verbose):
                  alg=alg.__name__, verbose=verbose)
 
 
-@ex.capture
+@ ex.capture
 def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, verbose, _seed, filename="res"):
 
     if verbose:
@@ -345,14 +354,19 @@ def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, verbose, _seed,
 
     results = [run_alg(_seed, data, Gt, i) for i in run]
 
-    df = pd.DataFrame(results)
-    df.to_csv(f'results/{filename}.csv', index=False)
+    # df = pd.DataFrame(results)
+    # df.to_csv(f'results/{filename}.csv', index=False)
 
     return results
 
 
+@ ex.named_config
 def exp1():
-    n = 107
+
+    n = 100
+    noise_level = 0.05
+    iters = 10
+
     graphs = [
         (nx.newman_watts_strogatz_graph, (n, 4, 0.5)),
         (nx.watts_strogatz_graph, (n, 10, 0.5)),
@@ -361,8 +375,6 @@ def exp1():
         (nx.powerlaw_cluster_graph, (n, 10, 0.5)),
     ]
 
-    noise_level = 0.05
-
     noises = [
         {'target_noise': noise_level},
         {'target_noise': noise_level, 'refill': True},
@@ -370,17 +382,46 @@ def exp1():
         # {'source_noise': noise, 'target_noise': noise, 'refill': True},
     ]
 
-    G = [
-        [generate_graphs(alg(*args), **nargs) for nargs in noises] for alg, args in graphs
-    ]
-
-    for i, gsn in enumerate(G):
-        for j, g in enumerate(gsn):
-            run_algs(*g, filename=f'res_{i}_{j}', verbose=False)
+    start = "exp1"
 
 
 @ex.capture
+def run_exp1(graphs, noises, iters):
+
+    G = [
+        [
+            [
+                generate_graphs(alg(*args), **nargs) for _ in range(iters)
+            ] for nargs in noises
+        ] for alg, args in graphs
+    ]
+
+    randcheck = np.random.rand(1)[0]
+
+    for graph_number, g_n in enumerate(G):
+        for noise_type, g_it in enumerate(g_n):
+            writer = pd.ExcelWriter(
+                f"results/res_g{graph_number+1}_n{noise_type+1}.xlsx", engine='openpyxl')
+
+            results = np.array([run_algs(*g, verbose=False) for g in g_it])
+
+            # print(results.shape)
+            for i in range(results.shape[1]):
+                pd.DataFrame(
+                    results[:, i, :],
+                    index=[f'it{j+1}' for j in range(results.shape[0])],
+                    columns=[f'acc{j+1}' for j in range(results.shape[2])]
+                ).to_excel(writer, sheet_name=f"alg{i + 1}")
+            writer.save()
+            # df.to_csv(
+            #     f'results/res_{graph_number}_{noise_type}.csv', index=False)
+
+    return randcheck
+
+
+@ ex.capture
 def playground():
+
     # G = nx.newman_watts_strogatz_graph(1000, 4, 0.5)
     G = nx.watts_strogatz_graph(1070, 10, 0.5)
     # G = nx.gnp_random_graph(10, 0.5)  # fast_gnp_random_graph for sparse
@@ -392,7 +433,7 @@ def playground():
     # G = 'data/CA-AstroPh/source.txt'
     # G = 'data/facebook/source.txt'
 
-    #G = {'dataset': 'arenas_old', 'edges': 1, 'noise_level': 5}
+    # G = {'dataset': 'arenas_old', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'arenas', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
@@ -411,55 +452,28 @@ def playground():
     with np.printoptions(precision=4, suppress=True) as a:
         print(np.array(results))
 
+    df = pd.DataFrame(results)
+    df.to_csv(f'results/{filename}.csv', index=False)
 
-@ex.automain
-def main(_config, verbose):
+
+@ ex.automain
+def main(_config, verbose, start):
     print()
 
     if not verbose:
         sys.stdout = open(os.devnull, 'w')
 
-    playground()
-    # exp1()
+    if start == "exp1":
+        randcheck = run_exp1()
+    else:
+        playground()
+        randcheck = 0
 
-    # Src, Tar, Gt = init()
+    # randcheck = np.random.rand(1)[0]
+    # print(randcheck)
 
-    # if verbose:
-    #     plotG(Src, 'Src', False)
-    #     plotG(Tar, 'Tar')
-    #     # plotGs(Tar, Src, circular=True)
-
-    # if prep == True:
-    #     L, S, li, lj, w = preprocess(Src, Tar, lalpha, mind)
-    # else:
-    #     L = S = li = lj = w = np.empty(1)
-
-    # data = {
-    #     'Src': Src,
-    #     'Tar': Tar,
-    #     'L': L,
-    #     'S': S,
-    #     'li': li,
-    #     'lj': lj,
-    #     'w': w
-    # }
-
-    # results = []
-
-    # for i in run:
-    #     # alg, args = algs[i]
-    #     # mt = mtype[i]
-    #     # res = alg.main(data=data, **args)
-    #     # matrix, cost = format_output(res)
-    #     # ma, mb = getmatching(matrix, cost, mt)
-    #     # results.append(
-    #     #     evall(ma, mb, data['Src'], data['Tar'], Gt,
-    #     #           alg=alg.__name__, verbose=verbose)
-    #     # )
-    #     results.append(run_alg(_seed, data, Gt, i))
-
-    # df = pd.DataFrame(results)
-    # df.to_csv(f'results/res.csv', index=False)
-
-    with open("config.yaml", "w") as cy:
-        yaml.dump(_config, cy)
+    with open("results/config.yaml", "w") as cy:
+        yaml.dump({
+            "randcheck": float(randcheck),
+            **_config
+        }, cy)

@@ -31,7 +31,7 @@ def global_config():
 
     GW_args = {
         'opt_dict': {
-            'epochs': 5,
+            'epochs': 1,
             'batch_size': 1000000,
             'use_cuda': False,
             'strategy': 'soft',
@@ -156,7 +156,7 @@ def global_config():
     ]
 
     mtype = [
-        4,      # gwl
+        1,      # gwl
         2,      # conealign
         3,      # grasp
         0,      # regal

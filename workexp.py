@@ -173,7 +173,7 @@ def global_config():
     run = [
         0,      # gwl
         1,      # conealign
-        2,      # grasp
+       # 2,      # grasp
         3,      # regal
 
         4,      # eigenalign
@@ -372,16 +372,16 @@ def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, verbose, _seed,
 @ ex.named_config
 def exp1():
 
-    n = 100
-    noise_level = 0.05
+    n = 1133
+    noise_level = 0.01
     iters = 10
 
     graphs = [
-        (nx.newman_watts_strogatz_graph, (n, 4, 0.5)),
+        (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
         (nx.watts_strogatz_graph, (n, 10, 0.5)),
-        (nx.gnp_random_graph, (n, 0.5)),
-        (nx.barabasi_albert_graph, (n, 30)),
-        (nx.powerlaw_cluster_graph, (n, 10, 0.5)),
+        (nx.gnp_random_graph, (n, 0.009)),
+        (nx.barabasi_albert_graph, (n, 5)),
+        (nx.powerlaw_cluster_graph, (n, 5, 0.5)),
     ]
 
     noises = [

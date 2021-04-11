@@ -36,28 +36,28 @@ def global_config():
             'use_cuda': False,
             'strategy': 'soft',
             # 'strategy': 'hard',
-            'beta': 10,
-            # 'beta': 1e-1,
-            'outer_iteration': 30,  # M
-            'inner_iteration': 200,  # N
+            #'beta': 0.1,
+            'beta': 1e-1,
+            'outer_iteration': 400,  # M
+            'inner_iteration': 1,  # N
             'sgd_iteration': 300,
             'prior': False,
             'prefix': 'results',
             'display': False
         },
         'hyperpara_dict': {
-            'dimension': 100,
-            'loss_type': 'MSE',
-            # 'loss_type': 'L2',
+            'dimension': 90,
+            #'loss_type': 'MSE',
+            'loss_type': 'L2',
             'cost_type': 'cosine',
-            # 'cost_type': 'RBF',
+            #'cost_type': 'RBF',
             'ot_method': 'proximal'
         },
-        'lr': 0.001,
-        # 'lr': 1e-3,
-        'gamma': 0.01,
-        # 'gamma': None,
-        # 'gamma': 0.8,
+        #'lr': 0.001,
+        'lr': 1e-3,
+        #'gamma': 0.01,
+        #'gamma': None,
+        'gamma': 0.8,
     }
 
     CONE_args = {
@@ -174,13 +174,13 @@ def global_config():
 
     run = [
         0,      # gwl
-        1,      # conealign
-        2,      # grasp
-        3,      # regal
+        #1,      # conealign
+        #2,      # grasp
+        #3,      # regal
 
-        4,      # eigenalign
-        5,      # NSD
-        6,      # isorank
+        #4,      # eigenalign
+        #5,      # NSD
+        #6,      # isorank
 
         # 7,      # netalign
         # 8,      # klaus
@@ -202,7 +202,7 @@ def full():
     run = [
         0,      # gwl
         1,      # conealign,
-        2,      # grasp,
+        #2,      # grasp,
         3,      # regal,
 
         4,      # eigenalign,
@@ -390,11 +390,11 @@ def exp1():
 
 @ex.capture
 def playground():
-    # G = nx.newman_watts_strogatz_graph(1000, 4, 0.5)
-    G = nx.watts_strogatz_graph(1070, 10, 0.5)
-    # G = nx.gnp_random_graph(10, 0.5)  # fast_gnp_random_graph for sparse
-    # G = nx.barabasi_albert_graph(1000, 30)
-    # G = nx.powerlaw_cluster_graph(100, 10, 0.5)
+    G = nx.newman_watts_strogatz_graph(1133, 7, 0.5)
+    #G = nx.watts_strogatz_graph(1133, 10, 0.5)
+    # G = nx.gnp_random_graph(1133, 0.009)  # fast_gnp_random_graph for sparse
+    #G = nx.barabasi_albert_graph(1133, 5)
+    # G = nx.powerlaw_cluster_graph(1133, 5, 0.5)
 
     # G = 'data/arenas_old/source.txt'
     # G = 'data/arenas/source.txt'
@@ -406,7 +406,7 @@ def playground():
     # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
 
-    noise = 0.05
+    noise = 0.1
     Src, Tar, Gt = generate_graphs(
         G,
         # source_noise=noise,

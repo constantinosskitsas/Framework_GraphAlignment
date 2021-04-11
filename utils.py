@@ -337,8 +337,8 @@ def fast4(l2):
 
 
 def S3(A, B, ma, mb):
-    A1 = np.sum(A, 1)
-    B1 = np.sum(B, 1)
+    A1 = np.sum(A, 0)
+    B1 = np.sum(B, 0)
     EdA1 = np.sum(A1)
     EdB1 = np.sum(B1)
     Ce = 0
@@ -355,15 +355,19 @@ def S3(A, B, ma, mb):
         elif source > target:
             Ce = Ce+target
     div = EdA1+EdB1-Ce
+    print(EdA1)
+    print(EdB1)
+    print(Ce)
     res = Ce/div
     return res
 
 
 def ICorS3GT(A, B, ma, mb, gmb, IC):
-    A1 = np.sum(A, 1)
-    B1 = np.sum(B, 1)
+    A1 = np.sum(A, 0)
+    B1 = np.sum(B, 0)
     EdA1 = np.sum(A1)
     EdB1 = np.sum(B1)
+
     Ce = 0
     source = 0
     target = 0

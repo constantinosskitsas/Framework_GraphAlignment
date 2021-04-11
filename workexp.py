@@ -31,28 +31,37 @@ def global_config():
 
     GW_args = {
         'opt_dict': {
-            'epochs': 5,            # the more u study the worse the grade man
-            'batch_size': 1000000,   # should be all data I guess?
+            'epochs': 1,
+            'batch_size': 1000000,
             'use_cuda': False,
             'strategy': 'soft',
+            # 'strategy': 'hard',
+            # 'beta': 0.1,
             'beta': 1e-1,
-            'outer_iteration': 400,
-            'inner_iteration': 1,
+            'outer_iteration': 400,  # M
+            'inner_iteration': 1,  # N
             'sgd_iteration': 300,
             'prior': False,
             'prefix': 'results',
             'display': False
         },
         'hyperpara_dict': {
-            'dimension': 100,
+            'dimension': 90,
+            # 'loss_type': 'MSE',
             'loss_type': 'L2',
             'cost_type': 'cosine',
+            # 'cost_type': 'RBF',
             'ot_method': 'proximal'
-        }
+        },
+        # 'lr': 0.001,
+        'lr': 1e-3,
+        # 'gamma': 0.01,
+        # 'gamma': None,
+        'gamma': 0.8,
     }
 
     CONE_args = {
-        'dim': 64,
+        'dim': 128,
         'window': 10,
         'negative': 1.0,
         'niter_init': 10,
@@ -83,10 +92,10 @@ def global_config():
     REGAL_args = {
         'attributes': None,
         'attrvals': 2,
-        'dimensions': 128,
-        'k': 10,
-        'untillayer': 2,
-        'alpha': 0.01,
+        'dimensions': 128,  # useless
+        'k': 10,            # d = klogn
+        'untillayer': 2,    # k
+        'alpha': 0.01,      # delta
         'gammastruc': 1.0,
         'gammaattr': 1.0,
         'numtop': 10,
@@ -101,7 +110,7 @@ def global_config():
     }
 
     NSD_args = {
-        'alpha': 0.5,
+        'alpha': 0.8,
         'iters': 10
     }
 
@@ -113,8 +122,8 @@ def global_config():
 
     NET_args = {
         'a': 1,
-        'b': 1,
-        'gamma': 0.99,
+        'b': 2,
+        'gamma': 0.95,
         'dtype': 2,
         'maxiter': 100,
         'verbose': True
@@ -145,7 +154,7 @@ def global_config():
     ]
 
     mtype = [
-        4,      # gwl
+        1,      # gwl
         2,      # conealign
         3,      # grasp
         0,      # regal
@@ -421,12 +430,11 @@ def run_exp1(graphs, noises, iters):
 
 @ ex.capture
 def playground():
-
-    # G = nx.newman_watts_strogatz_graph(1000, 4, 0.5)
-    G = nx.watts_strogatz_graph(1070, 10, 0.5)
-    # G = nx.gnp_random_graph(10, 0.5)  # fast_gnp_random_graph for sparse
-    # G = nx.barabasi_albert_graph(1000, 30)
-    # G = nx.powerlaw_cluster_graph(100, 10, 0.5)
+    G = nx.newman_watts_strogatz_graph(1133, 7, 0.5)
+    #G = nx.watts_strogatz_graph(1133, 10, 0.5)
+    # G = nx.gnp_random_graph(1133, 0.009)  # fast_gnp_random_graph for sparse
+    #G = nx.barabasi_albert_graph(1133, 5)
+    # G = nx.powerlaw_cluster_graph(1133, 5, 0.5)
 
     # G = 'data/arenas_old/source.txt'
     # G = 'data/arenas/source.txt'
@@ -438,7 +446,7 @@ def playground():
     # G = {'dataset': 'CA-AstroPh', 'edges': 1, 'noise_level': 5}
     # G = {'dataset': 'facebook', 'edges': 1, 'noise_level': 5}
 
-    noise = 0.05
+    noise = 0.1
     Src, Tar, Gt = generate_graphs(
         G,
         # source_noise=noise,

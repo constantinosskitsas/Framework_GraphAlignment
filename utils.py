@@ -355,9 +355,9 @@ def S3(A, B, ma, mb):
         elif source > target:
             Ce = Ce+target
     div = EdA1+EdB1-Ce
-    print(EdA1)
-    print(EdB1)
-    print(Ce)
+    # print(EdA1)
+    # print(EdB1)
+    # print(Ce)
     res = Ce/div
     return res
 

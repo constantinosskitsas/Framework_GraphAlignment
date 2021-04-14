@@ -182,6 +182,11 @@ def main(data, **args):
     Src = data['Src']
     Tar = data['Tar']
 
+    # min_dim = min(Src.shape[0] - 1, Tar.shape[0] - 1)
+
+    # if args['dim'] > min_dim:
+    #     args['dim'] = min_dim
+
     if args['dim'] > Src.shape[0] - 1:
         args['dim'] = Src.shape[0] - 1
 

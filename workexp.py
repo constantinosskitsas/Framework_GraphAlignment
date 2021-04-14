@@ -372,10 +372,18 @@ def init(graphs, noises, iters):
 
 
 @ex.capture
-def run_exp(G, output_path):
+def run_exp(G, output_path, _giter=(-np.inf, np.inf)):
+
+    first, last = _giter
+
+    _iter = 0
 
     for graph_number, g_n in enumerate(G):
         for noise_type, g_it in enumerate(g_n):
+            _iter += 1
+            if _iter < first or _iter > last:
+                continue
+
             writer = pd.ExcelWriter(
                 f"{output_path}/res_g{graph_number+1}_n{noise_type+1}.xlsx", engine='openpyxl')
 
@@ -404,15 +412,15 @@ def playground():
 
     iters = 1
 
-    n = 1133
+    n = 50
     graphs = [
-        # (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
-        # (nx.watts_strogatz_graph, (n, 10, 0.5)),
-        # (nx.gnp_random_graph, (n, 0.009)),
+        (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
+        (nx.watts_strogatz_graph, (n, 10, 0.5)),
+        (nx.gnp_random_graph, (n, 0.1)),
         # (nx.barabasi_albert_graph, (n, 5)),
         # (nx.powerlaw_cluster_graph, (n, 5, 0.5)),
 
-        (lambda x: x, ('data/arenas_old/source.txt',)),
+        # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
         # (lambda x: x, ('data/facebook/source.txt',)),
@@ -432,9 +440,9 @@ def playground():
 
     noise_level = 0.04
     noises = [
-        # {'target_noise': noise_level},
+        {'target_noise': noise_level},
         {'target_noise': noise_level, 'refill': True},
-        # {'source_noise': noise_level, 'target_noise': noise_level},
+        {'source_noise': noise_level, 'target_noise': noise_level},
         # {'source_noise': noise, 'target_noise': noise, 'refill': True},
     ]
 
@@ -486,7 +494,7 @@ def exp1():
 
 
 @ex.automain
-def main(_config, verbose, output_path):
+def main(_config, verbose, output_path, exist_ok=False):
     print()
 
     if not verbose:
@@ -494,7 +502,7 @@ def main(_config, verbose, output_path):
 
     G, randcheck = init()
 
-    os.mkdir(output_path)
+    os.makedirs(output_path, exist_ok=exist_ok)
     with open(f"{output_path}/config.yaml", "w") as cy:
         yaml.dump({
             "randcheck": float(randcheck),

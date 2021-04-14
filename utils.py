@@ -6,6 +6,10 @@ import collections
 import scipy.sparse as sps
 import sys
 import os
+try:
+    import lapjv
+except:
+    pass
 
 from data import similarities_preprocess
 from algorithms import bipartitewrapper as bmw
@@ -25,6 +29,8 @@ def getmatching(matrix, cost, mtype):
             return superfast(cost)
         elif mtype == 5:
             return bmw.getmatchings(sps.csr_matrix(cost.A * -1 + np.amax(cost.A)))
+        elif mtype == 10:
+            return jv(cost)
     except Exception as e:
         print(e)
         return [0], [0]
@@ -302,38 +308,17 @@ def superfast(l2, asc=True):
     return ma, mb
 
 
-def fast3(l2):
-    l2 = l2.A
-    num = np.shape(l2)[0]
-    ma = np.zeros(num, int)
-    mb = np.zeros(num, int)
-    for i in range(num):
-        print(f"fast3: {i}/{num}")
-        hi = np.where(l2 == np.amax(l2))
-        hia = hi[0][0]
-        hib = hi[1][0]
-        ma[hia] = hia
-        mb[hia] = hib
-        l2[:, hib] = -np.inf
-        l2[hia, :] = -np.inf
-    return ma, mb
+def jv(dist):
+    # print('hungarian_matching: calculating distance matrix')
 
-
-def fast4(l2):
-    l2 = l2.A
-    num = np.shape(l2)[0]
-    ma = np.zeros(num)
-    mb = np.zeros(num)
-    for _ in range(num):
-        print(f"fast4: {i}/{num}")
-        hi = np.where(l2 == np.amin(l2))
-        hia = hi[0][0]
-        hib = hi[1][0]
-        ma[hia] = hia
-        mb[hia] = hib
-        l2[:, hib] = np.inf
-        l2[hia, :] = np.inf
-    return ma, mb
+    # dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
+    n = np.shape(dist)[0]
+    # print(np.shape(dist))
+    # print('hungarian_matching: calculating matching')
+    cols, rows, _ = lapjv.lapjv(dist)
+    matching = np.c_[cols, np.linspace(0, n-1, n).astype(int)]
+    matching = matching[matching[:, 0].argsort()]
+    return matching.astype(int)
 
 
 def S3(A, B, ma, mb):

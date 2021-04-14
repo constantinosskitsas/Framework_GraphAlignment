@@ -30,7 +30,7 @@ def getmatching(matrix, cost, mtype):
         elif mtype == 5:
             return bmw.getmatchings(sps.csr_matrix(cost.A * -1 + np.amax(cost.A)))
         elif mtype == 10:
-            return jv(cost)
+            return jv(cost.A)
     except Exception as e:
         print(e)
         return [0], [0]
@@ -316,9 +316,13 @@ def jv(dist):
     # print(np.shape(dist))
     # print('hungarian_matching: calculating matching')
     cols, rows, _ = lapjv.lapjv(dist)
-    matching = np.c_[cols, np.linspace(0, n-1, n).astype(int)]
+    # print(cols)
+    # print(rows)
+    matching = np.c_[rows, np.linspace(0, n-1, n).astype(int)]
+    # print(matching)
     matching = matching[matching[:, 0].argsort()]
-    return matching.astype(int)
+    # print(matching)
+    return matching.astype(int).T
 
 
 def S3(A, B, ma, mb):

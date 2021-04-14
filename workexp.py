@@ -60,7 +60,7 @@ def global_config():
     }
 
     CONE_args = {
-        'dim': 128,
+        'dim': 128,  # clipped by Src[0] - 1
         'window': 10,
         'negative': 1.0,
         'niter_init': 10,
@@ -382,15 +382,13 @@ def run_exp(G, output_path):
             results = np.array([run_algs(*g) for g in g_it])
 
             # print(results.shape)
-            for i in range(results.shape[1]):
+            for i in range(results.shape[2]):
                 pd.DataFrame(
-                    results[:, i, :],
+                    results[:, :, i],
                     index=[f'it{j+1}' for j in range(results.shape[0])],
-                    columns=[f'acc{j+1}' for j in range(results.shape[2])]
-                ).to_excel(writer, sheet_name=f"alg{i + 1}")
+                    columns=[f'alg{j+1}' for j in range(results.shape[1])]
+                ).to_excel(writer, sheet_name=f"acc{i + 1}")
             writer.save()
-            # df.to_csv(
-            #     f'results/res_{graph_number}_{noise_type}.csv', index=False)
 
 
 @ex.config

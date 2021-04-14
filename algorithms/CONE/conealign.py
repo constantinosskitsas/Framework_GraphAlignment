@@ -181,6 +181,10 @@ def main(data, **args):
 
     Src = data['Src']
     Tar = data['Tar']
+
+    if args['dim'] > Src.shape[0] - 1:
+        args['dim'] = Src.shape[0] - 1
+
     # global args
     # args = parse_args()
 

@@ -452,18 +452,18 @@ def playground():
 @ex.named_config
 def exp1():
 
-    run = [
-        0,      # gwl
-        1,      # conealign
-        # 2,      # grasp
-        3,      # regal
+    mtype = [
+        1,      # gwl
+        2,      # conealign
+        10,      # grasp
+        0,      # regal
 
-        4,      # eigenalign
-        5,      # NSD
-        6,      # isorank
+        2,      # eigenalign
+        1,      # NSD
+        1,      # isorank
 
-        # 7,      # netalign
-        # 8,      # klaus
+        2,      # netalign
+        2,      # klaus
     ]
 
     verbose = False

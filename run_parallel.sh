@@ -33,3 +33,6 @@ done
 # bash run_parallel.sh 15 3 "exp1 noise_level=0.05 full run=[2,6,7,8]" 005 seed=196355709
 # bash run_parallel.sh 15 3 "exp1 noise_level=0.04 full run=[2,6,7,8]" 004 seed=895321488
 # bash run_parallel.sh 15 3 "exp1 noise_level=0.03 full run=[2,6,7,8]" 003 seed=821564523
+# bash run_parallel.sh 15 3 "exp1 noise_level=0.02 full run=[2,6,7,8]" 002 seed=123
+# bash run_parallel.sh 15 3 "exp1 noise_level=0.01 full run=[2,6,7,8]" 001 seed=123
+# bash run_parallel.sh 15 3 "exp1 noise_level=0.00 full run=[2,6,7,8]" 000 seed=123

@@ -245,11 +245,6 @@ def fast():
 
 @ex.capture
 def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, alg='NoName', eval_type=0):
-    sys.stdout = sys.__stdout__
-    np.set_printoptions(threshold=100, precision=4, suppress=True)
-    # np.set_printoptions(threshold=np.inf)
-
-    print(f"{' ' + alg +' ':#^35}")
 
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
@@ -281,19 +276,14 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, alg='NoName', e
         prefix = ""
 
     acc, acc2, alignment = res[eval_type]
-    print(res[:, :2].astype(float))
 
     acc3 = S3(Src.A, Tar.A, ma, mb)
-    print(acc3)
     acc4 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, True)
-    print(acc4)
     acc5 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, False)
-    print(acc5)
     if mnc:
         acc6 = score_MNC(Src, Tar, ma, mb)
     else:
         acc6 = -1
-    print(acc6)
 
     accs = (acc3, acc4, acc5, acc6)
 
@@ -304,10 +294,16 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, alg='NoName', e
             np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
             np.savetxt(f, alignment, fmt='%5d')
 
-    print(f"{'#':#^35}")
+    with np.printoptions(threshold=100, precision=4, suppress=True) as a:
+        sys.stdout = sys.__stdout__
 
-    if not verbose:
-        sys.stdout = open(os.devnull, 'w')
+        print(f"{' ' + alg +' ':#^35}")
+        print(res[:, :2].astype(float))
+        print(np.array(accs))
+        print(f"{'#':#^35}")
+
+        if not verbose:
+            sys.stdout = open(os.devnull, 'w')
 
     return acc, acc2, *accs
 
@@ -372,7 +368,7 @@ def init(graphs, noises, iters):
 
 
 @ex.capture
-def run_exp(G, output_path, _giter=(-np.inf, np.inf)):
+def run_exp(G, output_path, verbose, _giter=(-np.inf, np.inf)):
 
     first, last = _giter
 
@@ -389,7 +385,14 @@ def run_exp(G, output_path, _giter=(-np.inf, np.inf)):
 
             results = np.array([run_algs(*g) for g in g_it])
 
-            # print(results.shape)
+            with np.printoptions(threshold=np.inf, precision=4, suppress=True) as a:
+                sys.stdout = sys.__stdout__
+
+                print(results)
+
+                if not verbose:
+                    sys.stdout = open(os.devnull, 'w')
+
             for i in range(results.shape[2]):
                 pd.DataFrame(
                     results[:, :, i],
@@ -412,13 +415,24 @@ def playground():
 
     iters = 1
 
-    n = 50
+    n = 100
     graphs = [
-        (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
-        (nx.watts_strogatz_graph, (n, 10, 0.5)),
-        (nx.gnp_random_graph, (n, 0.1)),
+        # (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
+        # (nx.watts_strogatz_graph, (n, 10, 0.5)),
+        # (nx.gnp_random_graph, (n, 0.009)),
         # (nx.barabasi_albert_graph, (n, 5)),
         # (nx.powerlaw_cluster_graph, (n, 5, 0.5)),
+
+        # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
+
+        (nx.stochastic_block_model, (
+            [15, 15, 70],
+            [
+                [0.25, 0.05, 0.02],
+                [0.05, 0.35, 0.07],
+                [0.02, 0.07, 0.40],
+            ]
+        )),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas/source.txt',)),
@@ -441,8 +455,8 @@ def playground():
     noise_level = 0.04
     noises = [
         {'target_noise': noise_level},
-        {'target_noise': noise_level, 'refill': True},
-        {'source_noise': noise_level, 'target_noise': noise_level},
+        # {'target_noise': noise_level, 'refill': True},
+        # {'source_noise': noise_level, 'target_noise': noise_level},
         # {'source_noise': noise, 'target_noise': noise, 'refill': True},
     ]
 
@@ -473,13 +487,16 @@ def exp1():
 
     iters = 10
 
-    n = 1133
     graphs = [
-        (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
-        (nx.watts_strogatz_graph, (n, 10, 0.5)),
-        (nx.gnp_random_graph, (n, 0.009)),
-        (nx.barabasi_albert_graph, (n, 5)),
-        (nx.powerlaw_cluster_graph, (n, 5, 0.5)),
+        # (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+        # (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        # (nx.gnp_random_graph, (1133, 0.009)),
+        # (nx.barabasi_albert_graph, (1133, 5)),
+        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+
+        (lambda x: x, ('data/arenas/source.txt',)),
+        (lambda x: x, ('data/CA-AstroPh/source.txt',)),
+        (lambda x: x, ('data/facebook/source.txt',)),
     ]
 
     noise_level = None

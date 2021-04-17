@@ -318,18 +318,6 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
             np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
             np.savetxt(f, alignment, fmt='%5d')
 
-    # with np.printoptions(threshold=100, precision=4, suppress=True) as a:
-    #     sys.stdout = sys.__stdout__
-
-    #     print(f"{' ' + alg +' ':#^35}")
-    #     print(res[:, :2].astype(float))
-    #     print(np.array(accs))
-    #     print(f"{'#':#^35}")
-    #     _log.info(res[:, :2].astype(float))
-
-    #     if not verbose:
-    #         sys.stdout = open(os.devnull, 'w')
-
     return np.array([acc, acc2, *accs])
 
 
@@ -379,10 +367,6 @@ def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, plot, _seed):
         'w': w
     }
 
-    # results = np.array([run_alg(_seed, data, Gt, i) for i in run])
-
-    # _log.info("\n%s", results)
-
     return np.array([run_alg(_seed, data, Gt, i) for i in run])
 
 
@@ -418,7 +402,7 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
                 continue
             _it += 1
 
-            # _log.info("Graph:(%s/%s)", _git, total_graphs)
+            # _log.info("Graph:(%s/%s)", _it, total_graphs)
 
             writer = pd.ExcelWriter(
                 f"{output_path}/res_g{graph_number+1}_n{noise_type+1}.xlsx", engine='openpyxl')
@@ -433,14 +417,6 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
                 results.append(res)
 
             results = np.array(results)
-
-            # with np.printoptions(threshold=np.inf, precision=4, suppress=True) as a:
-            #     sys.stdout = sys.__stdout__
-
-            #     print(results)
-
-            #     if not verbose:
-            #         sys.stdout = open(os.devnull, 'w')
 
             for i in range(results.shape[2]):
                 pd.DataFrame(
@@ -561,19 +537,11 @@ def exp1():
 
 @ex.automain
 def main(_config, _log, verbose, output_path, exist_ok=False):
-    # print()
 
     if not verbose:
         sys.stdout = open(os.devnull, 'w')
         sys.stderr = open(os.devnull, 'w')
         algorithms.GWL.dev.util.logger.disabled = True
-
-    # _log.error(123)
-    # _log.info(123)
-    # x = np.array([[1, 2, 3], [4, 5, 1]])
-    # _log.info(x)
-    # _log.info("\n%s", x)
-    # print(123)
 
     try:
         G, randcheck = init()

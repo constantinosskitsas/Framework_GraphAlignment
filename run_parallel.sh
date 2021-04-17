@@ -62,6 +62,7 @@ for ((i=0;i<cores;i++)); do
 done
 
 # bash run_parallel.sh 4 4 "verbose=False plot=False save=False full" test INFO 123 python
+# bash run_parallel.sh 12 3 "verbose=False plot=False save=False full run=[0,2] mtype=[10,10,10,10,10,10,10,10,10,10] iters=1" deb DEBUG
 
 # bash run_parallel.sh 15 3 "exp1 noise_level=0.05 full run=[2,6,7,8]" 005 seed=196355709
 # bash run_parallel.sh 15 3 "exp1 noise_level=0.04 full run=[2,6,7,8]" 004 seed=895321488

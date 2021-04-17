@@ -582,10 +582,23 @@ def main(_config, _log, verbose, output_path, exist_ok=False):
 
         os.makedirs(output_path, exist_ok=exist_ok)
         with open(f"{output_path}/config.yaml", "w") as cy:
-            yaml.dump({
-                "randcheck": float(randcheck),
-                **_config
-            }, cy)
+            conf = {k: v for k, v in _config.items() if not k.endswith("_args")}
+
+            conf['algs'] = np.array(conf['algs'], dtype=object)[
+                conf['run']].tolist()
+            conf['mtype'] = np.array(conf['mtype'], dtype=object)[
+                conf['run']].tolist()
+
+            conf['_algs'] = conf.pop('algs')
+            conf['_graphs'] = conf.pop('graphs')
+            conf['_mtype'] = conf.pop('mtype')
+            conf['_noises'] = conf.pop('noises')
+
+            conf.pop("_giter", None)
+
+            conf['randcheck'] = float(randcheck)
+
+            yaml.dump(conf, cy)
 
         _log.info("config location: %s", output_path)
 

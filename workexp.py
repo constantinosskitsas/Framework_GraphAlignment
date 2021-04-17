@@ -1,5 +1,6 @@
 from sacred import Experiment
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp, isorank2 as isorank, bipartitewrapper as bmw
+import algorithms
 
 # from data import similarities_preprocess
 # from scipy.io import loadmat
@@ -19,10 +20,31 @@ import os
 import random
 import yaml
 import datetime
+import logging
 
 from utils import *
 
 ex = Experiment("experiment")
+
+# # create logger
+# logger = logging.getLogger('simple_example')
+# logger.setLevel(logging.DEBUG)
+
+# # create console handler and set level to debug
+# ch = logging.StreamHandler()
+# ch.setLevel(logging.DEBUG)
+
+# # create formatter
+# formatter = logging.Formatter(
+#     '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# # add formatter to ch
+# ch.setFormatter(formatter)
+
+# # add ch to logger
+# logger.addHandler(ch)
+
+# ex.logger = logger
 
 
 @ex.config
@@ -244,7 +266,7 @@ def fast():
 
 
 @ex.capture
-def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, alg='NoName', eval_type=0):
+def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoName', eval_type=0):
 
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
@@ -260,6 +282,8 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, alg='NoName', e
         eval_align(mb, ma, gmb1),
     ], dtype=object)
 
+    _log.debug("\n%s", res[:, :2].astype(float))
+
     accs = res[:, 0]
     best = np.argmax(accs)
 
@@ -267,10 +291,10 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, alg='NoName', e
         if eval_type:
             prefix = "#"
         else:
-            # print("misleading evaluation")
+            _log.warn("misleading evaluation")
             prefix = "!"
     elif eval_type and eval_type != best:
-        # print("eval_type mismatch")
+        _log.warn("eval_type mismatch")
         prefix = "%"
     else:
         prefix = ""
@@ -294,22 +318,23 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, alg='NoName', e
             np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
             np.savetxt(f, alignment, fmt='%5d')
 
-    with np.printoptions(threshold=100, precision=4, suppress=True) as a:
-        sys.stdout = sys.__stdout__
+    # with np.printoptions(threshold=100, precision=4, suppress=True) as a:
+    #     sys.stdout = sys.__stdout__
 
-        print(f"{' ' + alg +' ':#^35}")
-        print(res[:, :2].astype(float))
-        print(np.array(accs))
-        print(f"{'#':#^35}")
+    #     print(f"{' ' + alg +' ':#^35}")
+    #     print(res[:, :2].astype(float))
+    #     print(np.array(accs))
+    #     print(f"{'#':#^35}")
+    #     _log.info(res[:, :2].astype(float))
 
-        if not verbose:
-            sys.stdout = open(os.devnull, 'w')
+    #     if not verbose:
+    #         sys.stdout = open(os.devnull, 'w')
 
-    return acc, acc2, *accs
+    return np.array([acc, acc2, *accs])
 
 
-@ex.capture
-def run_alg(_seed, data, Gt, i, algs, mtype):
+@ ex.capture
+def run_alg(_seed, data, Gt, i, algs, mtype, _log):
 
     random.seed(_seed)
     np.random.seed(_seed)
@@ -319,10 +344,18 @@ def run_alg(_seed, data, Gt, i, algs, mtype):
     res = alg.main(data=data, **args)
     matrix, cost = format_output(res)
     ma, mb = getmatching(matrix, cost, mt)
-    return evall(ma, mb, data['Src'], data['Tar'], Gt, alg=alg.__name__)
+
+    _log.debug(f"{' ' + alg.__name__ +' ':#^35}")
+
+    result = evall(ma, mb, data['Src'], data['Tar'], Gt, alg=alg.__name__)
+
+    _log.debug("\n%s", result)
+    _log.debug(f"{'#':#^35}")
+
+    return result
 
 
-@ex.capture
+@ ex.capture
 def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, plot, _seed):
 
     if plot:
@@ -346,12 +379,14 @@ def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, plot, _seed):
         'w': w
     }
 
-    results = [run_alg(_seed, data, Gt, i) for i in run]
+    # results = np.array([run_alg(_seed, data, Gt, i) for i in run])
 
-    return results
+    # _log.info("\n%s", results)
+
+    return np.array([run_alg(_seed, data, Gt, i) for i in run])
 
 
-@ex.capture
+@ ex.capture
 def init(graphs, noises, iters):
 
     G = [
@@ -367,31 +402,45 @@ def init(graphs, noises, iters):
     return G, randcheck
 
 
-@ex.capture
-def run_exp(G, output_path, verbose, _giter=(-np.inf, np.inf)):
+@ ex.capture
+def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
 
     first, last = _giter
 
-    _iter = 0
+    _git = 0
+    _it = 0
+    total_graphs = min(len(G) * len(G[0]), last-first+1)
 
     for graph_number, g_n in enumerate(G):
         for noise_type, g_it in enumerate(g_n):
-            _iter += 1
-            if _iter < first or _iter > last:
+            _git += 1
+            if _git < first or _git > last:
                 continue
+            _it += 1
+
+            # _log.info("Graph:(%s/%s)", _git, total_graphs)
 
             writer = pd.ExcelWriter(
                 f"{output_path}/res_g{graph_number+1}_n{noise_type+1}.xlsx", engine='openpyxl')
 
-            results = np.array([run_algs(*g) for g in g_it])
+            results = []
+            for i, g in enumerate(g_it):
+                res = run_algs(*g)
 
-            with np.printoptions(threshold=np.inf, precision=4, suppress=True) as a:
-                sys.stdout = sys.__stdout__
+                _log.info("iteration:(%s/%s)/(%s/%s)\n%s", _it,
+                          total_graphs, i+1, len(g_it), res)
 
-                print(results)
+                results.append(res)
 
-                if not verbose:
-                    sys.stdout = open(os.devnull, 'w')
+            results = np.array(results)
+
+            # with np.printoptions(threshold=np.inf, precision=4, suppress=True) as a:
+            #     sys.stdout = sys.__stdout__
+
+            #     print(results)
+
+            #     if not verbose:
+            #         sys.stdout = open(os.devnull, 'w')
 
             for i in range(results.shape[2]):
                 pd.DataFrame(
@@ -402,7 +451,7 @@ def run_exp(G, output_path, verbose, _giter=(-np.inf, np.inf)):
             writer.save()
 
 
-@ex.config
+@ ex.config
 def playground():
 
     prep = False  # for prep run with full
@@ -413,9 +462,9 @@ def playground():
     save = True
     plot = True
 
-    iters = 1
+    iters = 10
 
-    n = 100
+    n = 500
     graphs = [
         # (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
         # (nx.watts_strogatz_graph, (n, 10, 0.5)),
@@ -426,7 +475,7 @@ def playground():
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
         (nx.stochastic_block_model, (
-            [15, 15, 70],
+            [15, 15, 25],
             [
                 [0.25, 0.05, 0.02],
                 [0.05, 0.35, 0.07],
@@ -455,9 +504,9 @@ def playground():
     noise_level = 0.04
     noises = [
         {'target_noise': noise_level},
-        # {'target_noise': noise_level, 'refill': True},
-        # {'source_noise': noise_level, 'target_noise': noise_level},
-        # {'source_noise': noise, 'target_noise': noise, 'refill': True},
+        {'target_noise': noise_level, 'refill': True},
+        {'source_noise': noise_level, 'target_noise': noise_level},
+        {'source_noise': noise_level, 'target_noise': noise_level, 'refill': True},
     ]
 
     output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
@@ -511,19 +560,36 @@ def exp1():
 
 
 @ex.automain
-def main(_config, verbose, output_path, exist_ok=False):
-    print()
+def main(_config, _log, verbose, output_path, exist_ok=False):
+    # print()
 
     if not verbose:
         sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+        algorithms.GWL.dev.util.logger.disabled = True
 
-    G, randcheck = init()
+    # _log.error(123)
+    # _log.info(123)
+    # x = np.array([[1, 2, 3], [4, 5, 1]])
+    # _log.info(x)
+    # _log.info("\n%s", x)
+    # print(123)
 
-    os.makedirs(output_path, exist_ok=exist_ok)
-    with open(f"{output_path}/config.yaml", "w") as cy:
-        yaml.dump({
-            "randcheck": float(randcheck),
-            **_config
-        }, cy)
+    try:
+        G, randcheck = init()
 
-    run_exp(G)
+        _log.info("randcheck: %s", randcheck)
+
+        os.makedirs(output_path, exist_ok=exist_ok)
+        with open(f"{output_path}/config.yaml", "w") as cy:
+            yaml.dump({
+                "randcheck": float(randcheck),
+                **_config
+            }, cy)
+
+        _log.info("config location: %s", output_path)
+
+        run_exp(G)
+    except Exception as e:
+        sys.stderr = sys.__stderr__
+        raise e

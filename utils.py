@@ -225,7 +225,7 @@ def plotG(G, name="", end=True):
     deg, cnt = zip(*degreeCount.items())
     plt.bar(deg, cnt, width=0.80, color="b")
 
-    print(degreeCount)
+    # print(degreeCount)
     plt.title(
         f"{name} Degree Histogram.\nn = {len(G)}, e = {len(G.edges)}, maxd = {deg[0]}, disc = {degreeCount[0]}")
     plt.ylabel("Count")

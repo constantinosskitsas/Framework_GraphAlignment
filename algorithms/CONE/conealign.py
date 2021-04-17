@@ -183,7 +183,6 @@ def main(data, **args):
     Tar = data['Tar']
 
     # min_dim = min(Src.shape[0] - 1, Tar.shape[0] - 1)
-
     # if args['dim'] > min_dim:
     #     args['dim'] = min_dim
 

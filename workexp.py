@@ -2,7 +2,7 @@ from sacred import Experiment
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp, isorank2 as isorank, bipartitewrapper as bmw
 import algorithms
 
-# from data import similarities_preprocess
+from data import similarities_preprocess
 # from scipy.io import loadmat
 # import inspect
 # import matplotlib.pyplot as plt
@@ -24,27 +24,28 @@ import logging
 
 from utils import *
 
-ex = Experiment("experiment")
+ex = Experiment("e")
 
-# # create logger
-# logger = logging.getLogger('simple_example')
-# logger.setLevel(logging.DEBUG)
+# create logger
+logger = logging.getLogger('e')
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
 
-# # create console handler and set level to debug
-# ch = logging.StreamHandler()
-# ch.setLevel(logging.DEBUG)
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
 
-# # create formatter
-# formatter = logging.Formatter(
-#     '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# create formatter
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-# # add formatter to ch
-# ch.setFormatter(formatter)
+# add formatter to ch
+ch.setFormatter(formatter)
 
-# # add ch to logger
-# logger.addHandler(ch)
+# add ch to logger
+logger.addHandler(ch)
 
-# ex.logger = logger
+ex.logger = logger
 
 
 @ex.config
@@ -275,6 +276,9 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
     mb = np.array(mb, int)
 
     assert ma.size == mb.size
+
+    _log.debug("matched %s out of %s", mb.size, gmb.size)
+
     res = np.array([
         eval_align(ma, mb, gmb),
         eval_align(mb, ma, gmb),
@@ -321,6 +325,33 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
     return np.array([acc, acc2, *accs])
 
 
+@ex.capture
+def alg_exe(alg, data, args):
+    return alg.main(data=data, **args)
+
+
+@ex.capture
+def getmatching(matrix, cost, mtype):
+    try:
+        if mtype == 0:
+            return colmax(matrix)
+        elif mtype == 1:
+            return superfast(matrix, asc=False)
+        elif mtype == 2:
+            return bmw.getmatchings(matrix)
+        elif mtype == 3:
+            return colmin(cost)
+        elif mtype == 4:
+            return superfast(cost)
+        elif mtype == 5:
+            return bmw.getmatchings(sps.csr_matrix(cost.A * -1 + np.amax(cost.A)))
+        elif mtype == 10:
+            return jv(cost.A)
+    except Exception as e:
+        print(e)
+        return [0], [0]
+
+
 @ ex.capture
 def run_alg(_seed, data, Gt, i, algs, mtype, _log):
 
@@ -329,22 +360,34 @@ def run_alg(_seed, data, Gt, i, algs, mtype, _log):
 
     alg, args = algs[i]
     mt = mtype[i]
-    res = alg.main(data=data, **args)
+
+    _log.debug(f"{' ' + alg.__name__ +' ':#^55}")
+
+    res = alg_exe(alg, data, args)
     matrix, cost = format_output(res)
     ma, mb = getmatching(matrix, cost, mt)
-
-    _log.debug(f"{' ' + alg.__name__ +' ':#^35}")
 
     result = evall(ma, mb, data['Src'], data['Tar'], Gt, alg=alg.__name__)
 
     _log.debug("\n%s", result)
-    _log.debug(f"{'#':#^35}")
+    _log.debug(f"{'#':#^55}")
 
     return result
 
 
 @ ex.capture
-def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, plot, _seed):
+def preprocess(Src, Tar, lalpha=1, mind=0.00001):
+    # L = similarities_preprocess.create_L(Tar, Src, alpha=lalpha, mind=mind)
+    L = similarities_preprocess.create_L(Src, Tar, alpha=lalpha, mind=mind)
+    # S = similarities_preprocess.create_S(Tar, Src, L)
+    S = similarities_preprocess.create_S(Src, Tar, L)
+    li, lj, w = sps.find(L)
+
+    return L, S, li, lj, w
+
+
+@ ex.capture
+def run_algs(Src, Tar, Gt, algs, run, mtype, prep, plot, _seed):
 
     if plot:
         plotG(Src, 'Src', False)
@@ -352,7 +395,7 @@ def run_algs(Src, Tar, Gt, algs, run, mtype, prep, lalpha, mind, plot, _seed):
         # plotGs(Tar, Src, circular=True)
 
     if prep:
-        L, S, li, lj, w = preprocess(Src, Tar, lalpha, mind)
+        L, S, li, lj, w = preprocess(Src, Tar)
     else:
         L = S = sps.eye(1)
         li = lj = w = np.empty(1)
@@ -402,7 +445,7 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
                 continue
             _it += 1
 
-            # _log.info("Graph:(%s/%s)", _it, total_graphs)
+            _log.info("Graph:(%s/%s)", _it, total_graphs)
 
             writer = pd.ExcelWriter(
                 f"{output_path}/res_g{graph_number+1}_n{noise_type+1}.xlsx", engine='openpyxl')
@@ -411,8 +454,7 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
             for i, g in enumerate(g_it):
                 res = run_algs(*g)
 
-                _log.info("iteration:(%s/%s)/(%s/%s)\n%s", _it,
-                          total_graphs, i+1, len(g_it), res)
+                _log.info("iteration:(%s/%s)\n%s", i+1, len(g_it), res)
 
                 results.append(res)
 

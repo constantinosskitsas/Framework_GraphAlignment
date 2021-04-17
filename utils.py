@@ -15,27 +15,6 @@ from data import similarities_preprocess
 from algorithms import bipartitewrapper as bmw
 
 
-def getmatching(matrix, cost, mtype):
-    try:
-        if mtype == 0:
-            return colmax(matrix)
-        elif mtype == 1:
-            return superfast(matrix, asc=False)
-        elif mtype == 2:
-            return bmw.getmatchings(matrix)
-        elif mtype == 3:
-            return colmin(cost)
-        elif mtype == 4:
-            return superfast(cost)
-        elif mtype == 5:
-            return bmw.getmatchings(sps.csr_matrix(cost.A * -1 + np.amax(cost.A)))
-        elif mtype == 10:
-            return jv(cost.A)
-    except Exception as e:
-        print(e)
-        return [0], [0]
-
-
 def eval_align(ma, mb, gmb):
 
     try:
@@ -61,16 +40,6 @@ def e_to_G(e):
     G += G.T
     G.data = G.data.clip(0, 1)
     return G
-
-
-def preprocess(Src, Tar, lalpha=1, mind=0.00001):
-    # L = similarities_preprocess.create_L(Tar, Src, alpha=lalpha, mind=mind)
-    L = similarities_preprocess.create_L(Src, Tar, alpha=lalpha, mind=mind)
-    # S = similarities_preprocess.create_S(Tar, Src, L)
-    S = similarities_preprocess.create_S(Src, Tar, L)
-    li, lj, w = sps.find(L)
-
-    return L, S, li, lj, w
 
 
 def load_as_nx(path):

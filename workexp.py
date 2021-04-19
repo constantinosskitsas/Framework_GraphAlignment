@@ -224,7 +224,8 @@ def global_config():
     iters = 1
 
     graphs = [
-        (nx.powerlaw_cluster_graph, (100, 5, 0.5))
+        # (lambda x: nx.Graph([[0, 1]]), ("undefined",))
+        (nx.powerlaw_cluster_graph, (50, 5, 0.5))
     ]
 
     noise_level = None

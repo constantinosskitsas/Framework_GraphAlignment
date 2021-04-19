@@ -24,7 +24,7 @@ import logging
 
 from utils import *
 
-ex = Experiment("e")
+ex = Experiment("ex")
 
 # create logger
 logger = logging.getLogger('e')
@@ -161,33 +161,43 @@ def global_config():
         'verbose': True
     }
 
+    GW_mtype = 2
+    CONE_mtype = 3
+    GRASP_mtype = -4
+    REGAL_mtype = 1
+    LREA_mtype = 3
+    NSD_mtype = 2
+    ISO_mtype = 2
+    NET_mtype = 3
+    KLAU_mtype = 3
+
     algs = [
-        (gwl, GW_args),
-        (conealign, CONE_args),
-        (grasp, GRASP_args),
-        (regal, REGAL_args),
+        (gwl, GW_args, GW_mtype),
+        (conealign, CONE_args, CONE_mtype),
+        (grasp, GRASP_args, GRASP_mtype),
+        (regal, REGAL_args, REGAL_mtype),
 
-        (eigenalign, LREA_args),
-        (NSD, NSD_args),
-        (isorank, ISO_args),
+        (eigenalign, LREA_args, LREA_mtype),
+        (NSD, NSD_args, NSD_mtype),
+        (isorank, ISO_args, ISO_mtype),
 
-        (netalign, NET_args),
-        (klaus, KLAU_args)
+        (netalign, NET_args, NET_mtype),
+        (klaus, KLAU_args, KLAU_mtype)
     ]
 
-    mtype = [
-        1,      # gwl
-        2,      # conealign
-        3,      # grasp
-        0,      # regal
+    # mtype = [
+    #     1,      # gwl
+    #     2,      # conealign
+    #     3,      # grasp
+    #     0,      # regal
 
-        2,      # eigenalign
-        1,      # NSD
-        1,      # isorank
+    #     2,      # eigenalign
+    #     1,      # NSD
+    #     1,      # isorank
 
-        2,      # netalign
-        2,      # klaus
-    ]
+    #     2,      # netalign
+    #     2,      # klaus
+    # ]
 
     run = [
         0,      # gwl
@@ -202,6 +212,25 @@ def global_config():
         # 7,      # netalign
         # 8,      # klaus
     ]
+
+    prep = False  # for prep run with full
+    lalpha = mind = None
+
+    verbose = False
+    mnc = True
+    save = False
+    plot = False
+
+
+@ex.named_config
+def gwjv():
+    GW_args = {
+        'opt_dict': {
+            'epochs': 10
+        }
+    }
+
+    GW_mtype = -4
 
 
 @ex.named_config
@@ -228,6 +257,20 @@ def full():
         7,      # netalign,
         8,      # klaus,
     ]
+
+
+@ex.named_config
+def debug():
+
+    verbose = True
+    save = True
+    plot = True
+
+
+@ex.named_config
+def win():
+
+    GRASP_mtype = -2
 
 
 @ex.named_config
@@ -295,10 +338,10 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
         if eval_type:
             prefix = "#"
         else:
-            _log.warn("misleading evaluation")
+            _log.warning("misleading evaluation")
             prefix = "!"
     elif eval_type and eval_type != best:
-        _log.warn("eval_type mismatch")
+        _log.warning("eval_type mismatch")
         prefix = "%"
     else:
         prefix = ""
@@ -331,35 +374,37 @@ def alg_exe(alg, data, args):
 
 
 @ex.capture
-def getmatching(matrix, cost, mtype):
+def getmatching(matrix, cost, mt, _log):
+    _log.debug("matching type: %s", mt)
     try:
-        if mtype == 0:
+        if mt == 1:
             return colmax(matrix)
-        elif mtype == 1:
+        elif mt == 2:
             return superfast(matrix, asc=False)
-        elif mtype == 2:
+        elif mt == 3:
             return bmw.getmatchings(matrix)
-        elif mtype == 3:
+
+        elif mt == -1:
             return colmin(cost)
-        elif mtype == 4:
+        elif mt == -2:
             return superfast(cost)
-        elif mtype == 5:
+        elif mt == -3:
             return bmw.getmatchings(sps.csr_matrix(cost.A * -1 + np.amax(cost.A)))
-        elif mtype == 10:
+        elif mt == -4:
             return jv(cost.A)
+
     except Exception as e:
-        print(e)
+        _log.error(e)
         return [0], [0]
 
 
 @ ex.capture
-def run_alg(_seed, data, Gt, i, algs, mtype, _log):
+def run_alg(_seed, data, Gt, i, algs, _log):
 
     random.seed(_seed)
     np.random.seed(_seed)
 
-    alg, args = algs[i]
-    mt = mtype[i]
+    alg, args, mt = algs[i]
 
     _log.debug(f"{' ' + alg.__name__ +' ':#^55}")
 
@@ -387,7 +432,7 @@ def preprocess(Src, Tar, lalpha=1, mind=0.00001):
 
 
 @ ex.capture
-def run_algs(Src, Tar, Gt, algs, run, mtype, prep, plot, _seed):
+def run_algs(Src, Tar, Gt, run, prep, plot, _seed):
 
     if plot:
         plotG(Src, 'Src', False)
@@ -472,14 +517,6 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
 @ ex.config
 def playground():
 
-    prep = False  # for prep run with full
-    lalpha = mind = None
-
-    verbose = True
-    mnc = True
-    save = True
-    plot = True
-
     iters = 10
 
     n = 500
@@ -492,17 +529,17 @@ def playground():
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
-        (nx.stochastic_block_model, (
-            [15, 15, 25],
-            [
-                [0.25, 0.05, 0.02],
-                [0.05, 0.35, 0.07],
-                [0.02, 0.07, 0.40],
-            ]
-        )),
+        # (nx.stochastic_block_model, (
+        #     [15, 15, 25],
+        #     [
+        #         [0.25, 0.05, 0.02],
+        #         [0.05, 0.35, 0.07],
+        #         [0.02, 0.07, 0.40],
+        #     ]
+        # )),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        # (lambda x: x, ('data/arenas/source.txt',)),
+        (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
         # (lambda x: x, ('data/facebook/source.txt',)),
 
@@ -519,12 +556,12 @@ def playground():
         #                 'edges': 1, 'noise_level': 5},)),
     ]
 
-    noise_level = 0.04
+    noise_level = 0.05
+    no_disc = False
     noises = [
-        {'target_noise': noise_level},
-        {'target_noise': noise_level, 'refill': True},
-        {'source_noise': noise_level, 'target_noise': noise_level},
-        {'source_noise': noise_level, 'target_noise': noise_level, 'refill': True},
+        {'target_noise': noise_level, "no_disc": no_disc},
+        {'target_noise': noise_level, 'refill': True, "no_disc": no_disc},
+        {'source_noise': noise_level, 'target_noise': noise_level, "no_disc": no_disc},
     ]
 
     output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
@@ -532,25 +569,6 @@ def playground():
 
 @ex.named_config
 def exp1():
-
-    mtype = [
-        1,      # gwl
-        2,      # conealign
-        10,      # grasp
-        0,      # regal
-
-        2,      # eigenalign
-        1,      # NSD
-        1,      # isorank
-
-        2,      # netalign
-        2,      # klaus
-    ]
-
-    verbose = False
-    mnc = True
-    save = False
-    plot = False
 
     iters = 10
 
@@ -592,16 +610,14 @@ def main(_config, _log, verbose, output_path, exist_ok=False):
 
         os.makedirs(output_path, exist_ok=exist_ok)
         with open(f"{output_path}/config.yaml", "w") as cy:
-            conf = {k: v for k, v in _config.items() if not k.endswith("_args")}
+            conf = {k: v for k, v in _config.items() if
+                    not k.endswith("_args") and not k.endswith("_mtype")}
 
             conf['algs'] = np.array(conf['algs'], dtype=object)[
-                conf['run']].tolist()
-            conf['mtype'] = np.array(conf['mtype'], dtype=object)[
                 conf['run']].tolist()
 
             conf['_algs'] = conf.pop('algs')
             conf['_graphs'] = conf.pop('graphs')
-            conf['_mtype'] = conf.pop('mtype')
             conf['_noises'] = conf.pop('noises')
 
             conf.pop("_giter", None)

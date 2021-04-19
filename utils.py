@@ -48,12 +48,12 @@ def load_as_nx(path):
     return np.array(G.edges)
 
 
-def refill_e(e, n, amount):
+def refill_e(edges, n, amount):
     if amount == 0:
-        return e
-    # print(e)
-    # ee = np.sort(e).tolist()
-    ee = {tuple(row) for row in np.sort(e).tolist()}
+        return edges
+    # print(edges)
+    # ee = np.sort(edges).tolist()
+    ee = {tuple(row) for row in np.sort(edges).tolist()}
     new_e = []
     check = 0
     while len(new_e) < amount:
@@ -70,10 +70,27 @@ def refill_e(e, n, amount):
         if check % 1000 == 999:
             print(f"refill - {check + 1} times in a row fail")
     # print(new_e)
-    return np.append(e, new_e, axis=0)
+    return np.append(edges, new_e, axis=0)
 
 
-def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
+def remove_e(edges, noise, no_disc):
+    if no_disc:
+        bin_count = np.bincount(edges.flatten())
+        rows_to_delete = []
+        for i, edge in enumerate(edges):
+            if np.random.sample(1)[0] < noise:
+                e, f = edge
+                if bin_count[e] > 1 and bin_count[f] > 1:
+                    bin_count[e] -= 1
+                    bin_count[f] -= 1
+                    rows_to_delete.append(i)
+        edges = np.delete(edges, rows_to_delete, axis=0)
+    else:
+        edges = edges[np.random.sample(edges.shape[0]) >= noise]
+    return edges
+
+
+def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False, no_disc=False):
 
     if isinstance(G, dict):
         dataset = G['dataset']
@@ -119,8 +136,35 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
 
     Tar_e = Gt[0][Src_e]
 
-    Src_e = Src_e[np.random.sample(nedges) >= source_noise]
-    Tar_e = Tar_e[np.random.sample(nedges) >= target_noise]
+    Src_e = remove_e(Src_e, source_noise, no_disc)
+    Tar_e = remove_e(Tar_e, target_noise, no_disc)
+
+    # if no_disc:
+    #     Src_bin = np.bincount(Src_e.flatten())
+    #     rows_to_delete = []
+    #     for i, edge in enumerate(Src_e):
+    #         if np.random.sample(1)[0] < source_noise:
+    #             e, f = edge
+    #             if Src_bin[e] > 1 and Src_bin[f] > 1:
+    #                 Src_bin[e] -= 1
+    #                 Src_bin[f] -= 1
+    #                 rows_to_delete.append(i)
+    #     Src_e = np.delete(Src_e, rows_to_delete, axis=0)
+
+    #     Tar_bin = np.bincount(Tar_e.flatten())
+    #     rows_to_delete = []
+    #     for i, edge in enumerate(Tar_e):
+    #         if np.random.sample(1)[0] < target_noise:
+    #             e, f = edge
+    #             if Tar_bin[e] > 1 and Tar_bin[f] > 1:
+    #                 Tar_bin[e] -= 1
+    #                 Tar_bin[f] -= 1
+    #                 rows_to_delete.append(i)
+    #     Tar_e = np.delete(Tar_e, rows_to_delete, axis=0)
+
+    # else:
+    #     Src_e = Src_e[np.random.sample(nedges) >= source_noise]
+    #     Tar_e = Tar_e[np.random.sample(nedges) >= target_noise]
 
     if refill:
         Src_e = refill_e(Src_e, n, nedges - Src_e.shape[0])

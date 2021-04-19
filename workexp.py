@@ -221,6 +221,22 @@ def global_config():
     save = False
     plot = False
 
+    iters = 1
+
+    graphs = [
+        (nx.powerlaw_cluster_graph, (100, 5, 0.5))
+    ]
+
+    noise_level = None
+    # no_disc = True
+    noises = [
+        {'target_noise': noise_level},
+        {'target_noise': noise_level, 'refill': True},
+        {'source_noise': noise_level, 'target_noise': noise_level},
+    ]
+
+    output_path = "results/_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
+
 
 @ex.named_config
 def gwjv():
@@ -459,12 +475,12 @@ def run_algs(Src, Tar, Gt, run, prep, plot, _seed):
 
 
 @ ex.capture
-def init(graphs, noises, iters):
+def init(graphs, noises, iters, no_disc=False):
 
     G = [
         [
             [
-                generate_graphs(alg(*args), **nargs) for _ in range(iters)
+                generate_graphs(alg(*args), no_disc=no_disc, **nargs) for _ in range(iters)
             ] for nargs in noises
         ] for alg, args in graphs
     ]
@@ -514,18 +530,17 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
             writer.save()
 
 
-@ ex.config
+@ex.named_config
 def playground():
 
     iters = 10
 
-    n = 500
     graphs = [
-        # (nx.newman_watts_strogatz_graph, (n, 7, 0.5)),
-        # (nx.watts_strogatz_graph, (n, 10, 0.5)),
-        # (nx.gnp_random_graph, (n, 0.009)),
-        # (nx.barabasi_albert_graph, (n, 5)),
-        # (nx.powerlaw_cluster_graph, (n, 5, 0.5)),
+        # (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+        # (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        # (nx.gnp_random_graph, (1133, 0.009)),
+        # (nx.barabasi_albert_graph, (1133, 5)),
+        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -557,41 +572,46 @@ def playground():
     ]
 
     noise_level = 0.05
-    no_disc = False
-    noises = [
-        {'target_noise': noise_level, "no_disc": no_disc},
-        {'target_noise': noise_level, 'refill': True, "no_disc": no_disc},
-        {'source_noise': noise_level, 'target_noise': noise_level, "no_disc": no_disc},
-    ]
+    # no_disc = True
 
-    output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
-
-
-@ex.named_config
-def exp1():
-
-    iters = 10
-
-    graphs = [
-        # (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
-        # (nx.watts_strogatz_graph, (1133, 10, 0.5)),
-        # (nx.gnp_random_graph, (1133, 0.009)),
-        # (nx.barabasi_albert_graph, (1133, 5)),
-        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
-
-        (lambda x: x, ('data/arenas/source.txt',)),
-        (lambda x: x, ('data/CA-AstroPh/source.txt',)),
-        (lambda x: x, ('data/facebook/source.txt',)),
-    ]
-
-    noise_level = None
     noises = [
         {'target_noise': noise_level},
         {'target_noise': noise_level, 'refill': True},
         {'source_noise': noise_level, 'target_noise': noise_level},
     ]
 
-    output_path = "results/exp1_" + \
+    output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
+
+
+@ex.named_config
+def exp1s():
+
+    iters = 10
+
+    graphs = [
+        (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+        (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        (nx.gnp_random_graph, (1133, 0.009)),
+        (nx.barabasi_albert_graph, (1133, 5)),
+        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+    ]
+
+    output_path = "results/exp1s_" + \
+        datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
+
+
+@ex.named_config
+def exp1r():
+
+    iters = 5
+
+    graphs = [
+        (lambda x: x, ('data/arenas/source.txt',)),
+        # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
+        # (lambda x: x, ('data/facebook/source.txt',)),
+    ]
+
+    output_path = "results/exp1r_" + \
         datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
 
 

@@ -58,12 +58,13 @@ def round_messages(messages, S, w, alpha, beta, setup, m, n):
     mi = bm.matching_indicator(rp, ci, match1, tripi, m, n)[1:]
 
     matchweight = sum(w[mi > 0])
+    # matchweight = np.dot(mi, w)
     cardinality = sum(mi)
 
     overlap = np.dot(mi.T, (S*mi))/2
     f = alpha*matchweight + beta*overlap
 
-    return f, matchweight, cardinality, overlap, val, mi
+    return f, matchweight, int(cardinality), int(overlap), val, mi
 
 
 def getmatchings(matrix):

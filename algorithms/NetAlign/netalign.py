@@ -52,7 +52,6 @@ def accumarray(xij, xw, n):
     return sums
 
 
-# def main(S, w, li, lj, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
 def main(data, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
 
     S = data['S']
@@ -97,7 +96,7 @@ def main(data, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
     fbest = 0
     fbestiter = 0
     if verbose:
-        print('{:4s}   {:4s}   {:7s} {:7s} {:7s} {:7s}   {:7s} {:7s} {:7s} {:7s}'.format(
+        print('{:4s}   {:>4s}   {:>7s} {:>7s} {:>7s} {:>7s}   {:>7s} {:>7s} {:>7s} {:>7s}'.format(
             'best', 'iter', 'obj_ma', 'wght_ma', 'card_ma', 'over_ma',
             'obj_mb', 'wght_mb', 'card_mb', 'over_mb'))
 
@@ -165,8 +164,7 @@ def main(data, a=1, b=1, gamma=0.99, dtype=2, maxiter=100, verbose=True):
                 bestchar = '*b'
             else:
                 bestchar = ''
-            print('{:4s}   {:4d}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}   {:5.2f} {:5.2f} {:5.2f} {:5.2f}'.format(
+            print('{:4s}   {:4d}   {:7.2f} {:7.2f} {:7d} {:7d}   {:7.2f} {:7.2f} {:7d} {:7d}'.format(
                 bestchar, it, *hista, *histb))
 
-    # return bmw.getmatchings(li, lj, mbest)
     return sps.csr_matrix((mbest, (li, lj)))

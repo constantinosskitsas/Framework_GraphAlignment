@@ -3,7 +3,7 @@ from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, 
 import algorithms
 
 from data import similarities_preprocess
-# from scipy.io import loadmat
+# from scipy.io import loadmat, savemat
 # import inspect
 # import matplotlib.pyplot as plt
 # from data import ReadFile
@@ -472,6 +472,8 @@ def run_algs(Src, Tar, Gt, run, prep, plot, _seed):
         'w': w
     }
 
+    # savemat("arenas123.mat", data)
+
     return np.array([run_alg(_seed, data, Gt, i) for i in run])
 
 
@@ -577,8 +579,8 @@ def playground():
 
     noises = [
         {'target_noise': noise_level},
-        {'target_noise': noise_level, 'refill': True},
-        {'source_noise': noise_level, 'target_noise': noise_level},
+        # {'target_noise': noise_level, 'refill': True},
+        # {'source_noise': noise_level, 'target_noise': noise_level},
     ]
 
     output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")

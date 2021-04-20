@@ -17,7 +17,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
     # print(tripi.tolist())
     # variables used for the primal-dual algorithm
     # normalize ai values # updated on 2-19-2019
-    # ai = ai/np.amax(abs(ai))
+    ai = ai/np.amax(abs(ai))
     alpha = np.zeros(m)
     bt = np.zeros(m+n)  # beta
     queue = np.zeros(m, int)

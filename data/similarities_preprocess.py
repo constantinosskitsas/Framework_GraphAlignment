@@ -214,25 +214,25 @@ def test3():
 
 
 if __name__ == "__main__":
-    # A, B, L, S = test1()
-    # # test2()
+    A, B, L, S = test1()
+    # # # test2()
 
-    _lim = 5
-    Src_e = np.loadtxt("data/arenas_orig.txt", int)
-    Src_e = Src_e[np.where(Src_e < _lim, True, False).all(axis=1)]
-    Gt = np.random.permutation(_lim)
-    Tar_e = Gt[Src_e]
+    # _lim = 5
+    # Src_e = np.loadtxt("data/arenas_orig.txt", int)
+    # Src_e = Src_e[np.where(Src_e < _lim, True, False).all(axis=1)]
+    # Gt = np.random.permutation(_lim)
+    # Tar_e = Gt[Src_e]
 
-    Tar = e_to_G(Tar_e)
-    Src = e_to_G(Src_e)
+    # Tar = e_to_G(Tar_e)
+    # Src = e_to_G(Src_e)
 
-    # L = create_L(Src, Tar)
-    # S = create_S(Src, Tar, L)
+    # # L = create_L(Src, Tar)
+    # # S = create_S(Src, Tar, L)
 
-    print(create_S(Src, Tar, create_L(Src, Tar)).A)
-    print(create_S(Tar, Src, create_L(Tar, Src)).A)
+    # print(create_S(Src, Tar, create_L(Src, Tar)).A)
+    # print(create_S(Tar, Src, create_L(Tar, Src)).A)
 
-    # print(A.A)
-    # print(B.A)
-    # print(create_L(A, B, 1).A)
-    # print(create_L(B, A, 1).A)
+    # # print(A.A)
+    # # print(B.A)
+    # # print(create_L(A, B, 1).A)
+    # # print(create_L(B, A, 1).A)

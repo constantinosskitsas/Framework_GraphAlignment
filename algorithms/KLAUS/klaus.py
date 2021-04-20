@@ -25,7 +25,6 @@ def maxrowmatch(Q, li, lj, m, n):
     return q, SM
 
 
-# def main(S, w, li, lj, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=True):
 def main(data, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=True):
 
     S = data['S']
@@ -45,7 +44,7 @@ def main(data, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=Tru
     next_reduction_iteration = stepm
 
     if verbose:
-        print('{:5s}   {:4s}   {:8s}   {:7s} {:7s} {:7s}  {:7s} {:7s} {:7s} {:7s}'.format(
+        print('{:5s}   {:>4s}   {:>8s}   {:>7s} {:>7s} {:>7s}  {:>7s} {:>7s} {:>7s} {:>7s}'.format(
             'best', 'iter', 'norm-u', 'lower', 'upper', 'cur', 'obj', 'weight', 'card', 'overlap'))
 
     for it in range(1, maxiter+1):
@@ -70,33 +69,21 @@ def main(data, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=Tru
         if rtype == 1:
             pass
         elif rtype == 2:
-            pass
-            # mw = S*x  # remove first 0 from x?
-            # mw = a*w + b/2*mw
 
-            # ai = np.zeros(len(tripi))
-            # ai[mperm2] = mw[mperm1]
-            # _, _, val, noute, match1 = bipartite_matching_primal_dual(
-            #     rp, ci, ai, tripi, m+1, n+1)
+            mw = S*x
+            mw = a*w + b/2*mw
 
-            # mx = matching_indicator(rp, ci, match1, tripi, m, n)[1:]
-            # ma, mb = edge_list(m, n, val, noute, match1)
+            f, matchval, card, overlap, _, mx = bmw.round_messages(
+                mw, S, w, a, b, setup, m, n)
 
-            # matchval = np.dot(mx, w)
-            # # overlap = np.dot(mx, S*mx/2)
-            # overlap = np.dot(mi.T, (S*mi))/2
-            # card = len(ma)
-            # f = a*matchval + b*overlap
-
-            # if f > flower:
-            #     flower = f
-            #     itermark = '**'
-            #     mi = mx
-            #     xbest = mw
-            #     # matching = (ma, mb)
+            if f > flower:
+                flower = f
+                itermark = '**'
+                mi = mx
+                xbest = mw
 
         if verbose:
-            print('{:5s}   {:4d}   {:8.1e}   {:5.2f} {:5.2f} {:5.2f}  {:5.2f} {:5.2f} {:5.2f} {:5.2f}'.format(
+            print('{:5s}   {:4d}   {:8.1e}   {:7.2f} {:7.2f} {:7.2f}  {:7.2f} {:7.2f} {:7d} {:7d}'.format(
                 itermark, it, np.linalg.norm(U.data, 1),
                 flower, fupper, val,
                 f, matchval, card, overlap
@@ -117,5 +104,4 @@ def main(data, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=Tru
         U = U - GM * sps.triu(SM) + sps.tril(SM).T * GM
         U.data = U.data.clip(-0.5, 0.5)
 
-    # return bmw.getmatchings(li, lj, xbest)
     return sps.csr_matrix((xbest, (li, lj)))

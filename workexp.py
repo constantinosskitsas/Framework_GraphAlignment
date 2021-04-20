@@ -157,7 +157,7 @@ def global_config():
         'b': 1,
         'gamma': 0.4,
         'stepm': 25,
-        'rtype': 1,
+        'rtype': 2,
         'maxiter': 100,
         'verbose': True
     }

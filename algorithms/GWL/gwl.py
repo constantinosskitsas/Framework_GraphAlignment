@@ -1,11 +1,12 @@
 from .model.GromovWassersteinLearning import GromovWassersteinLearning
 import torch.optim as optim
 from torch.optim import lr_scheduler
+import torch
 import numpy as np
 import scipy.sparse as sps
 
 
-def main(data, opt_dict, hyperpara_dict, lr, gamma):
+def main(data, opt_dict, hyperpara_dict, lr, gamma, max_cpu=0):
 
     Src = data['Src']
     Tar = data['Tar']
@@ -26,6 +27,9 @@ def main(data, opt_dict, hyperpara_dict, lr, gamma):
         'tar_number': len(data['tar_index']),
         **hyperpara_dict
     }
+
+    if max_cpu > 0:
+        torch.set_num_threads(max_cpu)
 
     gwd_model = GromovWassersteinLearning(hyperpara_dictt)
 

@@ -80,6 +80,7 @@ def global_config():
         # 'gamma': 0.01,
         # 'gamma': None,
         'gamma': 0.8,
+        'max_cpu': 4
     }
 
     CONE_args = {
@@ -301,7 +302,8 @@ def fast():
         },
         'hyperpara_dict': {
             'dimension': 5
-        }
+        },
+        'max_cpu': 0
     }
 
     GRASP_args = {
@@ -320,10 +322,7 @@ def fast():
         3,      # regal,
     ]
 
-    verbose = False
     mnc = False
-    save = False
-    plot = False
 
 
 @ex.capture

@@ -422,7 +422,7 @@ def run_alg(_seed, data, Gt, i, algs, _log):
 
     alg, args, mt = algs[i]
 
-    _log.debug(f"{' ' + alg.__name__ +' ':#^55}")
+    _log.debug(f"{' ' + alg.__name__ +' ':#^35}")
 
     res = alg_exe(alg, data, args)
     matrix, cost = format_output(res)
@@ -431,7 +431,7 @@ def run_alg(_seed, data, Gt, i, algs, _log):
     result = evall(ma, mb, data['Src'], data['Tar'], Gt, alg=alg.__name__)
 
     _log.debug("\n%s", result)
-    _log.debug(f"{'#':#^55}")
+    _log.debug(f"{'#':#^35}")
 
     return result
 
@@ -550,14 +550,14 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
 @ex.named_config
 def playground():
 
-    iters = 10
+    iters = 1
 
     graphs = [
-        (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
-        (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        (nx.gnp_random_graph, (100, 0.9)),
-        (nx.barabasi_albert_graph, (100, 5)),
-        (nx.powerlaw_cluster_graph, (100, 5, 0.5)),
+        # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
+        # (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        # (nx.gnp_random_graph, (100, 0.9)),
+        # (nx.barabasi_albert_graph, (100, 5)),
+        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -592,8 +592,8 @@ def playground():
     # no_disc = True
 
     noises = [
-        # {'target_noise': noise_level},
-        # {'target_noise': noise_level, 'refill': True},
+        {'target_noise': noise_level},
+        {'target_noise': noise_level, 'refill': True},
         {'source_noise': noise_level, 'target_noise': noise_level},
     ]
 

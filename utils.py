@@ -33,8 +33,8 @@ def eval_align(ma, mb, gmb):
     return gacc, acc, alignment
 
 
-def e_to_G(e):
-    n = np.amax(e) + 1
+def e_to_G(e, n):
+    # n = np.amax(e) + 1
     nedges = e.shape[0]
     G = sps.csr_matrix((np.ones(nedges), e.T), shape=(n, n), dtype=int)
     G += G.T
@@ -105,15 +105,15 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False, no_di
         Tar_e = load_as_nx(target)
         gt_e = np.loadtxt(grand_truth, int).T
 
-        Src = e_to_G(Src_e)
-        Tar = e_to_G(Tar_e)
+        # Src = e_to_G(Src_e)
+        # Tar = e_to_G(Tar_e)
 
         Gt = (
             gt_e[:, gt_e[1].argsort()][0],
             gt_e[:, gt_e[0].argsort()][1]
         )
 
-        return Src, Tar, Gt
+        return Src_e, Tar_e, Gt
     elif isinstance(G, str):
         Src_e = load_as_nx(G)
     elif isinstance(G, nx.Graph):
@@ -170,7 +170,7 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False, no_di
         Src_e = refill_e(Src_e, n, nedges - Src_e.shape[0])
         Tar_e = refill_e(Tar_e, n, nedges - Tar_e.shape[0])
 
-    return e_to_G(Src_e), e_to_G(Tar_e),  Gt
+    return Src_e, Tar_e,  Gt
 
 
 def load_G(path):
@@ -211,24 +211,27 @@ def format_output(res):
     return matrix, cost
 
 
-def plot(cx, filename):
-    connects = np.zeros(cx.shape)
-    for row, col in zip(cx.row, cx.col):
-        connects[row, col] += 1
-    plt.imshow(connects)
-    plt.savefig(f'results/{filename}.png')
-    plt.close('all')
+# def plot(cx, filename):
+#     connects = np.zeros(cx.shape)
+#     for row, col in zip(cx.row, cx.col):
+#         connects[row, col] += 1
+#     plt.imshow(connects)
+#     plt.savefig(f'results/{filename}.png')
+#     plt.close('all')
 
 
-def plotG(G, name="", end=True):
+def plotG(G, name="", end=True, circular=False):
     G = nx.Graph(G)
 
     plt.figure(name)
 
     if len(G) <= 200:
+        kwargs = {}
+        if circular:
+            kwargs = dict(pos=nx.circular_layout(G),
+                          node_color='r', edge_color='b')
         plt.subplot(211)
-        nx.draw(G, pos=nx.circular_layout(G),
-                node_color='r', edge_color='b')
+        nx.draw(G, **kwargs)
 
         plt.subplot(212)
 
@@ -250,39 +253,39 @@ def plotG(G, name="", end=True):
     plt.show(block=end)
 
 
-def plotGs(left, right, circular=False):
-    G_left = nx.Graph(left)
-    G_right = nx.Graph(right)
-    if circular:
-        plt.subplot(121)
-        nx.draw(G_left, pos=nx.circular_layout(G_left),
-                node_color='r', edge_color='b')
-        plt.subplot(122)
-        nx.draw(G_right, pos=nx.circular_layout(G_right),
-                node_color='r', edge_color='b')
-    else:
-        plt.subplot(121)
-        nx.draw(G_left)
-        plt.subplot(122)
-        nx.draw(G_right)
+# def plotGs(left, right, circular=False):
+#     G_left = nx.Graph(left)
+#     G_right = nx.Graph(right)
+#     if circular:
+#         plt.subplot(121)
+#         nx.draw(G_left, pos=nx.circular_layout(G_left),
+#                 node_color='r', edge_color='b')
+#         plt.subplot(122)
+#         nx.draw(G_right, pos=nx.circular_layout(G_right),
+#                 node_color='r', edge_color='b')
+#     else:
+#         plt.subplot(121)
+#         nx.draw(G_left)
+#         plt.subplot(122)
+#         nx.draw(G_right)
 
-    G = G_left
+#     G = G_left
 
-    degree_sequence = sorted([d for n, d in G.degree()],
-                             reverse=True)  # degree sequence
-    degreeCount = collections.Counter(degree_sequence)
-    deg, cnt = zip(*degreeCount.items())
+#     degree_sequence = sorted([d for n, d in G.degree()],
+#                              reverse=True)  # degree sequence
+#     degreeCount = collections.Counter(degree_sequence)
+#     deg, cnt = zip(*degreeCount.items())
 
-    fig, ax = plt.subplots()
-    plt.bar(deg, cnt, width=0.80, color="b")
+#     fig, ax = plt.subplots()
+#     plt.bar(deg, cnt, width=0.80, color="b")
 
-    plt.title("Degree Histogram")
-    plt.ylabel("Count")
-    plt.xlabel("Degree")
-    ax.set_xticks([d + 0.4 for d in deg])
-    ax.set_xticklabels(deg)
+#     plt.title("Degree Histogram")
+#     plt.ylabel("Count")
+#     plt.xlabel("Degree")
+#     ax.set_xticks([d + 0.4 for d in deg])
+#     ax.set_xticklabels(deg)
 
-    plt.show()
+#     plt.show()
 
 
 def colmax(matrix):
@@ -392,25 +395,25 @@ def ICorS3GT(A, B, ma, mb, gmb, IC):
     return res
 
 
-def get_counterpart(alignment_matrix):
-    counterpart_dict = {}
+# def get_counterpart(alignment_matrix):
+#     counterpart_dict = {}
 
-    if not sps.issparse(alignment_matrix):
-        sorted_indices = np.argsort(alignment_matrix)
+#     if not sps.issparse(alignment_matrix):
+#         sorted_indices = np.argsort(alignment_matrix)
 
-    n_nodes = alignment_matrix.shape[0]
-    for node_index in range(n_nodes):
+#     n_nodes = alignment_matrix.shape[0]
+#     for node_index in range(n_nodes):
 
-        if sps.issparse(alignment_matrix):
-            row, possible_alignments, possible_values = sps.find(
-                alignment_matrix[node_index])
-            node_sorted_indices = possible_alignments[possible_values.argsort(
-            )]
-        else:
-            node_sorted_indices = sorted_indices[node_index]
-        counterpart = node_sorted_indices[-1]
-        counterpart_dict[node_index] = counterpart
-    return counterpart_dict
+#         if sps.issparse(alignment_matrix):
+#             row, possible_alignments, possible_values = sps.find(
+#                 alignment_matrix[node_index])
+#             node_sorted_indices = possible_alignments[possible_values.argsort(
+#             )]
+#         else:
+#             node_sorted_indices = sorted_indices[node_index]
+#         counterpart = node_sorted_indices[-1]
+#         counterpart_dict[node_index] = counterpart
+#     return counterpart_dict
 
 
 def score_MNC(adj1, adj2, countera, counterb):

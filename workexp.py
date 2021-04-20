@@ -448,12 +448,11 @@ def preprocess(Src, Tar, lalpha=1, mind=0.00001):
 
 
 @ ex.capture
-def run_algs(Src, Tar, Gt, run, prep, plot, _seed):
+def run_algs(Src, Tar, Gt, run, prep, plot, _seed, circular=False):
 
     if plot:
-        plotG(Src, 'Src', False)
-        plotG(Tar, 'Tar')
-        # plotGs(Tar, Src, circular=True)
+        plotG(Src, 'Src', False, circular=circular)
+        plotG(Tar, 'Tar', circular=circular)
 
     if prep:
         L, S, li, lj, w = preprocess(Src, Tar)
@@ -515,9 +514,25 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
 
             results = []
             for i, g in enumerate(g_it):
-                res = run_algs(*g)
+                _log.info("iteration:(%s/%s)", i+1, len(g_it))
 
-                _log.info("iteration:(%s/%s)\n%s", i+1, len(g_it), res)
+                Src_e, Tar_e, Gt = g
+                n = Gt[0].size
+
+                src = nx.Graph(Src_e.tolist())
+                src_cc = len(max(nx.connected_components(src), key=len))
+                tar = nx.Graph(Tar_e.tolist())
+                tar_cc = len(max(nx.connected_components(tar), key=len))
+
+                if (src_cc < n):
+                    _log.warning("Disc. Source: %s < %s", src_cc, n)
+
+                if (tar_cc < n):
+                    _log.warning("Disc. Target: %s < %s", tar_cc, n)
+
+                res = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
+
+                _log.info("\n%s", res)
 
                 results.append(res)
 
@@ -538,11 +553,11 @@ def playground():
     iters = 10
 
     graphs = [
-        # (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
-        # (nx.watts_strogatz_graph, (1133, 10, 0.5)),
-        # (nx.gnp_random_graph, (1133, 0.009)),
-        # (nx.barabasi_albert_graph, (1133, 5)),
-        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+        (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
+        (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        (nx.gnp_random_graph, (100, 0.9)),
+        (nx.barabasi_albert_graph, (100, 5)),
+        (nx.powerlaw_cluster_graph, (100, 5, 0.5)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -556,7 +571,7 @@ def playground():
         # )),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        (lambda x: x, ('data/arenas/source.txt',)),
+        # (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
         # (lambda x: x, ('data/facebook/source.txt',)),
 
@@ -577,9 +592,9 @@ def playground():
     # no_disc = True
 
     noises = [
-        {'target_noise': noise_level},
+        # {'target_noise': noise_level},
         # {'target_noise': noise_level, 'refill': True},
-        # {'source_noise': noise_level, 'target_noise': noise_level},
+        {'source_noise': noise_level, 'target_noise': noise_level},
     ]
 
     output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")

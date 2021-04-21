@@ -1,5 +1,5 @@
 from sacred import Experiment
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp, isorank2 as isorank, bipartitewrapper as bmw
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank, bipartitewrapper as bmw
 import algorithms
 
 from data import similarities_preprocess

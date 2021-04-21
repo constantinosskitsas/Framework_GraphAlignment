@@ -21,10 +21,15 @@ import random
 import yaml
 import datetime
 import logging
+import time
+from sacred.observers import FileStorageObserver
+
 
 from utils import *
 
 ex = Experiment("ex")
+
+ex.observers.append(FileStorageObserver('runs'))
 
 # create logger
 logger = logging.getLogger('e')
@@ -410,12 +415,12 @@ def getmatching(matrix, cost, mt, _log):
             return jv(cost.A)
 
     except Exception as e:
-        _log.error(e)
+        _log.exception("")
         return [0], [0]
 
 
 @ ex.capture
-def run_alg(_seed, data, Gt, i, algs, _log):
+def run_alg(_seed, data, Gt, i, algs, _log, _run):
 
     random.seed(_seed)
     np.random.seed(_seed)
@@ -424,9 +429,15 @@ def run_alg(_seed, data, Gt, i, algs, _log):
 
     _log.debug(f"{' ' + alg.__name__ +' ':#^35}")
 
+    start = time.time()
     res = alg_exe(alg, data, args)
+    _run.log_scalar(f"{alg.__name__}.alg", time.time()-start)
+
     matrix, cost = format_output(res)
+
+    start = time.time()
     ma, mb = getmatching(matrix, cost, mt)
+    _run.log_scalar(f"{alg.__name__}.matching", time.time()-start)
 
     result = evall(ma, mb, data['Src'], data['Tar'], Gt, alg=alg.__name__)
 
@@ -553,11 +564,11 @@ def playground():
     iters = 1
 
     graphs = [
-        # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
-        # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        # (nx.gnp_random_graph, (100, 0.9)),
-        # (nx.barabasi_albert_graph, (100, 5)),
-        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+        (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
+        (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        (nx.gnp_random_graph, (100, 0.9)),
+        (nx.barabasi_albert_graph, (100, 5)),
+        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -594,7 +605,7 @@ def playground():
     noises = [
         {'target_noise': noise_level},
         {'target_noise': noise_level, 'refill': True},
-        {'source_noise': noise_level, 'target_noise': noise_level},
+        # {'source_noise': noise_level, 'target_noise': noise_level},
     ]
 
     output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
@@ -633,16 +644,20 @@ def exp1r():
 
 
 @ex.automain
-def main(_config, _log, verbose, output_path, exist_ok=False):
-
-    if not verbose:
-        sys.stdout = open(os.devnull, 'w')
-        sys.stderr = open(os.devnull, 'w')
-        algorithms.GWL.dev.util.logger.disabled = True
+def main(_config, _run, _log, verbose, output_path, exist_ok=False, nice=10):
 
     try:
-        G, randcheck = init()
+        if not verbose:
+            sys.stdout = open(os.devnull, 'w')
+            sys.stderr = open(os.devnull, 'w')
+            algorithms.GWL.dev.util.logger.disabled = True
 
+        try:
+            os.nice(nice)
+        except:
+            pass
+
+        G, randcheck = init()
         _log.info("randcheck: %s", randcheck)
 
         os.makedirs(output_path, exist_ok=exist_ok)
@@ -656,6 +671,7 @@ def main(_config, _log, verbose, output_path, exist_ok=False):
             conf['_algs'] = conf.pop('algs')
             conf['_graphs'] = conf.pop('graphs')
             conf['_noises'] = conf.pop('noises')
+            conf['run_id'] = _run._id
 
             conf.pop("_giter", None)
 
@@ -667,5 +683,4 @@ def main(_config, _log, verbose, output_path, exist_ok=False):
 
         run_exp(G)
     except Exception as e:
-        sys.stderr = sys.__stderr__
-        raise e
+        _log.exception("")

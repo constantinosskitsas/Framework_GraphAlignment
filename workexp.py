@@ -367,17 +367,17 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
     else:
         prefix = ""
 
-    acc, acc2, alignment = res[eval_type]
+    acc, accb, alignment = res[eval_type]
 
-    acc3 = S3(Src.A, Tar.A, ma, mb)
-    acc4 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, True)
-    acc5 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, False)
+    acc2 = S3(Src.A, Tar.A, ma, mb)
+    acc3 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, True)
+    acc4 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, False)
     if mnc:
-        acc6 = score_MNC(Src, Tar, ma, mb)
+        acc5 = score_MNC(Src, Tar, ma, mb)
     else:
-        acc6 = -1
+        acc5 = -1
 
-    accs = (acc3, acc4, acc5, acc6)
+    accs = (acc2, acc3, acc4, acc5)
 
     if save:
         with open(f'{output_path}/{prefix}{alg}_{best}_.txt', 'wb') as f:
@@ -386,7 +386,7 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
             np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
             np.savetxt(f, alignment, fmt='%5d')
 
-    return np.array([acc, acc2, *accs])
+    return np.array([acc, *accs])
 
 
 @ex.capture
@@ -459,14 +459,16 @@ def preprocess(Src, Tar, lalpha=1, mind=0.00001):
 
 
 @ ex.capture
-def run_algs(Src, Tar, Gt, run, prep, plot, _seed, circular=False):
+def run_algs(Src, Tar, Gt, run, prep, plot, _seed, _run, circular=False):
 
     if plot:
         plotG(Src, 'Src', False, circular=circular)
         plotG(Tar, 'Tar', circular=circular)
 
     if prep:
+        start = time.time()
         L, S, li, lj, w = preprocess(Src, Tar)
+        _run.log_scalar("graph.prep", time.time()-start)
     else:
         L = S = sps.eye(1)
         li = lj = w = np.empty(1)
@@ -503,7 +505,7 @@ def init(graphs, noises, iters, no_disc=False):
 
 
 @ ex.capture
-def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
+def run_exp(G, output_path, verbose, _log, _run, _giter=(0, np.inf)):
 
     first, last = _giter
 
@@ -532,14 +534,23 @@ def run_exp(G, output_path, verbose, _log, _giter=(0, np.inf)):
 
                 src = nx.Graph(Src_e.tolist())
                 src_cc = len(max(nx.connected_components(src), key=len))
+                src_disc = src_cc < n
+
                 tar = nx.Graph(Tar_e.tolist())
                 tar_cc = len(max(nx.connected_components(tar), key=len))
+                tar_disc = tar_cc < n
 
-                if (src_cc < n):
+                if (src_disc):
                     _log.warning("Disc. Source: %s < %s", src_cc, n)
+                _run.log_scalar("graph.Source.disc", src_disc)
+                _run.log_scalar("graph.Source.n", n)
+                _run.log_scalar("graph.Source.e", Src_e.shape[0])
 
-                if (tar_cc < n):
+                if (tar_disc):
                     _log.warning("Disc. Target: %s < %s", tar_cc, n)
+                _run.log_scalar("graph.Target.disc", tar_disc)
+                _run.log_scalar("graph.Target.n", n)
+                _run.log_scalar("graph.Target.e", Tar_e.shape[0])
 
                 res = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
 

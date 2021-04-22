@@ -234,7 +234,7 @@ def global_config():
         (nx.powerlaw_cluster_graph, (50, 5, 0.5))
     ]
 
-    noise_level = None
+    noise_level = _mtype = None
     # no_disc = True
     noises = [
         {'target_noise': noise_level},
@@ -246,14 +246,20 @@ def global_config():
 
 
 @ex.named_config
-def gwjv():
+def gwcost():
     GW_args = {
         'opt_dict': {
             'epochs': 10
         }
     }
 
-    GW_mtype = -4
+    # GW_mtype = -4
+
+
+@ex.named_config
+def mtype():
+    _mtype = 0
+    GW_mtype = CONE_mtype = GRASP_mtype = REGAL_mtype = LREA_mtype = NSD_mtype = ISO_mtype = NET_mtype = KLAU_mtype = _mtype
 
 
 @ex.named_config
@@ -350,7 +356,8 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
         eval_align(mb, ma, gmb1),
     ], dtype=object)
 
-    _log.debug("\n%s", res[:, :2].astype(float))
+    with np.printoptions(suppress=True, precision=4):
+        _log.debug("\n%s", res[:, :2].astype(float))
 
     accs = res[:, 0]
     best = np.argmax(accs)
@@ -404,15 +411,17 @@ def getmatching(matrix, cost, mt, _log):
             return superfast(matrix, asc=False)
         elif mt == 3:
             return bmw.getmatchings(matrix)
+        elif mt == 4:
+            return jv(-np.log(matrix.A))
 
         elif mt == -1:
             return colmin(cost)
         elif mt == -2:
             return superfast(cost)
         elif mt == -3:
-            return bmw.getmatchings(sps.csr_matrix(cost.A * -1 + np.amax(cost.A)))
+            return bmw.getmatchings(np.exp(-cost.A))
         elif mt == -4:
-            return jv(cost.A)
+            return jv(cost)
 
     except Exception as e:
         _log.exception("")
@@ -441,7 +450,8 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run):
 
     result = evall(ma, mb, data['Src'], data['Tar'], Gt, alg=alg.__name__)
 
-    _log.debug("\n%s", result)
+    with np.printoptions(suppress=True, precision=4):
+        _log.debug("\n%s", result)
     _log.debug(f"{'#':#^35}")
 
     return result
@@ -554,7 +564,8 @@ def run_exp(G, output_path, verbose, _log, _run, _giter=(0, np.inf)):
 
                 res = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
 
-                _log.info("\n%s", res)
+                with np.printoptions(suppress=True, precision=4):
+                    _log.info("\n%s", res)
 
                 results.append(res)
 
@@ -575,11 +586,11 @@ def playground():
     iters = 1
 
     graphs = [
-        (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
-        (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        (nx.gnp_random_graph, (100, 0.9)),
-        (nx.barabasi_albert_graph, (100, 5)),
-        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+        # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
+        # (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        # (nx.gnp_random_graph, (100, 0.9)),
+        # (nx.barabasi_albert_graph, (100, 5)),
+        (nx.powerlaw_cluster_graph, (213, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -615,7 +626,7 @@ def playground():
 
     noises = [
         {'target_noise': noise_level},
-        {'target_noise': noise_level, 'refill': True},
+        # {'target_noise': noise_level, 'refill': True},
         # {'source_noise': noise_level, 'target_noise': noise_level},
     ]
 

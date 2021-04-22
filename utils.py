@@ -328,7 +328,7 @@ def jv(dist):
     # print('hungarian_matching: calculating distance matrix')
 
     # dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
-    n = np.shape(dist)[0]
+    n = dist.shape[0]
     # print(np.shape(dist))
     # print('hungarian_matching: calculating matching')
     cols, rows, _ = lapjv.lapjv(dist)

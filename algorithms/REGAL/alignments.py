@@ -12,21 +12,22 @@ def get_embedding_similarities(embed, embed2=None, sim_measure="euclidean", num_
     if embed2 is None:
         embed2 = embed
 
-    if num_top is not None:  # KD tree with only top similarities computed
-        kd_sim = kd_align(
-            embed, embed2, distance_metric=sim_measure, num_top=num_top)
-        return kd_sim
+    # if num_top is not None:  # KD tree with only top similarities computed
+    similarity_matrix = kd_align(
+        embed, embed2, distance_metric=sim_measure, num_top=num_top)
+    # return kd_sim
 
   # All pairwise distance computation
-    if sim_measure == "cosine":
-        similarity_matrix = sklearn.metrics.pairwise.cosine_similarity(
-            embed, embed2)
-    else:
-        similarity_matrix = sklearn.metrics.pairwise.euclidean_distances(
-            embed, embed2)
-        similarity_matrix = np.exp(-similarity_matrix)
+    # if sim_measure == "cosine":
+    #     similarity_matrix = sklearn.metrics.pairwise.cosine_similarity(
+    #         embed, embed2)
+    # else:
+    #     similarity_matrix = sklearn.metrics.pairwise.euclidean_distances(
+    #         embed, embed2)
+    #     similarity_matrix = np.exp(-similarity_matrix)
 
-    return similarity_matrix
+    return similarity_matrix, sklearn.metrics.pairwise.euclidean_distances(
+        embed, embed2)
 
 # Split embeddings in half (TODO generalize to different numbers and sizes of networks)
 

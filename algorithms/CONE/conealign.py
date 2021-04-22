@@ -111,21 +111,21 @@ def align_embeddings(embed1, embed2, CONE_args, adj1=None, adj2=None, struc_embe
     aligned_embed1 = embed1.dot(dim_align_matrix)
     # Greedily match nodes
     # greedily align each embedding to most similar neighbor
-    if CONE_args['alignmethod'] == 'greedy':
-        # KD tree with only top similarities computed
-        if CONE_args['numtop'] is not None:
-            alignment_matrix = kd_align(
-                aligned_embed1, embed2, distance_metric=CONE_args['embsim'], num_top=CONE_args['numtop'])
-        # All pairwise distance computation
-        else:
-            if CONE_args['embsim'] == "cosine":
-                alignment_matrix = sklearn.metrics.pairwise.cosine_similarity(
-                    aligned_embed1, embed2)
-            else:
-                alignment_matrix = sklearn.metrics.pairwise.euclidean_distances(
-                    aligned_embed1, embed2)
-                alignment_matrix = np.exp(-alignment_matrix)
-    return alignment_matrix
+    # if CONE_args['alignmethod'] == 'greedy':
+    #     # KD tree with only top similarities computed
+    #     if CONE_args['numtop'] is not None:
+    alignment_matrix = kd_align(
+        aligned_embed1, embed2, distance_metric=CONE_args['embsim'], num_top=CONE_args['numtop'])
+    # # All pairwise distance computation
+    # else:
+    #     if CONE_args['embsim'] == "cosine":
+    #         alignment_matrix = sklearn.metrics.pairwise.cosine_similarity(
+    #             aligned_embed1, embed2)
+    #     else:
+    #         alignment_matrix = sklearn.metrics.pairwise.euclidean_distances(
+    #             aligned_embed1, embed2)
+    #         alignment_matrix = np.exp(-alignment_matrix)
+    return alignment_matrix, sklearn.metrics.pairwise.euclidean_distances(aligned_embed1, embed2)
 
 
 # def get_counterpart(alignment_matrix, true_alignments):
@@ -209,7 +209,7 @@ def main(data, **args):
     print("B")
 
     # step2 and 3: align embedding spaces and match nodes with similar embeddings
-    alignment_matrix = align_embeddings(
+    alignment_matrix, cost_matrix = align_embeddings(
         emb_matrixA,
         emb_matrixB,
         args,
@@ -221,4 +221,4 @@ def main(data, **args):
     total_time = time.time() - start
     print(("time for CONE-align (in seconds): %f" % total_time))
 
-    return alignment_matrix
+    return alignment_matrix, cost_matrix

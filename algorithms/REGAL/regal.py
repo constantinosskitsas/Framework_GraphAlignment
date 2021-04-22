@@ -75,9 +75,9 @@ def main(data, **args) -> object:
     emb1, emb2 = get_embeddings(embed)
     if args['numtop'] == 0:
         args['numtop'] = None
-    alignment_matrix = get_embedding_similarities(
+    alignment_matrix, cost_matrix = get_embedding_similarities(
         emb1, emb2, num_top=args['numtop'])
-    return alignment_matrix
+    return alignment_matrix, cost_matrix
 
 
 # Should take in a file with the input graph as edgelist (REGAL_args['input)

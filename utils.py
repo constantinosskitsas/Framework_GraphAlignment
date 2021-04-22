@@ -181,19 +181,23 @@ def load_G(path):
 def format_output(res):
 
     if isinstance(res, tuple):
-        matrix, cost = res
+        sim, cost = res
     else:
-        matrix = res
+        sim = res
         cost = None
 
-    try:
-        matrix = sps.csr_matrix(matrix)
-    except Exception as e:
-        matrix = None
-    try:
+    if sim is not None:
+        sim = sps.csr_matrix(sim)
+
+    if cost is not None:
         cost = sps.csr_matrix(cost)
-    except Exception as e:
-        cost = None
+
+    # try:
+    # except Exception as e:
+    #     matrix = None
+    # try:
+    # except Exception as e:
+    #     cost = None
 
     # print(matrix)
     # print(type(matrix))
@@ -208,7 +212,7 @@ def format_output(res):
     # except:
     #     pass
 
-    return matrix, cost
+    return sim, cost
 
 
 # def plot(cx, filename):

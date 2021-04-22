@@ -342,12 +342,20 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
     gmb1 = np.array(gmb1, int)
-    ma = np.array(ma, int)
-    mb = np.array(mb, int)
 
-    assert ma.size == mb.size
+    try:
+        ma = np.array(ma, int)
+        mb = np.array(mb, int)
+
+        assert ma.size == mb.size
+    except:
+        _log.exception("")
+        return np.array([-1, -1, -1, -1, -1])
 
     _log.debug("matched %s out of %s", mb.size, gmb.size)
+
+    # if ma.size == 0:
+    #     return
 
     res = np.array([
         eval_align(ma, mb, gmb),
@@ -405,27 +413,30 @@ def alg_exe(alg, data, args):
 def getmatching(matrix, cost, mt, _log):
     _log.debug("matching type: %s", mt)
     try:
-        if mt == 1:
-            return colmax(matrix)
-        elif mt == 2:
-            return superfast(matrix, asc=False)
-        elif mt == 3:
-            return bmw.getmatchings(matrix)
-        elif mt == 4:
-            return jv(-np.log(matrix.A))
+        if mt > 0:
+            if mt == 1:
+                return colmax(matrix)
+            elif mt == 2:
+                return superfast(matrix, asc=False)
+            elif mt == 3:
+                return bmw.getmatchings(matrix)
+            elif mt == 4:
+                return jv(-np.log(matrix.A))
 
-        elif mt == -1:
-            return colmin(cost)
-        elif mt == -2:
-            return superfast(cost)
-        elif mt == -3:
-            return bmw.getmatchings(np.exp(-cost.A))
-        elif mt == -4:
-            return jv(cost)
+        if mt < 0:
+            if mt == -1:
+                return colmin(cost)
+            elif mt == -2:
+                return superfast(cost)
+            elif mt == -3:
+                return bmw.getmatchings(np.exp(-cost.A))
+            elif mt == -4:
+                return jv(cost.A)
 
+        raise Exception("wrong matching config")
     except Exception as e:
         _log.exception("")
-        return [0], [0]
+        return None, None
 
 
 @ ex.capture

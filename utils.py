@@ -25,7 +25,7 @@ def eval_align(ma, mb, gmb):
         mab = gmb[ma]
         acc = np.mean(mb == mab)
 
-    except Exception as e:
+    except:
         mab = np.zeros(mb.size, int) - 1
         gacc = acc = -1.0
     alignment = np.array([ma, mb, mab]).T
@@ -191,26 +191,6 @@ def format_output(res):
 
     if cost is not None:
         cost = sps.csr_matrix(cost)
-
-    # try:
-    # except Exception as e:
-    #     matrix = None
-    # try:
-    # except Exception as e:
-    #     cost = None
-
-    # print(matrix)
-    # print(type(matrix))
-    # try:
-    #     print(matrix.shape)
-    # except:
-    #     pass
-    # print(cost)
-    # print(type(cost))
-    # try:
-    #     print(cost.shape)
-    # except:
-    #     pass
 
     return sim, cost
 
@@ -461,5 +441,5 @@ def score_MNC(adj1, adj2, countera, counterb):
             mnc += sim
 
         return mnc / countera.size
-    except Exception as e:
+    except:
         return -1

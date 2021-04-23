@@ -1,4 +1,5 @@
 from sacred import Experiment
+from sacred.observers import FileStorageObserver
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank, bipartitewrapper as bmw
 import algorithms
 
@@ -22,8 +23,7 @@ import yaml
 import datetime
 import logging
 import time
-from sacred.observers import FileStorageObserver
-
+import pickle
 
 from utils import *
 
@@ -333,14 +333,14 @@ def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoNa
     gmb = np.array(gmb, int)
     gmb1 = np.array(gmb1, int)
 
-    try:
-        ma = np.array(ma, int)
-        mb = np.array(mb, int)
+    # try:
+    ma = np.array(ma, int)
+    mb = np.array(mb, int)
 
-        assert ma.size == mb.size
-    except:
-        _log.exception("")
-        return np.array([-1, -1, -1, -1, -1])
+    assert ma.size == mb.size
+    # except:
+    #     _log.exception("")
+    #     return np.array([-1, -1, -1, -1, -1])
 
     _log.debug("matched %s out of %s", mb.size, gmb.size)
 
@@ -400,33 +400,37 @@ def alg_exe(alg, data, args):
 
 
 @ex.capture
-def getmatching(matrix, cost, mt, _log):
+def getmatching(sim, cost, mt, _log):
     _log.debug("matching type: %s", mt)
-    try:
-        if mt > 0:
-            if mt == 1:
-                return colmax(matrix)
-            elif mt == 2:
-                return superfast(matrix, asc=False)
-            elif mt == 3:
-                return bmw.getmatchings(matrix)
-            elif mt == 4:
-                return jv(-np.log(matrix.A))
+    # try:
+    if mt > 0:
+        if sim is None:
+            raise Exception("Empty sim matrix")
+        if mt == 1:
+            return colmax(sim)
+        elif mt == 2:
+            return superfast(sim, asc=False)
+        elif mt == 3:
+            return bmw.getmatchings(sim)
+        elif mt == 4:
+            return jv(-np.log(sim.A))
 
-        if mt < 0:
-            if mt == -1:
-                return colmin(cost)
-            elif mt == -2:
-                return superfast(cost)
-            elif mt == -3:
-                return bmw.getmatchings(np.exp(-cost.A))
-            elif mt == -4:
-                return jv(cost.A)
+    if mt < 0:
+        if cost is None:
+            raise Exception("Empty cost matrix")
+        if mt == -1:
+            return colmin(cost)
+        elif mt == -2:
+            return superfast(cost)
+        elif mt == -3:
+            return bmw.getmatchings(np.exp(-cost.A))
+        elif mt == -4:
+            return jv(cost.A)
 
-        raise Exception("wrong matching config")
-    except Exception as e:
-        _log.exception("")
-        return None, None
+    raise Exception("wrong matching config")
+    # except:
+    #     _log.exception("")
+    #     return None, None
 
 
 @ ex.capture
@@ -445,14 +449,25 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run):
 
     matrix, cost = format_output(res)
 
-    start = time.time()
-    ma, mb = getmatching(matrix, cost, mt)
-    _run.log_scalar(f"{alg.__name__}.matching", time.time()-start)
+    res = []
+    for mt in [1, 2, 3, 4, -1, -2, -3, -4]:
+        try:
+            start = time.time()
+            ma, mb = getmatching(matrix, cost, mt)
+            _run.log_scalar(f"{alg.__name__}.matching", time.time()-start)
 
-    result = evall(ma, mb, data['Src'], data['Tar'], Gt, alg=alg.__name__)
+            result = evall(ma, mb, data['Src'],
+                           data['Tar'], Gt, alg=alg.__name__)
+        except:
+            _log.exception("")
+            result = np.array([-1, -1, -1, -1, -1])
+        res.append(result[0])
+
+    result = np.array(res)
 
     with np.printoptions(suppress=True, precision=4):
-        _log.debug("\n%s", result)
+        _log.debug("\n%s", result.astype(float))
+
     _log.debug(f"{'#':#^35}")
 
     return result
@@ -536,14 +551,17 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
     # _it = 0
     # total_graphs = min(len(G) * len(G[0]), last-first+1)
 
+    os.mkdir(f'{output_path}/graphs')
+
+    res5 = []
     for graph_number, g_n in enumerate(G):
 
         _log.info("Graph:(%s/%s)", graph_number + 1, len(G))
 
-        plots = []
         writer = pd.ExcelWriter(
             f"{output_path}/res_g{graph_number+1}.xlsx", engine='openpyxl')
 
+        res4 = []
         for noise_level, g_it in enumerate(g_n):
             # _git += 1
             # if _git < first or _git > last:
@@ -554,12 +572,19 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
             # _log.info("Graph:(%s/%s)", _it, total_graphs)
 
-            results = []
+            res3 = []
             for i, g in enumerate(g_it):
                 _log.info("iteration:(%s/%s)", i+1, len(g_it))
 
                 Src_e, Tar_e, Gt = g
                 n = Gt[0].size
+
+                prefix = f"{output_path}/graphs/{graph_number+1:0>2d}_{noise_level+1:0>2d}_{i+1:0>2d}"
+                Gt_m = np.c_[np.arange(n), Gt[0]]
+                np.savetxt(f"{prefix}_Src.txt", Src_e, fmt='%d')
+                np.savetxt(f"{prefix}_Tar.txt", Tar_e, fmt='%d')
+                np.savetxt(f"{prefix}_Gt.txt", Gt_m, fmt='%d')
+                # np.savetxt(f"{prefix}_Gt2.txt", Gt[1], fmt='%d')
 
                 src = nx.Graph(Src_e.tolist())
                 src_cc = len(max(nx.connected_components(src), key=len))
@@ -581,49 +606,91 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
                 _run.log_scalar("graph.Target.n", n)
                 _run.log_scalar("graph.Target.e", Tar_e.shape[0])
 
-                res = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
+                res2 = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
 
                 with np.printoptions(suppress=True, precision=4):
-                    _log.info("\n%s", res)
+                    _log.info("\n%s", res2.astype(float))
 
-                results.append(res)
+                res3.append(res2)
 
-            results = np.array(results)
+            res3 = np.array(res3)
 
-            for i in range(results.shape[2]):
-                sn = f"acc{i + 1}"
+            # for i in range(res3.shape[2]):
+            #     sn = f"acc{i + 1}"
+            #     rownr = (writer.sheets[sn].max_row +
+            #              1) if sn in writer.sheets else 0
+            #     pd.DataFrame(
+            #         res3[:, :, i],
+            #         index=[f'it{j+1}' for j in range(res3.shape[0])],
+            #         columns=[f'alg{j+1}' for j in range(res3.shape[1])],
+            #     ).to_excel(writer,
+            #                sheet_name=sn,
+            #                startrow=rownr,
+            #                )
+
+            for i in range(res3.shape[1]):
+                sn = f"alg{i + 1}"
                 rownr = (writer.sheets[sn].max_row +
                          1) if sn in writer.sheets else 0
                 pd.DataFrame(
-                    results[:, :, i],
-                    index=[f'it{j+1}' for j in range(results.shape[0])],
-                    columns=[f'alg{j+1}' for j in range(results.shape[1])],
+                    res3[:, i, :],
+                    index=[f'it{j+1}' for j in range(res3.shape[0])],
+                    columns=[f'acc1_{j+1}' for j in range(res3.shape[2])],
                 ).to_excel(writer,
                            sheet_name=sn,
                            startrow=rownr,
                            )
 
-            plots.append(results)
+            res4.append(res3)
 
+        res4 = np.array(res4)
         writer.save()
 
-        plots = np.array(plots)
-        plt.figure()
-        for i in range(plots.shape[2]):
-            vals = np.mean(plots, axis=1)
-            plt.plot(noises, vals[:, i, 0], label=f"alg{i+1}")
-        plt.xticks(noises)
-        plt.xlabel("Noise level")
-        plt.ylabel("Accuracy")
-        plt.legend()
-        # plt.show()
-        plt.savefig(f"{output_path}/res_g{graph_number+1}")
+        plots = np.mean(res4, axis=1)
+
+        # plt.figure()
+        # for alg in range(plots.shape[1]):
+        #     vals = plots[:, alg, 0]
+        #     plt.plot(noises, vals, label=f"alg{alg+1}")
+        # plt.xlabel("Noise level")
+        # plt.xticks(noises)
+        # plt.ylabel("Accuracy")
+        # plt.ylim([-0.1, 1.1])
+        # plt.legend()
+        # # plt.show()
+        # plt.savefig(f"{output_path}/res_g{graph_number+1}")
+
+        acc = [
+            "SNN",
+            "SSG",
+            "SSH",
+            "SJV",
+            "CNN",
+            "CSG",
+            "CSH",
+            "CJV",
+        ]
+
+        for alg in range(plots.shape[1]):
+            plt.figure()
+            for i in range(plots.shape[2]):
+                vals = plots[:, alg, i]
+                if np.all(vals >= 0):
+                    plt.plot(noises, vals, label=acc[i])
+            plt.xlabel("Noise level")
+            plt.xticks(noises)
+            plt.ylabel("Accuracy")
+            plt.ylim([-0.1, 1.1])
+            plt.legend()
+            # plt.show()
+            plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
+
+        res5.append(res4)
+
+    np.save(f"{output_path}/_res5", np.array(res5))  # (g,n,i,alg,acc)
 
 
-# @ex.named_config
-
-
-@ex.config
+@ex.named_config
 def playground():
 
     iters = 3
@@ -631,9 +698,9 @@ def playground():
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        (nx.gnp_random_graph, (100, 0.9)),
+        (nx.gnp_random_graph, (50, 0.9)),
         # (nx.barabasi_albert_graph, (100, 5)),
-        (nx.powerlaw_cluster_graph, (213, 2, 0.3)),
+        (nx.powerlaw_cluster_graph, (75, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -685,35 +752,46 @@ def playground():
     output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
+# @ex.named_config
+# def exp_():
+
+#     iters = 10
+
+#     graphs = [
+#         (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+#         (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+#         (nx.gnp_random_graph, (1133, 0.009)),
+#         (nx.barabasi_albert_graph, (1133, 5)),
+#         (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+#     ]
+
+#     output_path = "results/exp_" + \
+#         datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+
+
 @ex.named_config
-def exp1s():
+def exp1():
 
     iters = 10
 
     graphs = [
-        (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
-        (nx.watts_strogatz_graph, (1133, 10, 0.5)),
-        (nx.gnp_random_graph, (1133, 0.009)),
-        (nx.barabasi_albert_graph, (1133, 5)),
+        (lambda x: x, ('data/arenas/source.txt',)),
         (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
     ]
 
-    output_path = "results/exp1s_" + \
-        datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
-
-
-@ex.named_config
-def exp1r():
-
-    iters = 5
-
-    graphs = [
-        (lambda x: x, ('data/arenas/source.txt',)),
-        # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
-        # (lambda x: x, ('data/facebook/source.txt',)),
+    noises = [
+        0.00,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
     ]
 
-    output_path = "results/exp1r_" + \
+    no_disc = True
+    noise_type = None
+
+    output_path = "results/exp1_" + \
         datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
@@ -754,6 +832,8 @@ def main(_config, _run, _log, verbose, output_path, exist_ok=False, nice=10):
             yaml.dump(conf, cy)
 
         _log.info("config location: %s", output_path)
+
+        pickle.dump(G, open(f"{output_path}/_G.pickle", "wb"))
 
         run_exp(G)
     except Exception as e:

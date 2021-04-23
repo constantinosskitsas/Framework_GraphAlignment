@@ -539,7 +539,11 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
     for graph_number, g_n in enumerate(G):
 
         _log.info("Graph:(%s/%s)", graph_number + 1, len(G))
+
         plots = []
+        writer = pd.ExcelWriter(
+            f"{output_path}/res_g{graph_number+1}.xlsx", engine='openpyxl')
+
         for noise_level, g_it in enumerate(g_n):
             # _git += 1
             # if _git < first or _git > last:
@@ -547,9 +551,6 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
             # _it += 1
 
             _log.info("Noise_level:(%s/%s)", noise_level + 1, len(g_n))
-
-            writer = pd.ExcelWriter(
-                f"{output_path}/res_g{graph_number+1}.xlsx", engine='openpyxl')
 
             # _log.info("Graph:(%s/%s)", _it, total_graphs)
 
@@ -591,8 +592,8 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
             for i in range(results.shape[2]):
                 sn = f"acc{i + 1}"
-                rownr = writer.sheets[sn].max_row + \
-                    1 if sn in writer.sheets else 0
+                rownr = (writer.sheets[sn].max_row +
+                         1) if sn in writer.sheets else 0
                 pd.DataFrame(
                     results[:, :, i],
                     index=[f'it{j+1}' for j in range(results.shape[0])],
@@ -601,9 +602,11 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
                            sheet_name=sn,
                            startrow=rownr,
                            )
-            writer.save()
 
             plots.append(results)
+
+        writer.save()
+
         plots = np.array(plots)
         plt.figure()
         for i in range(plots.shape[2]):

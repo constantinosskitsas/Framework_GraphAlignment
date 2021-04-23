@@ -191,20 +191,6 @@ def global_config():
         (klaus, KLAU_args, KLAU_mtype)
     ]
 
-    # mtype = [
-    #     1,      # gwl
-    #     2,      # conealign
-    #     3,      # grasp
-    #     0,      # regal
-
-    #     2,      # eigenalign
-    #     1,      # NSD
-    #     1,      # isorank
-
-    #     2,      # netalign
-    #     2,      # klaus
-    # ]
-
     run = [
         0,      # gwl
         1,      # conealign
@@ -236,13 +222,17 @@ def global_config():
 
     noise_level = _mtype = None
     # no_disc = True
-    noises = [
-        {'target_noise': noise_level},
-        {'target_noise': noise_level, 'refill': True},
-        {'source_noise': noise_level, 'target_noise': noise_level},
-    ]
 
-    output_path = "results/_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
+    noise_type = 1
+
+    def noise_types(noise_level, noise_type):
+        return [
+            {'target_noise': noise_level},
+            {'target_noise': noise_level, 'refill': True},
+            {'source_noise': noise_level, 'target_noise': noise_level},
+        ][noise_type - 1]
+
+    output_path = "results/_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config
@@ -510,41 +500,58 @@ def run_algs(Src, Tar, Gt, run, prep, plot, _seed, _run, circular=False):
 
 
 @ ex.capture
-def init(graphs, noises, iters, no_disc=False):
+def init(graphs, noises, iters, noise_types, noise_type, no_disc=False):
+
+    S_G = [
+        [alg(*args) for _ in range(iters)] for alg, args in graphs
+    ]
+
+    randcheck1 = np.random.rand(1)[0]
 
     G = [
         [
             [
-                generate_graphs(alg(*args), no_disc=no_disc, **nargs) for _ in range(iters)
-            ] for nargs in noises
-        ] for alg, args in graphs
+                generate_graphs(g, no_disc=no_disc, **noise_types(noise, noise_type)) for g in gi
+            ] for noise in noises
+        ] for gi in S_G
     ]
+    # G = [
+    #     [
+    #         [
+    #             generate_graphs(g, no_disc=no_disc, **nargs) for _ in range(iters)
+    #         ] for nargs in noises
+    #     ] for alg, args in graphs
+    # ]
 
-    randcheck = np.random.rand(1)[0]
-
-    return G, randcheck
+    randcheck2 = np.random.rand(1)[0]
+    return G, (float(randcheck1), float(randcheck2))
 
 
 @ ex.capture
-def run_exp(G, output_path, verbose, _log, _run, _giter=(0, np.inf)):
+def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
-    first, last = _giter
+    # first, last = _giter
 
-    _git = 0
-    _it = 0
-    total_graphs = min(len(G) * len(G[0]), last-first+1)
+    # _git = 0
+    # _it = 0
+    # total_graphs = min(len(G) * len(G[0]), last-first+1)
 
     for graph_number, g_n in enumerate(G):
-        for noise_type, g_it in enumerate(g_n):
-            _git += 1
-            if _git < first or _git > last:
-                continue
-            _it += 1
 
-            _log.info("Graph:(%s/%s)", _it, total_graphs)
+        _log.info("Graph:(%s/%s)", graph_number + 1, len(G))
+        plots = []
+        for noise_level, g_it in enumerate(g_n):
+            # _git += 1
+            # if _git < first or _git > last:
+            #     continue
+            # _it += 1
+
+            _log.info("Noise_level:(%s/%s)", noise_level + 1, len(g_n))
 
             writer = pd.ExcelWriter(
-                f"{output_path}/res_g{graph_number+1}_n{noise_type+1}.xlsx", engine='openpyxl')
+                f"{output_path}/res_g{graph_number+1}.xlsx", engine='openpyxl')
+
+            # _log.info("Graph:(%s/%s)", _it, total_graphs)
 
             results = []
             for i, g in enumerate(g_it):
@@ -583,23 +590,45 @@ def run_exp(G, output_path, verbose, _log, _run, _giter=(0, np.inf)):
             results = np.array(results)
 
             for i in range(results.shape[2]):
+                sn = f"acc{i + 1}"
+                rownr = writer.sheets[sn].max_row + \
+                    1 if sn in writer.sheets else 0
                 pd.DataFrame(
                     results[:, :, i],
                     index=[f'it{j+1}' for j in range(results.shape[0])],
-                    columns=[f'alg{j+1}' for j in range(results.shape[1])]
-                ).to_excel(writer, sheet_name=f"acc{i + 1}")
+                    columns=[f'alg{j+1}' for j in range(results.shape[1])],
+                ).to_excel(writer,
+                           sheet_name=sn,
+                           startrow=rownr,
+                           )
             writer.save()
 
+            plots.append(results)
+        plots = np.array(plots)
+        plt.figure()
+        for i in range(plots.shape[2]):
+            vals = np.mean(plots, axis=1)
+            plt.plot(noises, vals[:, i, 0], label=f"alg{i+1}")
+        plt.xticks(noises)
+        plt.xlabel("Noise level")
+        plt.ylabel("Accuracy")
+        plt.legend()
+        # plt.show()
+        plt.savefig(f"{output_path}/res_g{graph_number+1}")
 
-@ex.named_config
+
+# @ex.named_config
+
+
+@ex.config
 def playground():
 
-    iters = 1
+    iters = 3
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        # (nx.gnp_random_graph, (100, 0.9)),
+        (nx.gnp_random_graph, (100, 0.9)),
         # (nx.barabasi_albert_graph, (100, 5)),
         (nx.powerlaw_cluster_graph, (213, 2, 0.3)),
 
@@ -636,12 +665,21 @@ def playground():
     # no_disc = True
 
     noises = [
-        {'target_noise': noise_level},
-        # {'target_noise': noise_level, 'refill': True},
-        # {'source_noise': noise_level, 'target_noise': noise_level},
+        0.00,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
     ]
 
-    output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
+    # {'target_noise': noise_level},
+    # {'target_noise': noise_level, 'refill': True},
+    # {'source_noise': noise_level, 'target_noise': noise_level},
+
+    noise_type = 1
+
+    output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config
@@ -658,7 +696,7 @@ def exp1s():
     ]
 
     output_path = "results/exp1s_" + \
-        datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
+        datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config
@@ -673,7 +711,7 @@ def exp1r():
     ]
 
     output_path = "results/exp1r_" + \
-        datetime.datetime.now().strftime("%Y-%m-%d_%H;%M;%S,%f")
+        datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.automain
@@ -708,7 +746,7 @@ def main(_config, _run, _log, verbose, output_path, exist_ok=False, nice=10):
 
             conf.pop("_giter", None)
 
-            conf['randcheck'] = float(randcheck)
+            conf['randcheck'] = randcheck
 
             yaml.dump(conf, cy)
 

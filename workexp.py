@@ -414,6 +414,10 @@ def getmatching(sim, cost, mt, _log):
             return bmw.getmatchings(sim)
         elif mt == 4:
             return jv(-np.log(sim.A))
+        elif mt == 5:
+            mb = sps.csgraph.maximum_bipartite_matching(
+                sim, perm_type="column")
+            return np.arange(mb.size), mb
 
     if mt < 0:
         if cost is None:
@@ -426,6 +430,10 @@ def getmatching(sim, cost, mt, _log):
             return bmw.getmatchings(np.exp(-cost.A))
         elif mt == -4:
             return jv(cost.A)
+        elif mt == -5:
+            mb = sps.csgraph.maximum_bipartite_matching(
+                np.exp(-cost.A), perm_type="column")
+            return np.arange(mb.size), mb
 
     raise Exception("wrong matching config")
     # except:
@@ -449,21 +457,22 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run):
 
     matrix, cost = format_output(res)
 
-    res = []
-    for mt in [1, 2, 3, 4, -1, -2, -3, -4]:
-        try:
-            start = time.time()
-            ma, mb = getmatching(matrix, cost, mt)
-            _run.log_scalar(f"{alg.__name__}.matching", time.time()-start)
+    # res = []
+    # for mt in [1, 2, 3, 4, -1, -2, -3, -4]:
+    try:
+        # if (mt == 3 and i == 5) or (mt == -3 and i == 0):
+        #     raise Exception("Skip")
+        start = time.time()
+        ma, mb = getmatching(matrix, cost, mt)
+        _run.log_scalar(f"{alg.__name__}.matching", time.time()-start)
 
-            result = evall(ma, mb, data['Src'],
-                           data['Tar'], Gt, alg=alg.__name__)
-        except:
-            _log.exception("")
-            result = np.array([-1, -1, -1, -1, -1])
-        res.append(result[0])
-
-    result = np.array(res)
+        result = evall(ma, mb, data['Src'],
+                       data['Tar'], Gt, alg=alg.__name__)
+    except:
+        _log.exception("")
+        result = np.array([-1, -1, -1, -1, -1])
+    #     res.append(result[0])
+    # result = np.array(res)
 
     with np.printoptions(suppress=True, precision=4):
         _log.debug("\n%s", result.astype(float))
@@ -615,31 +624,31 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
             res3 = np.array(res3)
 
-            # for i in range(res3.shape[2]):
-            #     sn = f"acc{i + 1}"
-            #     rownr = (writer.sheets[sn].max_row +
-            #              1) if sn in writer.sheets else 0
-            #     pd.DataFrame(
-            #         res3[:, :, i],
-            #         index=[f'it{j+1}' for j in range(res3.shape[0])],
-            #         columns=[f'alg{j+1}' for j in range(res3.shape[1])],
-            #     ).to_excel(writer,
-            #                sheet_name=sn,
-            #                startrow=rownr,
-            #                )
-
-            for i in range(res3.shape[1]):
-                sn = f"alg{i + 1}"
+            for i in range(res3.shape[2]):
+                sn = f"acc{i + 1}"
                 rownr = (writer.sheets[sn].max_row +
                          1) if sn in writer.sheets else 0
                 pd.DataFrame(
-                    res3[:, i, :],
+                    res3[:, :, i],
                     index=[f'it{j+1}' for j in range(res3.shape[0])],
-                    columns=[f'acc1_{j+1}' for j in range(res3.shape[2])],
+                    columns=[f'alg{j+1}' for j in range(res3.shape[1])],
                 ).to_excel(writer,
                            sheet_name=sn,
                            startrow=rownr,
                            )
+
+            # for i in range(res3.shape[1]):
+            #     sn = f"alg{i + 1}"
+            #     rownr = (writer.sheets[sn].max_row +
+            #              1) if sn in writer.sheets else 0
+            #     pd.DataFrame(
+            #         res3[:, i, :],
+            #         index=[f'it{j+1}' for j in range(res3.shape[0])],
+            #         columns=[f'acc1_{j+1}' for j in range(res3.shape[2])],
+            #     ).to_excel(writer,
+            #                sheet_name=sn,
+            #                startrow=rownr,
+            #                )
 
             res4.append(res3)
 
@@ -648,42 +657,41 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
         plots = np.mean(res4, axis=1)
 
-        # plt.figure()
-        # for alg in range(plots.shape[1]):
-        #     vals = plots[:, alg, 0]
-        #     plt.plot(noises, vals, label=f"alg{alg+1}")
-        # plt.xlabel("Noise level")
-        # plt.xticks(noises)
-        # plt.ylabel("Accuracy")
-        # plt.ylim([-0.1, 1.1])
-        # plt.legend()
-        # # plt.show()
-        # plt.savefig(f"{output_path}/res_g{graph_number+1}")
-
-        acc = [
-            "SNN",
-            "SSG",
-            "SSH",
-            "SJV",
-            "CNN",
-            "CSG",
-            "CSH",
-            "CJV",
-        ]
-
+        plt.figure()
         for alg in range(plots.shape[1]):
-            plt.figure()
-            for i in range(plots.shape[2]):
-                vals = plots[:, alg, i]
-                if np.all(vals >= 0):
-                    plt.plot(noises, vals, label=acc[i])
-            plt.xlabel("Noise level")
-            plt.xticks(noises)
-            plt.ylabel("Accuracy")
-            plt.ylim([-0.1, 1.1])
-            plt.legend()
-            # plt.show()
-            plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
+            vals = plots[:, alg, 0]
+            plt.plot(noises, vals, label=f"alg{alg+1}")
+        plt.xlabel("Noise level")
+        plt.xticks(noises)
+        plt.ylabel("Accuracy")
+        plt.ylim([-0.1, 1.1])
+        plt.legend()
+        plt.savefig(f"{output_path}/res_g{graph_number+1}")
+
+        # acc = [
+        #     "SNN",
+        #     "SSG",
+        #     "SSH",
+        #     "SJV",
+        #     "CNN",
+        #     "CSG",
+        #     "CSH",
+        #     "CJV",
+        # ]
+
+        # for alg in range(plots.shape[1]):
+        #     plt.figure()
+        #     for i in range(plots.shape[2]):
+        #         vals = plots[:, alg, i]
+        #         if np.all(vals >= 0):
+        #             plt.plot(noises, vals, label=acc[i])
+        #     plt.xlabel("Noise level")
+        #     plt.xticks(noises)
+        #     plt.ylabel("Accuracy")
+        #     plt.ylim([-0.1, 1.1])
+        #     plt.legend()
+        #     # plt.show()
+        #     plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
 
         res5.append(res4)
 

@@ -16,6 +16,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import collections
 import scipy.sparse as sps
+import scipy
 import sys
 import os
 import random
@@ -169,7 +170,7 @@ def global_config():
 
     GW_mtype = 2
     CONE_mtype = 3
-    GRASP_mtype = -4
+    GRASP_mtype = -5
     REGAL_mtype = 1
     LREA_mtype = 3
     NSD_mtype = 2
@@ -220,7 +221,7 @@ def global_config():
         (nx.powerlaw_cluster_graph, (50, 5, 0.5))
     ]
 
-    noise_level = _mtype = None
+    _mtype = None
     # no_disc = True
 
     noise_type = 1
@@ -411,13 +412,13 @@ def getmatching(sim, cost, mt, _log):
         elif mt == 2:
             return superfast(sim, asc=False)
         elif mt == 3:
-            return bmw.getmatchings(sim)
+            return scipy.optimize.linear_sum_assignment(sim.A, maximize=True)
         elif mt == 4:
-            return jv(-np.log(sim.A))
+            return sps.csgraph.min_weight_full_bipartite_matching(sim, maximize=True)
         elif mt == 5:
-            mb = sps.csgraph.maximum_bipartite_matching(
-                sim, perm_type="column")
-            return np.arange(mb.size), mb
+            return jv(-np.log(sim.A))
+        elif mt == 99:
+            return bmw.getmatchings(sim)
 
     if mt < 0:
         if cost is None:
@@ -427,13 +428,13 @@ def getmatching(sim, cost, mt, _log):
         elif mt == -2:
             return superfast(cost)
         elif mt == -3:
-            return bmw.getmatchings(np.exp(-cost.A))
+            return scipy.optimize.linear_sum_assignment(cost.A)
         elif mt == -4:
-            return jv(cost.A)
+            return sps.csgraph.min_weight_full_bipartite_matching(cost)
         elif mt == -5:
-            mb = sps.csgraph.maximum_bipartite_matching(
-                np.exp(-cost.A), perm_type="column")
-            return np.arange(mb.size), mb
+            return jv(cost.A)
+        elif mt == -99:
+            return bmw.getmatchings(np.exp(-cost.A))
 
     raise Exception("wrong matching config")
     # except:
@@ -457,22 +458,23 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run):
 
     matrix, cost = format_output(res)
 
-    # res = []
-    # for mt in [1, 2, 3, 4, -1, -2, -3, -4]:
-    try:
-        # if (mt == 3 and i == 5) or (mt == -3 and i == 0):
-        #     raise Exception("Skip")
-        start = time.time()
-        ma, mb = getmatching(matrix, cost, mt)
-        _run.log_scalar(f"{alg.__name__}.matching", time.time()-start)
+    res = []
+    for mt in [1, 2, 3, 4, 5, -1, -2, -3, -4, -5]:
+        try:
+            # if (mt == 4 or mt == -4):
+            #     raise Exception("Skip")
+            start = time.time()
+            ma, mb = getmatching(matrix, cost, mt)
+            _run.log_scalar(f"{alg.__name__}.matching({mt})",
+                            time.time()-start)
 
-        result = evall(ma, mb, data['Src'],
-                       data['Tar'], Gt, alg=alg.__name__)
-    except:
-        _log.exception("")
-        result = np.array([-1, -1, -1, -1, -1])
-    #     res.append(result[0])
-    # result = np.array(res)
+            result = evall(ma, mb, data['Src'],
+                           data['Tar'], Gt, alg=alg.__name__)
+        except:
+            _log.exception("")
+            result = np.array([-1, -1, -1, -1, -1])
+        res.append(result[0])
+    result = np.array(res)
 
     with np.printoptions(suppress=True, precision=4):
         _log.debug("\n%s", result.astype(float))
@@ -624,31 +626,31 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
             res3 = np.array(res3)
 
-            for i in range(res3.shape[2]):
-                sn = f"acc{i + 1}"
-                rownr = (writer.sheets[sn].max_row +
-                         1) if sn in writer.sheets else 0
-                pd.DataFrame(
-                    res3[:, :, i],
-                    index=[f'it{j+1}' for j in range(res3.shape[0])],
-                    columns=[f'alg{j+1}' for j in range(res3.shape[1])],
-                ).to_excel(writer,
-                           sheet_name=sn,
-                           startrow=rownr,
-                           )
-
-            # for i in range(res3.shape[1]):
-            #     sn = f"alg{i + 1}"
+            # for i in range(res3.shape[2]):
+            #     sn = f"acc{i + 1}"
             #     rownr = (writer.sheets[sn].max_row +
             #              1) if sn in writer.sheets else 0
             #     pd.DataFrame(
-            #         res3[:, i, :],
+            #         res3[:, :, i],
             #         index=[f'it{j+1}' for j in range(res3.shape[0])],
-            #         columns=[f'acc1_{j+1}' for j in range(res3.shape[2])],
+            #         columns=[f'alg{j+1}' for j in range(res3.shape[1])],
             #     ).to_excel(writer,
             #                sheet_name=sn,
             #                startrow=rownr,
             #                )
+
+            for i in range(res3.shape[1]):
+                sn = f"alg{i + 1}"
+                rownr = (writer.sheets[sn].max_row +
+                         1) if sn in writer.sheets else 0
+                pd.DataFrame(
+                    res3[:, i, :],
+                    index=[f'it{j+1}' for j in range(res3.shape[0])],
+                    columns=[f'acc1_{j+1}' for j in range(res3.shape[2])],
+                ).to_excel(writer,
+                           sheet_name=sn,
+                           startrow=rownr,
+                           )
 
             res4.append(res3)
 
@@ -657,41 +659,43 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
         plots = np.mean(res4, axis=1)
 
-        plt.figure()
-        for alg in range(plots.shape[1]):
-            vals = plots[:, alg, 0]
-            plt.plot(noises, vals, label=f"alg{alg+1}")
-        plt.xlabel("Noise level")
-        plt.xticks(noises)
-        plt.ylabel("Accuracy")
-        plt.ylim([-0.1, 1.1])
-        plt.legend()
-        plt.savefig(f"{output_path}/res_g{graph_number+1}")
-
-        # acc = [
-        #     "SNN",
-        #     "SSG",
-        #     "SSH",
-        #     "SJV",
-        #     "CNN",
-        #     "CSG",
-        #     "CSH",
-        #     "CJV",
-        # ]
-
+        # plt.figure()
         # for alg in range(plots.shape[1]):
-        #     plt.figure()
-        #     for i in range(plots.shape[2]):
-        #         vals = plots[:, alg, i]
-        #         if np.all(vals >= 0):
-        #             plt.plot(noises, vals, label=acc[i])
-        #     plt.xlabel("Noise level")
-        #     plt.xticks(noises)
-        #     plt.ylabel("Accuracy")
-        #     plt.ylim([-0.1, 1.1])
-        #     plt.legend()
-        #     # plt.show()
-        #     plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
+        #     vals = plots[:, alg, 0]
+        #     plt.plot(noises, vals, label=f"alg{alg+1}")
+        # plt.xlabel("Noise level")
+        # plt.xticks(noises)
+        # plt.ylabel("Accuracy")
+        # plt.ylim([-0.1, 1.1])
+        # plt.legend()
+        # plt.savefig(f"{output_path}/res_g{graph_number+1}")
+
+        acc = [
+            "SNN",
+            "SSG",
+            "SH",
+            "SSH",
+            "SJV",
+            "CNN",
+            "CSG",
+            "CH",
+            "CSH",
+            "CJV",
+        ]
+
+        for alg in range(plots.shape[1]):
+            plt.figure()
+            for i in range(plots.shape[2]):
+                vals = plots[:, alg, i]
+                if np.all(vals >= 0):
+                    plt.plot(noises, vals, label=acc[i])
+            plt.xlabel("Noise level")
+            plt.xticks(noises)
+            plt.ylabel("Accuracy")
+            plt.ylim([-0.1, 1.1])
+            plt.legend()
+            # plt.show()
+            plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
 
         res5.append(res4)
 
@@ -701,14 +705,14 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 @ex.named_config
 def playground():
 
-    iters = 3
+    iters = 1
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        (nx.gnp_random_graph, (50, 0.9)),
+        # (nx.gnp_random_graph, (50, 0.9)),
         # (nx.barabasi_albert_graph, (100, 5)),
-        (nx.powerlaw_cluster_graph, (75, 2, 0.3)),
+        # (nx.powerlaw_cluster_graph, (200, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -722,7 +726,7 @@ def playground():
         # )),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        # (lambda x: x, ('data/arenas/source.txt',)),
+        (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
         # (lambda x: x, ('data/facebook/source.txt',)),
 
@@ -739,15 +743,14 @@ def playground():
         #                 'edges': 1, 'noise_level': 5},)),
     ]
 
-    noise_level = 0.05
     # no_disc = True
 
     noises = [
-        0.00,
-        0.01,
-        0.02,
-        0.03,
-        0.04,
+        # 0.00,
+        # 0.01,
+        # 0.02,
+        # 0.03,
+        # 0.04,
         0.05,
     ]
 

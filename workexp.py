@@ -168,15 +168,26 @@ def global_config():
         'verbose': True
     }
 
-    GW_mtype = 2
-    CONE_mtype = 3
-    GRASP_mtype = -5
-    REGAL_mtype = 1
+    GW_mtype = 4
+    CONE_mtype = -4
+    GRASP_mtype = -4
+    REGAL_mtype = -4
     LREA_mtype = 3
-    NSD_mtype = 2
+    NSD_mtype = 4
+
     ISO_mtype = 2
     NET_mtype = 3
     KLAU_mtype = 3
+
+    # GW_mtype = 2
+    # CONE_mtype = 3
+    # GRASP_mtype = -5
+    # REGAL_mtype = 1
+    # LREA_mtype = 3
+    # NSD_mtype = 2
+    # ISO_mtype = 2
+    # NET_mtype = 3
+    # KLAU_mtype = 3
 
     algs = [
         (gwl, GW_args, GW_mtype),
@@ -200,8 +211,8 @@ def global_config():
 
         4,      # eigenalign
         5,      # NSD
-        6,      # isorank
 
+        # 6,      # isorank
         # 7,      # netalign
         # 8,      # klaus
     ]
@@ -290,7 +301,12 @@ def debug():
 @ex.named_config
 def win():
 
-    GRASP_mtype = -2
+    GW_mtype = 3
+    CONE_mtype = -3
+    GRASP_mtype = -3
+    REGAL_mtype = -3
+    LREA_mtype = 3
+    NSD_mtype = 3
 
 
 @ex.named_config
@@ -414,9 +430,9 @@ def getmatching(sim, cost, mt, _log):
         elif mt == 3:
             return scipy.optimize.linear_sum_assignment(sim.A, maximize=True)
         elif mt == 4:
-            return sps.csgraph.min_weight_full_bipartite_matching(sim, maximize=True)
-        elif mt == 5:
             return jv(-np.log(sim.A))
+        elif mt == 98:
+            return sps.csgraph.min_weight_full_bipartite_matching(sim, maximize=True)
         elif mt == 99:
             return bmw.getmatchings(sim)
 
@@ -430,9 +446,9 @@ def getmatching(sim, cost, mt, _log):
         elif mt == -3:
             return scipy.optimize.linear_sum_assignment(cost.A)
         elif mt == -4:
-            return sps.csgraph.min_weight_full_bipartite_matching(cost)
-        elif mt == -5:
             return jv(cost.A)
+        elif mt == -98:
+            return sps.csgraph.min_weight_full_bipartite_matching(cost)
         elif mt == -99:
             return bmw.getmatchings(np.exp(-cost.A))
 
@@ -458,23 +474,23 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run):
 
     matrix, cost = format_output(res)
 
-    res = []
-    for mt in [1, 2, 3, 4, 5, -1, -2, -3, -4, -5]:
-        try:
-            # if (mt == 4 or mt == -4):
-            #     raise Exception("Skip")
-            start = time.time()
-            ma, mb = getmatching(matrix, cost, mt)
-            _run.log_scalar(f"{alg.__name__}.matching({mt})",
-                            time.time()-start)
+    # res = []
+    # for mt in [1, 2, 3, 4, -1, -2, -3, -4]:
+    try:
+        # if (mt == 4 or mt == -4):
+        #     raise Exception("Skip")
+        start = time.time()
+        ma, mb = getmatching(matrix, cost, mt)
+        _run.log_scalar(f"{alg.__name__}.matching({mt})",
+                        time.time()-start)
 
-            result = evall(ma, mb, data['Src'],
-                           data['Tar'], Gt, alg=alg.__name__)
-        except:
-            _log.exception("")
-            result = np.array([-1, -1, -1, -1, -1])
-        res.append(result[0])
-    result = np.array(res)
+        result = evall(ma, mb, data['Src'],
+                       data['Tar'], Gt, alg=alg.__name__)
+    except:
+        _log.exception("")
+        result = np.array([-1, -1, -1, -1, -1])
+    #     res.append(result[0])
+    # result = np.array(res)
 
     with np.printoptions(suppress=True, precision=4):
         _log.debug("\n%s", result.astype(float))
@@ -562,6 +578,18 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
     # _it = 0
     # total_graphs = min(len(G) * len(G[0]), last-first+1)
 
+    # acc = [
+    #     # "old_douche"
+    #     "SNN",
+    #     "SSG",
+    #     "SLS",
+    #     "SJV",
+    #     "CNN",
+    #     "CSG",
+    #     "CLS",
+    #     "CJV",
+    # ]
+
     os.mkdir(f'{output_path}/graphs')
 
     res5 = []
@@ -626,31 +654,31 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
             res3 = np.array(res3)
 
-            # for i in range(res3.shape[2]):
-            #     sn = f"acc{i + 1}"
-            #     rownr = (writer.sheets[sn].max_row +
-            #              1) if sn in writer.sheets else 0
-            #     pd.DataFrame(
-            #         res3[:, :, i],
-            #         index=[f'it{j+1}' for j in range(res3.shape[0])],
-            #         columns=[f'alg{j+1}' for j in range(res3.shape[1])],
-            #     ).to_excel(writer,
-            #                sheet_name=sn,
-            #                startrow=rownr,
-            #                )
-
-            for i in range(res3.shape[1]):
-                sn = f"alg{i + 1}"
+            for i in range(res3.shape[2]):
+                sn = f"acc{i + 1}"
                 rownr = (writer.sheets[sn].max_row +
                          1) if sn in writer.sheets else 0
                 pd.DataFrame(
-                    res3[:, i, :],
+                    res3[:, :, i],
                     index=[f'it{j+1}' for j in range(res3.shape[0])],
-                    columns=[f'acc1_{j+1}' for j in range(res3.shape[2])],
+                    columns=[f'alg{j+1}' for j in range(res3.shape[1])],
                 ).to_excel(writer,
                            sheet_name=sn,
                            startrow=rownr,
                            )
+
+            # for i in range(res3.shape[1]):
+            #     sn = f"alg{i + 1}"
+            #     rownr = (writer.sheets[sn].max_row +
+            #              1) if sn in writer.sheets else 0
+            #     pd.DataFrame(
+            #         res3[:, i, :],
+            #         index=[f'it{j+1}' for j in range(res3.shape[0])],
+            #         columns=[acc[j] for j in range(res3.shape[2])],
+            #     ).to_excel(writer,
+            #                sheet_name=sn,
+            #                startrow=rownr,
+            #                )
 
             res4.append(res3)
 
@@ -659,43 +687,30 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 
         plots = np.mean(res4, axis=1)
 
-        # plt.figure()
-        # for alg in range(plots.shape[1]):
-        #     vals = plots[:, alg, 0]
-        #     plt.plot(noises, vals, label=f"alg{alg+1}")
-        # plt.xlabel("Noise level")
-        # plt.xticks(noises)
-        # plt.ylabel("Accuracy")
-        # plt.ylim([-0.1, 1.1])
-        # plt.legend()
-        # plt.savefig(f"{output_path}/res_g{graph_number+1}")
-
-        acc = [
-            "SNN",
-            "SSG",
-            "SH",
-            "SSH",
-            "SJV",
-            "CNN",
-            "CSG",
-            "CH",
-            "CSH",
-            "CJV",
-        ]
-
+        plt.figure()
         for alg in range(plots.shape[1]):
-            plt.figure()
-            for i in range(plots.shape[2]):
-                vals = plots[:, alg, i]
-                if np.all(vals >= 0):
-                    plt.plot(noises, vals, label=acc[i])
-            plt.xlabel("Noise level")
-            plt.xticks(noises)
-            plt.ylabel("Accuracy")
-            plt.ylim([-0.1, 1.1])
-            plt.legend()
-            # plt.show()
-            plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
+            vals = plots[:, alg, 0]
+            plt.plot(noises, vals, label=f"alg{alg+1}")
+        plt.xlabel("Noise level")
+        plt.xticks(noises)
+        plt.ylabel("Accuracy")
+        plt.ylim([-0.1, 1.1])
+        plt.legend()
+        plt.savefig(f"{output_path}/res_g{graph_number+1}")
+
+        # for alg in range(plots.shape[1]):
+        #     plt.figure()
+        #     for i in range(plots.shape[2]):
+        #         vals = plots[:, alg, i]
+        #         if np.all(vals >= 0):
+        #             plt.plot(noises, vals, label=acc[i])
+        #     plt.xlabel("Noise level")
+        #     plt.xticks(noises)
+        #     plt.ylabel("Accuracy")
+        #     plt.ylim([-0.1, 1.1])
+        #     plt.legend()
+        #     # plt.show()
+        #     plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
 
         res5.append(res4)
 
@@ -712,7 +727,7 @@ def playground():
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
         # (nx.gnp_random_graph, (50, 0.9)),
         # (nx.barabasi_albert_graph, (100, 5)),
-        # (nx.powerlaw_cluster_graph, (200, 2, 0.3)),
+        (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -726,7 +741,7 @@ def playground():
         # )),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        (lambda x: x, ('data/arenas/source.txt',)),
+        # (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
         # (lambda x: x, ('data/facebook/source.txt',)),
 
@@ -746,11 +761,11 @@ def playground():
     # no_disc = True
 
     noises = [
-        # 0.00,
-        # 0.01,
-        # 0.02,
-        # 0.03,
-        # 0.04,
+        0.00,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
         0.05,
     ]
 
@@ -763,21 +778,33 @@ def playground():
     output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
-# @ex.named_config
-# def exp_():
+@ex.named_config
+def exp2():
 
-#     iters = 10
+    iters = 10
 
-#     graphs = [
-#         (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
-#         (nx.watts_strogatz_graph, (1133, 10, 0.5)),
-#         (nx.gnp_random_graph, (1133, 0.009)),
-#         (nx.barabasi_albert_graph, (1133, 5)),
-#         (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
-#     ]
+    graphs = [
+        (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+        (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        (nx.gnp_random_graph, (1133, 0.009)),
+        (nx.barabasi_albert_graph, (1133, 5)),
+        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+    ]
 
-#     output_path = "results/exp_" + \
-#         datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+    noises = [
+        0.00,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+    ]
+
+    no_disc = True
+    noise_type = None
+
+    output_path = "results/exp2_" + \
+        datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config

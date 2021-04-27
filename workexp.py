@@ -720,14 +720,14 @@ def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
 @ex.named_config
 def playground():
 
-    iters = 1
+    iters = 10
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
         # (nx.gnp_random_graph, (50, 0.9)),
         # (nx.barabasi_albert_graph, (100, 5)),
-        (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
+        # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -739,6 +739,13 @@ def playground():
         #         [0.02, 0.07, 0.40],
         #     ]
         # )),
+
+        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 300)),
+        (nx.LFR_benchmark_graph, (1133, 5, 2, 0.1, 10, None, None, 100, 300)),
+        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.2, 10, None, None, 100, 300)),
+        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.05, 10, None, None, 100, 300)),
+        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 50, 350)),
+        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 200)),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas/source.txt',)),
@@ -758,7 +765,7 @@ def playground():
         #                 'edges': 1, 'noise_level': 5},)),
     ]
 
-    # no_disc = True
+    no_disc = True
 
     noises = [
         0.00,
@@ -835,6 +842,24 @@ def exp1():
 
 @ex.automain
 def main(_config, _run, _log, verbose, output_path, exist_ok=False, nice=10):
+
+    # n = 1133
+    # tau1 = 5
+    # # tau1 = 3
+    # tau2 = 3
+    # # tau2 = 1.5
+    # mu = 0.1
+    # G = nx.LFR_benchmark_graph(
+    #     n, tau1, tau2, mu,
+    #     average_degree=10,
+    #     min_community=100,
+    #     max_community=300,
+    #     # seed=10
+    # )
+    # print(len(G.edges))
+    # print([len(x) for x in {frozenset(G.nodes[v]["community"]) for v in G}])
+    # plotG(G)
+    # return
 
     try:
         if not verbose:

@@ -43,14 +43,14 @@ def main(data, iters, method, bmatch, default_params=True):
         # X = newbound_methods.newbound_rounding_lowrank_evaluation_relaxed(U1, V1, bmatch) * (10 ** 8)  # 1
         X, nzi, nzj, nzv = newbound_methods.newbound_rounding_lowrank_evaluation_relaxed(
             U1, V1, bmatch)  # alternative
-        nzv = nzv * (10 ** 8)  # alternative
-        X = X * (10 ** 8)
-        X1 = X.toarray()
-        avgdeg = map(lambda x: sum(X1[x, :] != 0),
-                     np.arange(0, np.shape(X1)[0], 1))  # keep1
+        # nzv = nzv * (10 ** 8)  # alternative
+        # X = X * (10 ** 8)
+        # X1 = X.toarray()
+        # avgdeg = map(lambda x: sum(X1[x, :] != 0),
+        #              np.arange(0, np.shape(X1)[0], 1))  # keep1
         # np.fromiter(avgdeg, dtype=np.float)#keep1
-        avgdeg = np.array(list(avgdeg))
-        avgdeg = np.mean(avgdeg)  # keep1
+        # avgdeg = np.array(list(avgdeg))
+        # avgdeg = np.mean(avgdeg)  # keep1
         # Matching = bipartite_Matching.edge_list(bipartite_Matching.bipartite_matching(X))  # 1
 
         # m, n, val, noute, match1 = (

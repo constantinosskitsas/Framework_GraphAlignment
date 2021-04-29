@@ -443,3 +443,7 @@ def score_MNC(adj1, adj2, countera, counterb):
         return mnc / countera.size
     except:
         return -1
+
+
+def iter_name(amount, prefix=""):
+    return [f"{prefix}{i}" for i in range(1, amount+1)]

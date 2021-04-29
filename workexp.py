@@ -194,13 +194,25 @@ def global_config():
         (conealign, CONE_args, CONE_mtype),
         (grasp, GRASP_args, GRASP_mtype),
         (regal, REGAL_args, REGAL_mtype),
-
         (eigenalign, LREA_args, LREA_mtype),
         (NSD, NSD_args, NSD_mtype),
-        (isorank, ISO_args, ISO_mtype),
 
+        (isorank, ISO_args, ISO_mtype),
         (netalign, NET_args, NET_mtype),
         (klaus, KLAU_args, KLAU_mtype)
+    ]
+
+    alg_names = [
+        "GW",
+        "CONE",
+        "GRASP",
+        "REGAL",
+        "LREA",
+        "NSD",
+
+        "ISO",
+        "NET",
+        "KLAU"
     ]
 
     run = [
@@ -244,7 +256,7 @@ def global_config():
             {'source_noise': noise_level, 'target_noise': noise_level},
         ][noise_type - 1]
 
-    output_path = "results/_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+    # output_path = "_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config
@@ -259,9 +271,22 @@ def gwcost():
 
 
 @ex.named_config
-def mtype():
-    _mtype = 0
-    GW_mtype = CONE_mtype = GRASP_mtype = REGAL_mtype = LREA_mtype = NSD_mtype = ISO_mtype = NET_mtype = KLAU_mtype = _mtype
+def mall():
+    mall = True
+    mtypes = [1, 2, 3, 4, -1, -2, -3, -4]
+    acc_names = [
+        # "old_douche"
+        "SNN",
+        "SSG",
+        "SLS",
+        "SJV",
+        "CNN",
+        "CSG",
+        "CLS",
+        "CJV",
+    ]
+    # _mtype = 0
+    # GW_mtype = CONE_mtype = GRASP_mtype = REGAL_mtype = LREA_mtype = NSD_mtype = ISO_mtype = NET_mtype = KLAU_mtype = _mtype
 
 
 @ex.named_config
@@ -344,7 +369,7 @@ def fast():
 
 
 @ex.capture
-def evall(ma, mb, Src, Tar, Gt, output_path, verbose, mnc, save, _log, alg='NoName', eval_type=0):
+def evall(ma, mb, Src, Tar, Gt, verbose, mnc, save, _log, output_path="", alg='NoName', eval_type=0):
 
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
@@ -459,10 +484,10 @@ def getmatching(sim, cost, mt, _log):
 
 
 @ ex.capture
-def run_alg(_seed, data, Gt, i, algs, _log, _run):
+def run_alg(_seed, data, Gt, i, algs, _log, _run, mtypes=None, mall=False):
 
-    random.seed(_seed)
-    np.random.seed(_seed)
+    # random.seed(_seed)
+    # np.random.seed(_seed)
 
     alg, args, mt = algs[i]
 
@@ -472,25 +497,53 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run):
     res = alg_exe(alg, data, args)
     _run.log_scalar(f"{alg.__name__}.alg", time.time()-start)
 
-    matrix, cost = format_output(res)
+    sim, cost = format_output(res)
 
-    # res = []
-    # for mt in [1, 2, 3, 4, -1, -2, -3, -4]:
     try:
-        # if (mt == 4 or mt == -4):
-        #     raise Exception("Skip")
-        start = time.time()
-        ma, mb = getmatching(matrix, cost, mt)
-        _run.log_scalar(f"{alg.__name__}.matching({mt})",
-                        time.time()-start)
-
-        result = evall(ma, mb, data['Src'],
-                       data['Tar'], Gt, alg=alg.__name__)
+        _run.log_scalar(f"{alg.__name__}.sim.size", sim.size)
+        _run.log_scalar(f"{alg.__name__}.sim.max", sim.max())
+        _run.log_scalar(f"{alg.__name__}.sim.min", sim.min())
+        _run.log_scalar(f"{alg.__name__}.sim.avg", sim.data.mean())
     except:
-        _log.exception("")
-        result = np.array([-1, -1, -1, -1, -1])
-    #     res.append(result[0])
-    # result = np.array(res)
+        pass
+    try:
+        _run.log_scalar(f"{alg.__name__}.cost.size", cost.size)
+        _run.log_scalar(f"{alg.__name__}.cost.max", cost.max())
+        _run.log_scalar(f"{alg.__name__}.cost.min", cost.min())
+        _run.log_scalar(f"{alg.__name__}.cost.avg", cost.data.mean())
+    except:
+        pass
+
+    if mall:
+        res2 = []
+        for mt in mtypes:
+            try:
+
+                start = time.time()
+                ma, mb = getmatching(sim, cost, mt)
+                _run.log_scalar(f"{alg.__name__}.matching({mt})",
+                                time.time()-start)
+
+                res1 = evall(ma, mb, data['Src'],
+                             data['Tar'], Gt, alg=alg.__name__)
+            except:
+                _log.exception("")
+                res1 = np.array([-1, -1, -1, -1, -1])
+            res2.append(res1)
+        result = np.array(res2)[:, 0]
+    else:
+        try:
+
+            start = time.time()
+            ma, mb = getmatching(sim, cost, mt)
+            _run.log_scalar(f"{alg.__name__}.matching({mt})",
+                            time.time()-start)
+
+            result = evall(ma, mb, data['Src'],
+                           data['Tar'], Gt, alg=alg.__name__)
+        except:
+            _log.exception("")
+            result = np.array([-1, -1, -1, -1, -1])
 
     with np.printoptions(suppress=True, precision=4):
         _log.debug("\n%s", result.astype(float))
@@ -542,13 +595,17 @@ def run_algs(Src, Tar, Gt, run, prep, plot, _seed, _run, circular=False):
 
 
 @ ex.capture
-def init(graphs, noises, iters, noise_types, noise_type, no_disc=False):
+def init1(graphs, iters):
 
     S_G = [
         [alg(*args) for _ in range(iters)] for alg, args in graphs
     ]
 
-    randcheck1 = np.random.rand(1)[0]
+    return S_G, np.random.rand(1)[0]
+
+
+@ ex.capture
+def init2(S_G, noises, noise_types, noise_type, no_disc=False):
 
     G = [
         [
@@ -557,177 +614,197 @@ def init(graphs, noises, iters, noise_types, noise_type, no_disc=False):
             ] for noise in noises
         ] for gi in S_G
     ]
-    # G = [
-    #     [
-    #         [
-    #             generate_graphs(g, no_disc=no_disc, **nargs) for _ in range(iters)
-    #         ] for nargs in noises
-    #     ] for alg, args in graphs
-    # ]
 
-    randcheck2 = np.random.rand(1)[0]
-    return G, (float(randcheck1), float(randcheck2))
+    return G, np.random.rand(1)[0]
+
+
+@ex.capture
+def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=None, mall=False):
+    graph_names = iter_name(
+        res5.shape[0], "g") if graph_names is None else graph_names
+    acc_names = iter_name(
+        res5.shape[4], "acc") if acc_names is None else acc_names
+    alg_names = iter_name(
+        res5.shape[3], "alg") if alg_names is None else alg_names
+
+    for graph_number, res4 in enumerate(res5):
+        writer = pd.ExcelWriter(
+            f"{output_path}/res_{graph_names[graph_number]}.xlsx", engine='openpyxl')
+
+        for noise_level, res3 in enumerate(res4):
+            if mall:
+                for i in range(res3.shape[1]):
+                    sn = alg_names[run[i]]
+                    rownr = (writer.sheets[sn].max_row +
+                             1) if sn in writer.sheets else 0
+                    pd.DataFrame(
+                        res3[:, i, :],
+                        index=[f'it{j+1}' for j in range(res3.shape[0])],
+                        columns=[acc_names[j] for j in range(res3.shape[2])],
+                    ).to_excel(writer,
+                               sheet_name=sn,
+                               startrow=rownr,
+                               )
+            else:
+                for i in range(res3.shape[2]):
+                    sn = str(acc_names[i])
+                    rownr = (writer.sheets[sn].max_row +
+                             1) if sn in writer.sheets else 0
+                    pd.DataFrame(
+                        res3[:, :, i],
+                        index=[f'it{j+1}' for j in range(res3.shape[0])],
+                        columns=[str(alg_names[run[j]])
+                                 for j in range(res3.shape[1])],
+                    ).to_excel(writer,
+                               sheet_name=sn,
+                               startrow=rownr,
+                               )
+
+        writer.save()
+
+
+@ex.capture
+def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, alg_names=None, mall=False):
+    graph_names = iter_name(
+        res5.shape[0], "g") if graph_names is None else graph_names
+    acc_names = iter_name(
+        res5.shape[4], "acc") if acc_names is None else acc_names
+    alg_names = iter_name(
+        res5.shape[3], "alg") if alg_names is None else alg_names
+
+    for graph_number, res4 in enumerate(res5):
+        plots = np.mean(res4, axis=1)
+
+        if mall:
+            for alg in range(plots.shape[1]):
+                plt.figure()
+                for i in range(plots.shape[2]):
+                    vals = plots[:, alg, i]
+                    if np.all(vals >= 0):
+                        plt.plot(noises, vals, label=acc_names[i])
+                plt.xlabel("Noise level")
+                plt.xticks(noises)
+                plt.ylabel("Accuracy")
+                plt.ylim([-0.1, 1.1])
+                plt.legend()
+                plt.savefig(
+                    f"{output_path}/res_{graph_names[graph_number]}_{alg_names[run[alg]]}")
+        else:
+            plt.figure()
+            for alg in range(plots.shape[1]):
+                vals = plots[:, alg, 0]
+                plt.plot(noises, vals, label=alg_names[run[alg]])
+            plt.xlabel("Noise level")
+            plt.xticks(noises)
+            plt.ylabel("Accuracy")
+            plt.ylim([-0.1, 1.1])
+            plt.legend()
+            plt.savefig(f"{output_path}/res_{graph_names[graph_number]}")
 
 
 @ ex.capture
-def run_exp(G, output_path, verbose, noises, _log, _run, _giter=(0, np.inf)):
-
-    # first, last = _giter
-
-    # _git = 0
-    # _it = 0
-    # total_graphs = min(len(G) * len(G[0]), last-first+1)
-
-    # acc = [
-    #     # "old_douche"
-    #     "SNN",
-    #     "SSG",
-    #     "SLS",
-    #     "SJV",
-    #     "CNN",
-    #     "CSG",
-    #     "CLS",
-    #     "CJV",
-    # ]
-
-    os.mkdir(f'{output_path}/graphs')
-
+def run_exp(G, output_path, verbose, noises, _log, _run):
+    res2 = res3 = res4 = None
     res5 = []
-    for graph_number, g_n in enumerate(G):
+    try:
+        os.mkdir(f'{output_path}/graphs')
 
-        _log.info("Graph:(%s/%s)", graph_number + 1, len(G))
+        for graph_number, g_n in enumerate(G):
 
-        writer = pd.ExcelWriter(
-            f"{output_path}/res_g{graph_number+1}.xlsx", engine='openpyxl')
+            _log.info("Graph:(%s/%s)", graph_number + 1, len(G))
 
-        res4 = []
-        for noise_level, g_it in enumerate(g_n):
-            # _git += 1
-            # if _git < first or _git > last:
-            #     continue
-            # _it += 1
+            res4 = []
+            for noise_level, g_it in enumerate(g_n):
 
-            _log.info("Noise_level:(%s/%s)", noise_level + 1, len(g_n))
+                _log.info("Noise_level:(%s/%s)", noise_level + 1, len(g_n))
 
-            # _log.info("Graph:(%s/%s)", _it, total_graphs)
+                res3 = []
+                for i, g in enumerate(g_it):
+                    _log.info("iteration:(%s/%s)", i+1, len(g_it))
 
-            res3 = []
-            for i, g in enumerate(g_it):
-                _log.info("iteration:(%s/%s)", i+1, len(g_it))
+                    Src_e, Tar_e, Gt = g
+                    n = Gt[0].size
 
-                Src_e, Tar_e, Gt = g
-                n = Gt[0].size
+                    prefix = f"{output_path}/graphs/{graph_number+1:0>2d}_{noise_level+1:0>2d}_{i+1:0>2d}"
+                    Gt_m = np.c_[np.arange(n), Gt[0]]
+                    np.savetxt(f"{prefix}_Src.txt", Src_e, fmt='%d')
+                    np.savetxt(f"{prefix}_Tar.txt", Tar_e, fmt='%d')
+                    np.savetxt(f"{prefix}_Gt.txt", Gt_m, fmt='%d')
 
-                prefix = f"{output_path}/graphs/{graph_number+1:0>2d}_{noise_level+1:0>2d}_{i+1:0>2d}"
-                Gt_m = np.c_[np.arange(n), Gt[0]]
-                np.savetxt(f"{prefix}_Src.txt", Src_e, fmt='%d')
-                np.savetxt(f"{prefix}_Tar.txt", Tar_e, fmt='%d')
-                np.savetxt(f"{prefix}_Gt.txt", Gt_m, fmt='%d')
-                # np.savetxt(f"{prefix}_Gt2.txt", Gt[1], fmt='%d')
+                    src = nx.Graph(Src_e.tolist())
+                    src_cc = len(max(nx.connected_components(src), key=len))
+                    src_disc = src_cc < n
 
-                src = nx.Graph(Src_e.tolist())
-                src_cc = len(max(nx.connected_components(src), key=len))
-                src_disc = src_cc < n
+                    tar = nx.Graph(Tar_e.tolist())
+                    tar_cc = len(max(nx.connected_components(tar), key=len))
+                    tar_disc = tar_cc < n
 
-                tar = nx.Graph(Tar_e.tolist())
-                tar_cc = len(max(nx.connected_components(tar), key=len))
-                tar_disc = tar_cc < n
+                    if (src_disc):
+                        _log.warning("Disc. Source: %s < %s", src_cc, n)
+                    _run.log_scalar("graph.Source.disc", src_disc)
+                    _run.log_scalar("graph.Source.n", n)
+                    _run.log_scalar("graph.Source.e", Src_e.shape[0])
 
-                if (src_disc):
-                    _log.warning("Disc. Source: %s < %s", src_cc, n)
-                _run.log_scalar("graph.Source.disc", src_disc)
-                _run.log_scalar("graph.Source.n", n)
-                _run.log_scalar("graph.Source.e", Src_e.shape[0])
+                    if (tar_disc):
+                        _log.warning("Disc. Target: %s < %s", tar_cc, n)
+                    _run.log_scalar("graph.Target.disc", tar_disc)
+                    _run.log_scalar("graph.Target.n", n)
+                    _run.log_scalar("graph.Target.e", Tar_e.shape[0])
 
-                if (tar_disc):
-                    _log.warning("Disc. Target: %s < %s", tar_cc, n)
-                _run.log_scalar("graph.Target.disc", tar_disc)
-                _run.log_scalar("graph.Target.n", n)
-                _run.log_scalar("graph.Target.e", Tar_e.shape[0])
+                    res2 = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
 
-                res2 = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
+                    with np.printoptions(suppress=True, precision=4):
+                        _log.info("\n%s", res2.astype(float))
 
-                with np.printoptions(suppress=True, precision=4):
-                    _log.info("\n%s", res2.astype(float))
+                    res3.append(res2)
 
-                res3.append(res2)
+                res3 = np.array(res3)
+                res4.append(res3)
 
-            res3 = np.array(res3)
+            res4 = np.array(res4)
+            res5.append(res4)
+    except:
+        np.save(f"{output_path}/_res2", np.array(res2))
+        np.save(f"{output_path}/_res3", np.array(res3))
+        np.save(f"{output_path}/_res4", np.array(res4))
+        _log.exception("")
+        # raise
+    # finally:
+    #     res5 = np.array(res5)
+    #     np.save(f"{output_path}/_res5", res5)
 
-            for i in range(res3.shape[2]):
-                sn = f"acc{i + 1}"
-                rownr = (writer.sheets[sn].max_row +
-                         1) if sn in writer.sheets else 0
-                pd.DataFrame(
-                    res3[:, :, i],
-                    index=[f'it{j+1}' for j in range(res3.shape[0])],
-                    columns=[f'alg{j+1}' for j in range(res3.shape[1])],
-                ).to_excel(writer,
-                           sheet_name=sn,
-                           startrow=rownr,
-                           )
-
-            # for i in range(res3.shape[1]):
-            #     sn = f"alg{i + 1}"
-            #     rownr = (writer.sheets[sn].max_row +
-            #              1) if sn in writer.sheets else 0
-            #     pd.DataFrame(
-            #         res3[:, i, :],
-            #         index=[f'it{j+1}' for j in range(res3.shape[0])],
-            #         columns=[acc[j] for j in range(res3.shape[2])],
-            #     ).to_excel(writer,
-            #                sheet_name=sn,
-            #                startrow=rownr,
-            #                )
-
-            res4.append(res3)
-
-        res4 = np.array(res4)
-        writer.save()
-
-        plots = np.mean(res4, axis=1)
-
-        plt.figure()
-        for alg in range(plots.shape[1]):
-            vals = plots[:, alg, 0]
-            plt.plot(noises, vals, label=f"alg{alg+1}")
-        plt.xlabel("Noise level")
-        plt.xticks(noises)
-        plt.ylabel("Accuracy")
-        plt.ylim([-0.1, 1.1])
-        plt.legend()
-        plt.savefig(f"{output_path}/res_g{graph_number+1}")
-
-        # for alg in range(plots.shape[1]):
-        #     plt.figure()
-        #     for i in range(plots.shape[2]):
-        #         vals = plots[:, alg, i]
-        #         if np.all(vals >= 0):
-        #             plt.plot(noises, vals, label=acc[i])
-        #     plt.xlabel("Noise level")
-        #     plt.xticks(noises)
-        #     plt.ylabel("Accuracy")
-        #     plt.ylim([-0.1, 1.1])
-        #     plt.legend()
-        #     # plt.show()
-        #     plt.savefig(f"{output_path}/res_g{graph_number+1}_alg{alg+1}")
-
-        res5.append(res4)
-
-    np.save(f"{output_path}/_res5", np.array(res5))  # (g,n,i,alg,acc)
+    return np.array(res5)  # (g,n,i,alg,acc)
 
 
 @ex.named_config
 def playground():
 
-    iters = 10
+    iters = 3
+
+    graph_names = [
+        "barabasi",
+        "powerlaw"
+    ]
+
+    # acc_names = [
+    #     5, 4, 3, 2, 1
+    # ]
+
+    # alg_names = [
+    #     "gw1",
+    #     "gw2",
+    #     "gw3",
+    #     "gw4",
+    #     "gw5",
+    #     "gw6",
+    # ]
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
         # (nx.gnp_random_graph, (50, 0.9)),
-        # (nx.barabasi_albert_graph, (100, 5)),
-        # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
+        (nx.barabasi_albert_graph, (100, 5)),
+        (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -740,12 +817,12 @@ def playground():
         #     ]
         # )),
 
-        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 300)),
-        (nx.LFR_benchmark_graph, (1133, 5, 2, 0.1, 10, None, None, 100, 300)),
-        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.2, 10, None, None, 100, 300)),
-        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.05, 10, None, None, 100, 300)),
-        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 50, 350)),
-        (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 200)),
+        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 300)),
+        # (nx.LFR_benchmark_graph, (1133, 5, 2, 0.1, 10, None, None, 100, 300)),
+        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.2, 10, None, None, 100, 300)),
+        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.05, 10, None, None, 100, 300)),
+        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 50, 350)),
+        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 200)),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas/source.txt',)),
@@ -769,11 +846,11 @@ def playground():
 
     noises = [
         0.00,
-        0.01,
-        0.02,
-        0.03,
-        0.04,
         0.05,
+        0.10,
+        0.15,
+        0.20,
+        0.25,
     ]
 
     # {'target_noise': noise_level},
@@ -782,13 +859,21 @@ def playground():
 
     noise_type = 1
 
-    output_path = "results/pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+    # output_path = "pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config
 def exp2():
 
     iters = 10
+
+    graph_names = [
+        "nw_str",
+        "watts_str",
+        "gnp",
+        "barabasi",
+        "powerlaw"
+    ]
 
     graphs = [
         (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
@@ -810,8 +895,8 @@ def exp2():
     no_disc = True
     noise_type = None
 
-    output_path = "results/exp2_" + \
-        datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+    # output_path = "exp2_" + \
+    #     datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config
@@ -836,30 +921,18 @@ def exp1():
     no_disc = True
     noise_type = None
 
-    output_path = "results/exp1_" + \
-        datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+    # output_path = "exp1_" + \
+    #     datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.automain
-def main(_config, _run, _log, verbose, output_path, exist_ok=False, nice=10):
+def main(_config, _run, _log, verbose, load=[], exist_ok=False, nice=10):
 
-    # n = 1133
-    # tau1 = 5
-    # # tau1 = 3
-    # tau2 = 3
-    # # tau2 = 1.5
-    # mu = 0.1
-    # G = nx.LFR_benchmark_graph(
-    #     n, tau1, tau2, mu,
-    #     average_degree=10,
-    #     min_community=100,
-    #     max_community=300,
-    #     # seed=10
-    # )
-    # print(len(G.edges))
-    # print([len(x) for x in {frozenset(G.nodes[v]["community"]) for v in G}])
-    # plotG(G)
-    # return
+    path = f"runs/{_run._id}"
+
+    def load_path(_id):
+        _id = _id if _id > 0 else int(_run._id) + _id
+        return f"runs/{_id}"
 
     try:
         if not verbose:
@@ -872,32 +945,36 @@ def main(_config, _run, _log, verbose, output_path, exist_ok=False, nice=10):
         except:
             pass
 
-        G, randcheck = init()
+        if len(load) > 0:
+            S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
+            randcheck1 = load[0]
+        else:
+            S_G, randcheck1 = init1()
+
+        pickle.dump(S_G, open(f"{path}/_S_G.pickle", "wb"))
+
+        if len(load) > 1:
+            G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
+            randcheck2 = load[1]
+        else:
+            G, randcheck2 = init2(S_G)
+
+        pickle.dump(G, open(f"{path}/_G.pickle", "wb"))
+
+        randcheck = (randcheck1, randcheck2)
         _log.info("randcheck: %s", randcheck)
+        open(f"{path}/_randcheck.txt", "w").write(str(randcheck))
 
-        os.makedirs(output_path, exist_ok=exist_ok)
-        with open(f"{output_path}/config.yaml", "w") as cy:
-            conf = {k: v for k, v in _config.items() if
-                    not k.endswith("_args") and not k.endswith("_mtype")}
+        if len(load) > 2:
+            res5 = np.load(f"{load_path(load[2])}/_res5.npy")
+        else:
+            res5 = run_exp(G, path)
 
-            conf['algs'] = np.array(conf['algs'], dtype=object)[
-                conf['run']].tolist()
+        np.save(f"{path}/_res5", res5)
 
-            conf['_algs'] = conf.pop('algs')
-            conf['_graphs'] = conf.pop('graphs')
-            conf['_noises'] = conf.pop('noises')
-            conf['run_id'] = _run._id
+        os.makedirs(f"{path}/res")
+        savexls(res5, f"{path}/res")
+        plotres(res5, f"{path}/res")
 
-            conf.pop("_giter", None)
-
-            conf['randcheck'] = randcheck
-
-            yaml.dump(conf, cy)
-
-        _log.info("config location: %s", output_path)
-
-        pickle.dump(G, open(f"{output_path}/_G.pickle", "wb"))
-
-        run_exp(G)
     except Exception as e:
         _log.exception("")

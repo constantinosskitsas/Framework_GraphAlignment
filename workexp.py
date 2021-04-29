@@ -904,6 +904,11 @@ def exp1():
 
     iters = 10
 
+    graph_names = [
+        "arenas",
+        "powerlaw"
+    ]
+
     graphs = [
         (lambda x: x, ('data/arenas/source.txt',)),
         (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),

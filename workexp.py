@@ -235,7 +235,6 @@ def global_config():
     verbose = False
     mnc = True
     save = False
-    plot = False
 
     iters = 1
 
@@ -273,17 +272,21 @@ def gwcost():
 @ex.named_config
 def mall():
     mall = True
-    mtypes = [1, 2, 3, 4, -1, -2, -3, -4]
+    mtypes = [1, 2, 3, 30, 4, 40, -1, -2, -3, -30, -4, -40]
     acc_names = [
         # "old_douche"
         "SNN",
         "SSG",
         "SLS",
+        "SLSl",
         "SJV",
+        "SJVl",
         "CNN",
         "CSG",
         "CLS",
+        "CLSl",
         "CJV",
+        "CJVl",
     ]
     # _mtype = 0
     # GW_mtype = CONE_mtype = GRASP_mtype = REGAL_mtype = LREA_mtype = NSD_mtype = ISO_mtype = NET_mtype = KLAU_mtype = _mtype
@@ -320,7 +323,7 @@ def debug():
 
     verbose = True
     save = True
-    plot = True
+    plot = [True, True]
 
 
 @ex.named_config
@@ -454,7 +457,11 @@ def getmatching(sim, cost, mt, _log):
             return superfast(sim, asc=False)
         elif mt == 3:
             return scipy.optimize.linear_sum_assignment(sim.A, maximize=True)
+        elif mt == 30:
+            return scipy.optimize.linear_sum_assignment(np.log(sim.A), maximize=True)
         elif mt == 4:
+            return jv(-sim.A)
+        elif mt == 40:
             return jv(-np.log(sim.A))
         elif mt == 98:
             return sps.csgraph.min_weight_full_bipartite_matching(sim, maximize=True)
@@ -470,8 +477,12 @@ def getmatching(sim, cost, mt, _log):
             return superfast(cost)
         elif mt == -3:
             return scipy.optimize.linear_sum_assignment(cost.A)
+        elif mt == -30:
+            return scipy.optimize.linear_sum_assignment(np.log(cost.A))
         elif mt == -4:
             return jv(cost.A)
+        elif mt == -40:
+            return jv(np.log(cost.A))
         elif mt == -98:
             return sps.csgraph.min_weight_full_bipartite_matching(cost)
         elif mt == -99:
@@ -565,11 +576,7 @@ def preprocess(Src, Tar, lalpha=1, mind=0.00001):
 
 
 @ ex.capture
-def run_algs(Src, Tar, Gt, run, prep, plot, _seed, _run, circular=False):
-
-    if plot:
-        plotG(Src, 'Src', False, circular=circular)
-        plotG(Tar, 'Tar', circular=circular)
+def run_algs(Src, Tar, Gt, run, prep, _seed, _run, circular=False):
 
     if prep:
         start = time.time()
@@ -604,6 +611,18 @@ def init1(graphs, iters):
     return S_G, np.random.rand(1)[0]
 
 
+@ex.capture
+def plotS_G(S_G, _log, circular=False):
+    for gi in S_G:
+        for g in gi:
+            try:
+                _log.debug([len(x)
+                            for x in {frozenset(g.nodes[v]["community"]) for v in g}])
+            except:
+                pass
+            plotG(g, 'Src', circular=circular)
+
+
 @ ex.capture
 def init2(S_G, noises, noise_types, noise_type, no_disc=False):
 
@@ -618,7 +637,17 @@ def init2(S_G, noises, noise_types, noise_type, no_disc=False):
     return G, np.random.rand(1)[0]
 
 
-@ex.capture
+@ ex.capture
+def plot_G(G, circular=False):
+    for gi in G:
+        for ni in gi:
+            for g in ni:
+                Src, Tar, _ = g
+                plotG(Src.tolist(), 'Src', False, circular=circular)
+                plotG(Tar.tolist(), 'Tar', circular=circular)
+
+
+@ ex.capture
 def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=None, mall=False):
     graph_names = iter_name(
         res5.shape[0], "g") if graph_names is None else graph_names
@@ -779,11 +808,13 @@ def run_exp(G, output_path, verbose, noises, _log, _run):
 @ex.named_config
 def playground():
 
-    iters = 3
+    iters = 10
 
     graph_names = [
-        "barabasi",
-        "powerlaw"
+        # "barabasi",
+        # "powerlaw",
+        # "arenas",
+        "LFR_span"
     ]
 
     # acc_names = [
@@ -803,8 +834,8 @@ def playground():
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
         # (nx.gnp_random_graph, (50, 0.9)),
-        (nx.barabasi_albert_graph, (100, 5)),
-        (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
+        # (nx.barabasi_albert_graph, (100, 5)),
+        # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -816,13 +847,22 @@ def playground():
         #         [0.02, 0.07, 0.40],
         #     ]
         # )),
+        # (nx.LFR_benchmark_graph, (1133, 3.5, 1.05,
+        #                           0.1, 5.0, None, None, 50, 200, 1e-07, 2000)), #2k, desc
+        # (nx.LFR_benchmark_graph, (1133, 2.5, 1.05,
+        #                           0.1, 4.0, None, None, 300, 800, 1e-07, 2000)), #1600, very desc
+        # (nx.LFR_benchmark_graph, (1133, 2.5, 1.05,
+        #                           0.2, 4.0, None, None, 3, 1100, 1e-07, 500)),  # ~2000, very steep
 
-        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 300)),
-        # (nx.LFR_benchmark_graph, (1133, 5, 2, 0.1, 10, None, None, 100, 300)),
-        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.2, 10, None, None, 100, 300)),
-        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.05, 10, None, None, 100, 300)),
-        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 50, 350)),
-        # (nx.LFR_benchmark_graph, (1133, 5, 3, 0.1, 10, None, None, 100, 200)),
+        # (nx.LFR_benchmark_graph, (1133, 3, 1.05,
+        #                           0.2, 5, None, None, 3, 1100, 1e-07, 500)),  # almost 3k, very desc
+
+        # (nx.LFR_benchmark_graph, (1133, 3, 1.05,
+        #                           0.2, 5.5, None, None, 3, 1100, 1e-07, 500)),  # 3500, very desc (shifting)
+
+        (nx.LFR_benchmark_graph, (1133, 2.75, 1.2,
+                                  0.2, 7, None, None, 3, 1100, 1e-07, 5000)),  # the 5k.. very desc + 331
+
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas/source.txt',)),
@@ -846,11 +886,24 @@ def playground():
 
     noises = [
         0.00,
+
+        0.01,
+        0.02,
+        0.03,
+        0.04,
         0.05,
-        0.10,
-        0.15,
-        0.20,
-        0.25,
+
+        # 0.06,
+        # 0.07,
+        # 0.08,
+        # 0.09,
+        # 0.10,
+
+        # 0.05,
+        # 0.10,
+        # 0.15,
+        # 0.20,
+        # 0.25,
     ]
 
     # {'target_noise': noise_level},
@@ -931,7 +984,7 @@ def exp1():
 
 
 @ex.automain
-def main(_config, _run, _log, verbose, load=[], exist_ok=False, nice=10):
+def main(_config, _run, _log, verbose, load=[], plot=[], nice=10):
 
     path = f"runs/{_run._id}"
 
@@ -957,6 +1010,8 @@ def main(_config, _run, _log, verbose, load=[], exist_ok=False, nice=10):
             S_G, randcheck1 = init1()
 
         pickle.dump(S_G, open(f"{path}/_S_G.pickle", "wb"))
+        if len(plot) > 0 and plot[0]:
+            plotS_G(S_G)
 
         if len(load) > 1:
             G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
@@ -965,6 +1020,8 @@ def main(_config, _run, _log, verbose, load=[], exist_ok=False, nice=10):
             G, randcheck2 = init2(S_G)
 
         pickle.dump(G, open(f"{path}/_G.pickle", "wb"))
+        if len(plot) > 1 and plot[1]:
+            plot_G(G)
 
         randcheck = (randcheck1, randcheck2)
         _log.info("randcheck: %s", randcheck)

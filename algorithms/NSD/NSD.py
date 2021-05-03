@@ -18,7 +18,7 @@ def normout_rowstochastic(P):
     colsums = sum(P, 1)-1
     pi, pj, pv = findnz_alt(P)
     pv = np.divide(pv, colsums[pi])
-    ef = (colsums[pi])
+    # ef = (colsums[pi])
     Q = csc_matrix((pv, (pi, pj)), shape=(n, n)).toarray()
     return Q
 

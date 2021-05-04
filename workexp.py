@@ -140,7 +140,7 @@ def global_config():
 
     NSD_args = {
         'alpha': 0.8,
-        'iters': 10
+        'iters': 20
     }
 
     ISO_args = {
@@ -790,6 +790,8 @@ def run_exp(G, output_path, verbose, noises, _log, _run):
                     res3.append(res2)
 
                 res3 = np.array(res3)
+                with np.printoptions(suppress=True, precision=4):
+                    _log.debug("\n%s", res3.astype(float))
                 res4.append(res3)
 
             res4 = np.array(res4)
@@ -916,6 +918,49 @@ def playground():
     noise_type = 1
 
     # output_path = "pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+
+
+@ex.named_config
+def exp3():
+
+    CONE_args = {
+        "dim": 512
+    }
+
+    # LREA_args = {
+    #     'iters': 40
+    # }
+
+    # NSD_args = {
+    #     'iters': 30
+    # }
+
+    run = [1, 2, 3, 4, 5]
+
+    iters = 10
+
+    graph_names = [
+        "facebook",
+    ]
+
+    graphs = [
+        (lambda x: x, ('data/facebook/source.txt',)),
+    ]
+
+    noises = [
+        0.00,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+    ]
+
+    no_disc = True
+    noise_type = None
+
+    # output_path = "exp1_" + \
+    #     datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config

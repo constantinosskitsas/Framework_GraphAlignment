@@ -172,8 +172,8 @@ def global_config():
     CONE_mtype = -4
     GRASP_mtype = -4
     REGAL_mtype = -4
-    LREA_mtype = 3
-    NSD_mtype = 4
+    LREA_mtype = 4
+    NSD_mtype = 40
 
     ISO_mtype = 2
     NET_mtype = 3
@@ -334,7 +334,7 @@ def win():
     GRASP_mtype = -3
     REGAL_mtype = -3
     LREA_mtype = 3
-    NSD_mtype = 3
+    NSD_mtype = 30
 
 
 @ex.named_config
@@ -565,9 +565,11 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run, mtypes=None, mall=False):
 
 
 @ ex.capture
-def preprocess(Src, Tar, lalpha=1, mind=0.00001):
+def preprocess(Src, Tar, REGAL_args, CONE_args, lalpha=1, mind=0.00001):
     # L = similarities_preprocess.create_L(Tar, Src, alpha=lalpha, mind=mind)
     L = similarities_preprocess.create_L(Src, Tar, alpha=lalpha, mind=mind)
+    # L, _ = regal.main({"Src": Src, "Tar": Tar}, **REGAL_args)
+    # L, _ = conealign.main({"Src": Src, "Tar": Tar}, **CONE_args)
     # S = similarities_preprocess.create_S(Tar, Src, L)
     S = similarities_preprocess.create_S(Src, Tar, L)
     li, lj, w = sps.find(L)
@@ -814,7 +816,8 @@ def playground():
         # "barabasi",
         # "powerlaw",
         # "arenas",
-        "LFR_span"
+        # "LFR_span",
+        "facebook",
     ]
 
     # acc_names = [
@@ -860,14 +863,14 @@ def playground():
         # (nx.LFR_benchmark_graph, (1133, 3, 1.05,
         #                           0.2, 5.5, None, None, 3, 1100, 1e-07, 500)),  # 3500, very desc (shifting)
 
-        (nx.LFR_benchmark_graph, (1133, 2.75, 1.2,
-                                  0.2, 7, None, None, 3, 1100, 1e-07, 5000)),  # the 5k.. very desc + 331
+        # (nx.LFR_benchmark_graph, (1133, 2.75, 1.2,
+        #                           0.2, 7, None, None, 3, 1100, 1e-07, 5000)),  # the 5k.. very desc + 331
 
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
-        # (lambda x: x, ('data/facebook/source.txt',)),
+        (lambda x: x, ('data/facebook/source.txt',)),
 
         # (lambda x: x, ({'dataset': 'arenas_old',
         #                 'edges': 1, 'noise_level': 5},)),
@@ -885,12 +888,12 @@ def playground():
     no_disc = True
 
     noises = [
-        0.00,
+        # 0.00,
 
-        0.01,
-        0.02,
-        0.03,
-        0.04,
+        # 0.01,
+        # 0.02,
+        # 0.03,
+        # 0.04,
         0.05,
 
         # 0.06,

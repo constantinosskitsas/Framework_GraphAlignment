@@ -83,7 +83,7 @@ def bipartite_matching_primal_dual(rp, ci, ai, tripi, m, n):
                 bt[tmod[j]] += theta
             continue
         i = i+1
-        print(f"{i} < {m}")
+        # print(f"{i} < {m}")
     val = 0
     # print("po")
     for i in range(1, m):

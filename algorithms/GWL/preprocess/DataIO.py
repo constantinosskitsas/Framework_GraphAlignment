@@ -610,5 +610,5 @@ def cost_sampler2(database, indices1, indices2, device):
     mu_t = mu_t.to(device)
     index_s = index_s.to(device)
     index_t = index_t.to(device)
-    print(cost_s)
+    # print(cost_s)
     return cost_s, cost_t, mu_s, mu_t, index_s, index_t, mask_s, mask_t

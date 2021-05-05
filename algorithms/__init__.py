@@ -5,5 +5,6 @@ from .NetAlign import netalign
 from .NSD import NSD
 from .KLAUS import klaus
 from .GWL import gwl
-from .isorank import isorank, isorank2
+from .isorank import isorank2
+# from .isorank import isorank
 from .GrASp import grasp, grasp2

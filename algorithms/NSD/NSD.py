@@ -1,48 +1,52 @@
-from evaluation import evaluation
-import networkx
-from networkx.algorithms.bipartite.tests.test_matrix import sparse
-import numpy as np
-import scipy
-import networkx.algorithms.bipartite.matching
-from scipy.sparse.csgraph._matching import maximum_bipartite_matching
+# from evaluation import evaluation
+# import networkx
+# from networkx.algorithms.bipartite.tests.test_matrix import sparse
 
-from algorithms import bipartiteMatching
-from data import ReadFile
-from data.ReadFile import nonzeroentries, edgelist_to_adjmatrix1
-from scipy.sparse import csc_matrix, csr_matrix
-scipy.sparse.csgraph
+import numpy as np
+import scipy.sparse as sps
+
+# import scipy
+# import networkx.algorithms.bipartite.matching
+# from scipy.sparse.csgraph._matching import maximum_bipartite_matching
+
+# from algorithms import bipartiteMatching
+# from data import ReadFile
+# from data.ReadFile import nonzeroentries, edgelist_to_adjmatrix1
+# from scipy.sparse import csc_matrix, csr_matrix
+# scipy.sparse.csgraph
 
 
 def normout_rowstochastic(P):
     n = np.shape(P)[0]
-    colsums = sum(P, 1)-1
-    pi, pj, pv = findnz_alt(P)
+    # colsums = sum(P, 1)-1
+    colsums = np.sum(P, axis=0)
+    # pi, pj, pv = findnz_alt(P)
+    pi, pj, pv = sps.find(P)
     pv = np.divide(pv, colsums[pi])
-    # ef = (colsums[pi])
-    Q = csc_matrix((pv, (pi, pj)), shape=(n, n)).toarray()
+    Q = sps.csc_matrix((pv, (pi, pj)), shape=(n, n)).toarray()
     return Q
 
 
-def makesparse(D):
-    num = np.shape(D)[0]*0.2
-    num = int(num)
-    print(num)
-    X = np.copy(D)
-    V = np.sort(X, axis=0)
-    X = np.sort(X)
+# def makesparse(D):
+#     num = np.shape(D)[0]*0.2
+#     num = int(num)
+#     print(num)
+#     X = np.copy(D)
+#     V = np.sort(X, axis=0)
+#     X = np.sort(X)
 
-    count = 0
-    for i in range(np.shape(D)[0]):
-        test = X[i, num]
-        count = 0
-        for j in range(np.shape(D)[1]):
-            test1 = V[j, num]
-            if (D[i, j] <= test and D[i, j] <= test1):
-                D[i, j] = 0
-                count = count+1
-        print("metrw", count)
-    Da = csc_matrix(D)
-    return Da, D
+#     count = 0
+#     for i in range(np.shape(D)[0]):
+#         test = X[i, num]
+#         count = 0
+#         for j in range(np.shape(D)[1]):
+#             test1 = V[j, num]
+#             if (D[i, j] <= test and D[i, j] <= test1):
+#                 D[i, j] = 0
+#                 count = count+1
+#         print("metrw", count)
+#     Da = csc_matrix(D)
+#     return Da, D
 
 
 def nsd(A, B, alpha, iters, Zvecs, Wvecs):
@@ -54,6 +58,7 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
     # operations needed are only Ax or Bx
     GlobalSim = np.zeros((nA, nB))
     for i in range(np.shape(Zvecs)[1]):
+        print(f"<{i}>")
         z = Zvecs[:, i]
         w = Wvecs[:, i]
         z = z / sum(z)
@@ -64,7 +69,10 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
 
         W[:, 0] = w
         Z[:, 0] = z
-        print(B)
+        # print(B.shape)
+        # print(B.size)
+        # print(B.mean())
+        # print(B)
         for k in range(1, iters + 1):
             #W[:, k] = np.dot(B.conj(), W[:, k - 1])
             W[:, k] = np.dot(B.transpose(), W[:, k-1])
@@ -94,63 +102,63 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
     return GlobalSim
 
 
-def findnz_alt(A):
-    size = np.count_nonzero(A)
-    a = np.zeros((size), dtype=int)
-    b = np.zeros((size), dtype=int)
-    c = np.zeros((size), dtype=float)
-    count = 0
-    for i in range(np.shape(A)[0]):
-        for j in range(np.shape(A)[1]):
-            if (A[i, j] == 1):
-                a[count] = i
-                b[count] = j
-                c[count] = 1.0
-                count = count+1
-    return a, b, c
+# def findnz_alt(A):
+#     size = np.count_nonzero(A)
+#     a = np.zeros((size), dtype=int)
+#     b = np.zeros((size), dtype=int)
+#     c = np.zeros((size), dtype=float)
+#     count = 0
+#     for i in range(np.shape(A)[0]):
+#         for j in range(np.shape(A)[1]):
+#             if (A[i, j] == 1):
+#                 a[count] = i
+#                 b[count] = j
+#                 c[count] = 1.0
+#                 count = count+1
+#     return a, b, c
 
 
-def findnz1(A):
-    out_tpl = np.nonzero(A)
-    out_arr = A[np.nonzero(A)]
-    return out_tpl[0], out_tpl[1], out_arr
+# def findnz1(A):
+#     out_tpl = np.nonzero(A)
+#     out_arr = A[np.nonzero(A)]
+#     return out_tpl[0], out_tpl[1], out_arr
 
 
-def findnz(A):
-    rwcol = np.nonzero(A)
-    print(np.shape(A))
-    print(np.shape(rwcol))
-    rw = rwcol[0]
-    col = rwcol[1]
-    print(np.shape(rw))
-    print(np.shape(col))
-    vi = np.zeros(np.shape(rw))
-    for i in range(np.shape(rw)[0]):
-        vi = A[rw, col]
-    return rw, col, vi
+# def findnz(A):
+#     rwcol = np.nonzero(A)
+#     print(np.shape(A))
+#     print(np.shape(rwcol))
+#     rw = rwcol[0]
+#     col = rwcol[1]
+#     print(np.shape(rw))
+#     print(np.shape(col))
+#     vi = np.zeros(np.shape(rw))
+#     for i in range(np.shape(rw)[0]):
+#         vi = A[rw, col]
+#     return rw, col, vi
 
 
-def fast2(l2):
-    num = np.shape(l2)[0]
-    print(num)
-    print(np.shape(l2))
-    zero_els = np.count_nonzero(l2)
-    print(zero_els, "hiii")
-    ma = np.zeros(np.shape(l2)[0])
-    mb = np.zeros(np.shape(l2)[0])
-    i = 0
-    while i < num:
-        hi = (np.where(l2 == np.amax(l2)))
-        mb[hi[1][0]] = hi[0][0]
-        ma[hi[1][0]] = hi[1][0]
-        print(hi[0][0])
-        print(hi[1][0])
-        print(l2[hi[0][0], hi[1][0]])
-        l2[hi[0][0], :] = 0
-        l2[:, hi[1][0]] = 0
-        i = i + 1
-        print(i)
-    return ma, mb
+# def fast2(l2):
+#     num = np.shape(l2)[0]
+#     print(num)
+#     print(np.shape(l2))
+#     zero_els = np.count_nonzero(l2)
+#     print(zero_els, "hiii")
+#     ma = np.zeros(np.shape(l2)[0])
+#     mb = np.zeros(np.shape(l2)[0])
+#     i = 0
+#     while i < num:
+#         hi = (np.where(l2 == np.amax(l2)))
+#         mb[hi[1][0]] = hi[0][0]
+#         ma[hi[1][0]] = hi[1][0]
+#         print(hi[0][0])
+#         print(hi[1][0])
+#         print(l2[hi[0][0], hi[1][0]])
+#         l2[hi[0][0], :] = 0
+#         l2[:, hi[1][0]] = 0
+#         i = i + 1
+#         print(i)
+#     return ma, mb
 
 
 # def main(A, B, alpha, iters):
@@ -159,29 +167,29 @@ def main(data, alpha, iters):
     Src = data['Src']
     Tar = data['Tar']
 
-    print("hey1")
+    # print("hey1")
     X = nsd(
         Src.A, Tar.A, alpha, iters,
         np.ones((np.shape(Src)[0], 1)),
         np.ones((np.shape(Tar)[0], 1))
     )
-    print(X)
+    # print(X)
     #np.savetxt("array.txt",X, fmt="%s")
-    asa = (np.shape(X))[0]
-    print("asa", asa)
+    # asa = (np.shape(X))[0]
+    # print("asa", asa)
     #nzi1 = np.zeros(asa, int)
     #nzj1 = np.zeros(asa, int)
     #nzv1 = np.zeros(asa, float)
     #nzi1, nzj1, nzv1 = findnz1(X)
     # DA = scipy.sparse.csc_matrix(
     #   (nzv1, (nzi1, nzj1)), shape=(asa, asa))
-    print("hey4")
+    # print("hey4")
     # print(DA)
     # x1 = np.copy(X)
     # ma1, mb1 = fast2(x1)
     # newarr,pr=makesparse(X)
     #np.savetxt("array1.txt", pr, fmt="%s")
-    print("hey5")
+    # print("hey5")
     # print(newarr)
     #nzi, nzj, nzv = findnz1(newarr)
     #asa = maximum_bipartite_matching(newarr,perm_type='column')

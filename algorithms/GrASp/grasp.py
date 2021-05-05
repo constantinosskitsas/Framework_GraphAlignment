@@ -137,7 +137,7 @@ def functional_maps_gen(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t
 
         # calculate correspondence matrix C
         C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1_rot, V2_rot, k, q)
-        print(np.diagonal(C))
+        # print(np.diagonal(C))
 
         # use eigenvectors for alignment
         G1_emb = C @ V1_rot.T  # [:, 0: k].T;
@@ -150,7 +150,7 @@ def functional_maps_gen(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t
 
         C = calc_correspondence_matrix_ortho(A, B, k)
         #C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1[:,0:k], V2[:,0:k], k, q)
-        print(np.diagonal(C))
+        # print(np.diagonal(C))
 
         G1_emb = C @ V1[:, 0: k].T
 

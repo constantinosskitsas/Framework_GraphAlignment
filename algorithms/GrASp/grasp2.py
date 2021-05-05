@@ -16,7 +16,8 @@ from . import base_align_pymanopt as ba
 
 from sklearn.neighbors import NearestNeighbors
 # np.set_printoptions(precision=3)
-np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
+
+# np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
 
 
 # 	#noise_level= [1]
@@ -123,14 +124,14 @@ def functional_maps_base_align(A1, A2, q, k, laa, icp, icp_its, lower_t, upper_t
     Cor1 = calc_corresponding_functions(n, q, t, D1, V1)
     # print(Cor1)
     Cor2 = calc_corresponding_functions(n, q, t, D2, V2)
-    print(np.abs(Cor2-Cor1))
+    # print(np.abs(Cor2-Cor1))
 
     B = ba.optimize_AB(Cor1, Cor2, n, V1, V2, D1, D2, k)
 
     V1_rot = V1[:, 0:k]
     V2_rot = V2[:, 0:k] @ B
     C = calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1_rot, V2_rot, k, q)
-    print(np.diagonal(C))
+    # print(np.diagonal(C))
 
     G1_emb = V1_rot.T  # [:, 0: k].T;
     G2_emb = C @ V2_rot.T  # [:, 0: k].T;

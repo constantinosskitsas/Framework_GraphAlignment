@@ -124,5 +124,5 @@ def score_alignment_matrix(alignment_matrix, topk=None, topk_score_weighted=Fals
                     alignment_score += 1
                 correct_nodes.append(node_index)
         alignment_score /= float(n_nodes)
-    print(correct_nodes)
+    # print(correct_nodes)
     return alignment_score, set(correct_nodes)

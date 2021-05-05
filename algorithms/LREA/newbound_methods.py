@@ -8,7 +8,7 @@ import math
 
 
 def newbound_rounding_lowrank_evaluation_relaxed(U, V, bmatch):
-    np.set_printoptions(threshold=sys.maxsize)
+    # np.set_printoptions(threshold=sys.maxsize)
     U_sortperm = np.argsort(U*-1, 0, 'stable')
     # U_sortperm[265][6]=887
     #U_sortperm[266][6] = 885
@@ -127,7 +127,7 @@ def newbound_rounding_lowrank_evaluation_relaxed(U, V, bmatch):
 
 
 def newbound_rounding_lowrank_evaluation_relaxed1(U, V, bmatch):
-    np.set_printoptions(threshold=sys.maxsize)
+    # np.set_printoptions(threshold=sys.maxsize)
     U_sortperm = np.argsort(U*-1, 0, 'mergesort')
     V_sortperm = np.argsort(V*-1, 0, 'mergesort')
     nU = np.shape(U)[0]

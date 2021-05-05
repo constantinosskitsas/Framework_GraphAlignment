@@ -312,14 +312,13 @@ class GromovWassersteinLearning(object):
         ec2 = ec2 / num_edges * 100.
         return nc1, ec1, nc2, ec2
 
-
     def getCostm(self):
         index_s = torch.LongTensor(list(range(self.src_num)))
         index_t = torch.LongTensor(list(range(self.tar_num)))
         cost_st = self.gwl_model.mutual_cost_mat(index_s, index_t)
         cost_st = cost_st.cpu().data.numpy()
         return cost_st
-        
+
     def evaluation_recommendation1(self):
         index_s = torch.LongTensor(list(range(self.src_num)))
         index_t = torch.LongTensor(list(range(self.tar_num)))
@@ -328,18 +327,17 @@ class GromovWassersteinLearning(object):
         prec = 0
         tops = 1
         num = 0
-        mb=np.zeros((self.src_num))
+        mb = np.zeros((self.src_num))
         for n in range(len(mb)):
             items = cost_st[n, :]
             idx = np.argsort(items)
             top = 1
-            print(idx)
+            # print(idx)
             top_items = idx[:1]
-            print(top_items)
-            recommend_item=top_items[0]
-            mb[n]=recommend_item
+            # print(top_items)
+            recommend_item = top_items[0]
+            mb[n] = recommend_item
         return mb
-
 
     def evaluation_recommendation(self, database):
         index_s = torch.LongTensor(list(range(self.src_num)))
@@ -836,11 +834,11 @@ class GromovWassersteinLearning(object):
 
     def save_matching(self, full_path):
         with open(full_path, 'wb') as f:  # Python 3: open(..., 'wb')
-            print(self.NC1, self.EC1, self.NC2, self.EC2, self.d_gw)
+            # print(self.NC1, self.EC1, self.NC2, self.EC2, self.d_gw)
             pickle.dump([self.NC1, self.EC1, self.NC2, self.EC2, self.d_gw], f)
 
     def save_recommend(self, full_path):
         with open(full_path, 'wb') as f:  # Python 3: open(..., 'wb')
-            print(self.Prec, self.Recall, self.F1, self.d_gw, self.trans)
+            # print(self.Prec, self.Recall, self.F1, self.d_gw, self.trans)
             pickle.dump([self.Prec, self.Recall, self.F1,
                          self.d_gw, self.trans], f)

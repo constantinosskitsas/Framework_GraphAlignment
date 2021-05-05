@@ -285,7 +285,7 @@ def colmin(matrix):
 
 
 def superfast(l2, asc=True):
-    print(f"superfast: init")
+    # print(f"superfast: init")
     l2 = l2.A
     n = np.shape(l2)[0]
     ma = np.zeros(n, int)
@@ -298,7 +298,7 @@ def superfast(l2, asc=True):
     for x, y in zip(*np.unravel_index(vals, l2.shape)):
         if x in rows or y in cols:
             continue
-        print(f"superfast: {i}/{n}")
+        # print(f"superfast: {i}/{n}")
         i += 1
         ma[x] = x
         mb[x] = y

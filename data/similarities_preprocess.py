@@ -1,6 +1,7 @@
 from math import log2, floor
 import numpy as np
 import scipy.sparse as sps
+import networkx as nx
 
 
 def e_to_G(e):
@@ -80,7 +81,7 @@ def create_S(A, B, L):
     wv = np.full(m, -1)
     ri1 = 0
     for i in range(n):
-        print(f'{i}/{n}')
+        # print(f'{i}/{n}')
         for ri1 in range(rpAB[i], rpAB[i+1]):
             wv[ciAB[ri1]] = ri1
 
@@ -216,6 +217,25 @@ def test3():
 if __name__ == "__main__":
     A, B, L, S = test1()
     # # # test2()
+
+    Src = nx.gnp_random_graph(10, 0.5)
+    Tar = nx.gnp_random_graph(10, 0.5)
+
+    Src = e_to_G(np.array(Src.edges))
+    Tar = e_to_G(np.array(Tar.edges))
+
+    L = create_L(Src, Tar)
+    S = create_S(Src, Tar, L)
+
+    # print(Src.A.sum(axis=1))
+    print(Src.A)
+    # print(Tar.A.sum(axis=1))
+    print(Tar.A)
+    with np.printoptions(precision=3, suppress=True):
+        # print(Src.A)
+        # print(Tar.A)
+        print(L.A)
+        print(S.A)
 
     # _lim = 5
     # Src_e = np.loadtxt("data/arenas_orig.txt", int)

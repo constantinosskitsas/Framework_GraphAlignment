@@ -25,6 +25,7 @@ import datetime
 import logging
 import time
 import pickle
+import copy
 
 from utils import *
 
@@ -598,9 +599,7 @@ def run_algs(Src, Tar, Gt, run, prep, _seed, _run, circular=False):
         'w': w
     }
 
-    # savemat("arenas123.mat", data)
-
-    return np.array([run_alg(_seed, data, Gt, i) for i in run])
+    return np.array([run_alg(_seed, copy.deepcopy(data), Gt, i) for i in run])
 
 
 @ ex.capture
@@ -817,9 +816,9 @@ def playground():
     graph_names = [
         # "barabasi",
         # "powerlaw",
-        # "arenas",
+        "arenas",
         # "LFR_span",
-        "facebook",
+        # "facebook",
     ]
 
     # acc_names = [
@@ -870,9 +869,9 @@ def playground():
 
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        # (lambda x: x, ('data/arenas/source.txt',)),
+        (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
-        (lambda x: x, ('data/facebook/source.txt',)),
+        # (lambda x: x, ('data/facebook/source.txt',)),
 
         # (lambda x: x, ({'dataset': 'arenas_old',
         #                 'edges': 1, 'noise_level': 5},)),
@@ -890,12 +889,12 @@ def playground():
     no_disc = True
 
     noises = [
-        # 0.00,
+        0.00,
 
-        # 0.01,
-        # 0.02,
-        # 0.03,
-        # 0.04,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
         0.05,
 
         # 0.06,

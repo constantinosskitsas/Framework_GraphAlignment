@@ -54,120 +54,131 @@ logger.addHandler(ch)
 
 ex.logger = logger
 
+_GW_args = {
+    'opt_dict': {
+        'epochs': 1,
+        'batch_size': 1000000,
+        'use_cuda': False,
+        'strategy': 'soft',
+        # 'strategy': 'hard',
+        # 'beta': 0.1,
+        'beta': 1e-1,
+        'outer_iteration': 400,  # M
+        'inner_iteration': 1,  # N
+        'sgd_iteration': 300,
+        'prior': False,
+        'prefix': 'results',
+        'display': False
+    },
+    'hyperpara_dict': {
+        'dimension': 90,
+        # 'loss_type': 'MSE',
+        'loss_type': 'L2',
+        'cost_type': 'cosine',
+        # 'cost_type': 'RBF',
+        'ot_method': 'proximal'
+    },
+    # 'lr': 0.001,
+    'lr': 1e-3,
+    # 'gamma': 0.01,
+    # 'gamma': None,
+    'gamma': 0.8,
+    'max_cpu': 4
+}
+
+_CONE_args = {
+    'dim': 128,  # clipped by Src[0] - 1
+    'window': 10,
+    'negative': 1.0,
+    'niter_init': 10,
+    'reg_init': 1.0,
+    'nepoch': 5,
+    'niter_align': 10,
+    'reg_align': 0.05,
+    'bsz': 10,
+    'lr': 1.0,
+    'embsim': 'euclidean',
+    'alignmethod': 'greedy',
+    'numtop': 10
+}
+
+_GRASP_args = {
+    'laa': 2,
+    'icp': False,
+    'icp_its': 3,
+    'q': 100,
+    'k': 20,
+    'n_eig': None,  # Src.shape[0] - 1
+    'lower_t': 1.0,
+    'upper_t': 50.0,
+    'linsteps': True,
+    'base_align': True
+}
+
+_REGAL_args = {
+    'attributes': None,
+    'attrvals': 2,
+    'dimensions': 128,  # useless
+    'k': 10,            # d = klogn
+    'untillayer': 2,    # k
+    'alpha': 0.01,      # delta
+    'gammastruc': 1.0,
+    'gammaattr': 1.0,
+    'numtop': 10,
+    'buckets': 2
+}
+
+_LREA_args = {
+    'iters': 8,
+    'method': "lowrank_svd_union",
+    'bmatch': 3,
+    'default_params': True
+}
+
+_NSD_args = {
+    'alpha': 0.8,
+    'iters': 20
+}
+
+_ISO_args = {
+    'alpha': None,  # 0.6 in full
+    'tol': 1e-12,
+    'maxiter': 100
+}
+
+_NET_args = {
+    'a': 1,
+    'b': 2,
+    'gamma': 0.95,
+    'dtype': 2,
+    'maxiter': 100,
+    'verbose': True
+}
+
+_KLAU_args = {
+    'a': 1,
+    'b': 1,
+    'gamma': 0.4,
+    'stepm': 25,
+    'rtype': 2,
+    'maxiter': 100,
+    'verbose': True
+}
+
 
 @ex.config
 def global_config():
 
-    GW_args = {
-        'opt_dict': {
-            'epochs': 1,
-            'batch_size': 1000000,
-            'use_cuda': False,
-            'strategy': 'soft',
-            # 'strategy': 'hard',
-            # 'beta': 0.1,
-            'beta': 1e-1,
-            'outer_iteration': 400,  # M
-            'inner_iteration': 1,  # N
-            'sgd_iteration': 300,
-            'prior': False,
-            'prefix': 'results',
-            'display': False
-        },
-        'hyperpara_dict': {
-            'dimension': 90,
-            # 'loss_type': 'MSE',
-            'loss_type': 'L2',
-            'cost_type': 'cosine',
-            # 'cost_type': 'RBF',
-            'ot_method': 'proximal'
-        },
-        # 'lr': 0.001,
-        'lr': 1e-3,
-        # 'gamma': 0.01,
-        # 'gamma': None,
-        'gamma': 0.8,
-        'max_cpu': 4
-    }
+    GW_args = _GW_args
+    CONE_args = _CONE_args
+    GRASP_args = _GRASP_args
+    REGAL_args = _REGAL_args
+    LREA_args = _LREA_args
+    NSD_args = _NSD_args
 
-    CONE_args = {
-        'dim': 128,  # clipped by Src[0] - 1
-        'window': 10,
-        'negative': 1.0,
-        'niter_init': 10,
-        'reg_init': 1.0,
-        'nepoch': 5,
-        'niter_align': 10,
-        'reg_align': 0.05,
-        'bsz': 10,
-        'lr': 1.0,
-        'embsim': 'euclidean',
-        'alignmethod': 'greedy',
-        'numtop': 10
-    }
-
-    GRASP_args = {
-        'laa': 2,
-        'icp': False,
-        'icp_its': 3,
-        'q': 100,
-        'k': 20,
-        'n_eig': None,  # Src.shape[0] - 1
-        'lower_t': 1.0,
-        'upper_t': 50.0,
-        'linsteps': True,
-        'base_align': True
-    }
-
-    REGAL_args = {
-        'attributes': None,
-        'attrvals': 2,
-        'dimensions': 128,  # useless
-        'k': 10,            # d = klogn
-        'untillayer': 2,    # k
-        'alpha': 0.01,      # delta
-        'gammastruc': 1.0,
-        'gammaattr': 1.0,
-        'numtop': 10,
-        'buckets': 2
-    }
-
-    LREA_args = {
-        'iters': 8,
-        'method': "lowrank_svd_union",
-        'bmatch': 3,
-        'default_params': True
-    }
-
-    NSD_args = {
-        'alpha': 0.8,
-        'iters': 20
-    }
-
-    ISO_args = {
-        'alpha': None,  # 0.6 in full
-        'tol': 1e-12,
-        'maxiter': 100
-    }
-
-    NET_args = {
-        'a': 1,
-        'b': 2,
-        'gamma': 0.95,
-        'dtype': 2,
-        'maxiter': 100,
-        'verbose': True
-    }
-
-    KLAU_args = {
-        'a': 1,
-        'b': 1,
-        'gamma': 0.4,
-        'stepm': 25,
-        'rtype': 2,
-        'maxiter': 100,
-        'verbose': True
-    }
+    ISO_args = _ISO_args
+    NET_args = _NET_args
+    KLAU_args = _KLAU_args
 
     GW_mtype = 4
     CONE_mtype = -4
@@ -179,16 +190,6 @@ def global_config():
     ISO_mtype = 2
     NET_mtype = 3
     KLAU_mtype = 3
-
-    # GW_mtype = 2
-    # CONE_mtype = 3
-    # GRASP_mtype = -5
-    # REGAL_mtype = 1
-    # LREA_mtype = 3
-    # NSD_mtype = 2
-    # ISO_mtype = 2
-    # NET_mtype = 3
-    # KLAU_mtype = 3
 
     algs = [
         (gwl, GW_args, GW_mtype),
@@ -214,6 +215,14 @@ def global_config():
         "ISO",
         "NET",
         "KLAU"
+    ]
+
+    acc_names = [
+        "acc",
+        "S3",
+        "IC",
+        "S3gt",
+        "mnc",
     ]
 
     run = [
@@ -244,7 +253,6 @@ def global_config():
         (nx.powerlaw_cluster_graph, (50, 5, 0.5))
     ]
 
-    _mtype = None
     # no_disc = True
 
     noise_type = 1
@@ -255,6 +263,8 @@ def global_config():
             {'target_noise': noise_level, 'refill': True},
             {'source_noise': noise_level, 'target_noise': noise_level},
         ][noise_type - 1]
+
+    tmp = []
 
     # output_path = "_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
@@ -289,8 +299,9 @@ def mall():
         "CJV",
         "CJVl",
     ]
-    # _mtype = 0
-    # GW_mtype = CONE_mtype = GRASP_mtype = REGAL_mtype = LREA_mtype = NSD_mtype = ISO_mtype = NET_mtype = KLAU_mtype = _mtype
+
+    xls_type = 2
+    plot_type = 2
 
 
 @ex.named_config
@@ -649,7 +660,7 @@ def plot_G(G, circular=False):
 
 
 @ ex.capture
-def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=None, mall=False):
+def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=None, xls_type=1):
     graph_names = iter_name(
         res5.shape[0], "g") if graph_names is None else graph_names
     acc_names = iter_name(
@@ -662,20 +673,7 @@ def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=
             f"{output_path}/res_{graph_names[graph_number]}.xlsx", engine='openpyxl')
 
         for noise_level, res3 in enumerate(res4):
-            if mall:
-                for i in range(res3.shape[1]):
-                    sn = alg_names[run[i]]
-                    rownr = (writer.sheets[sn].max_row +
-                             1) if sn in writer.sheets else 0
-                    pd.DataFrame(
-                        res3[:, i, :],
-                        index=[f'it{j+1}' for j in range(res3.shape[0])],
-                        columns=[acc_names[j] for j in range(res3.shape[2])],
-                    ).to_excel(writer,
-                               sheet_name=sn,
-                               startrow=rownr,
-                               )
-            else:
+            if xls_type == 1:
                 for i in range(res3.shape[2]):
                     sn = str(acc_names[i])
                     rownr = (writer.sheets[sn].max_row +
@@ -689,12 +687,25 @@ def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=
                                sheet_name=sn,
                                startrow=rownr,
                                )
+            elif xls_type == 2:
+                for i in range(res3.shape[1]):
+                    sn = alg_names[run[i]]
+                    rownr = (writer.sheets[sn].max_row +
+                             1) if sn in writer.sheets else 0
+                    pd.DataFrame(
+                        res3[:, i, :],
+                        index=[f'it{j+1}' for j in range(res3.shape[0])],
+                        columns=[acc_names[j] for j in range(res3.shape[2])],
+                    ).to_excel(writer,
+                               sheet_name=sn,
+                               startrow=rownr,
+                               )
 
         writer.save()
 
 
 @ex.capture
-def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, alg_names=None, mall=False):
+def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, alg_names=None, plot_type=1, xlabel="Noise level", ylabel="Accuracy"):
     graph_names = iter_name(
         res5.shape[0], "g") if graph_names is None else graph_names
     acc_names = iter_name(
@@ -705,31 +716,47 @@ def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, al
     for graph_number, res4 in enumerate(res5):
         plots = np.mean(res4, axis=1)
 
-        if mall:
+        if plot_type == 1:
+            plt.figure()
+            for alg in range(plots.shape[1]):
+                vals = plots[:, alg, 0]
+                plt.plot(noises, vals, label=alg_names[run[alg]])
+            plt.xlabel(xlabel)
+            plt.xticks(noises)
+            plt.ylabel(ylabel)
+            plt.ylim([-0.1, 1.1])
+            plt.legend()
+            plt.savefig(f"{output_path}/res_{graph_names[graph_number]}.png")
+
+        elif plot_type == 2:
             for alg in range(plots.shape[1]):
                 plt.figure()
                 for i in range(plots.shape[2]):
                     vals = plots[:, alg, i]
                     if np.all(vals >= 0):
                         plt.plot(noises, vals, label=acc_names[i])
-                plt.xlabel("Noise level")
+                plt.xlabel(xlabel)
                 plt.xticks(noises)
-                plt.ylabel("Accuracy")
+                plt.ylabel(ylabel)
                 plt.ylim([-0.1, 1.1])
                 plt.legend()
                 plt.savefig(
-                    f"{output_path}/res_{graph_names[graph_number]}_{alg_names[run[alg]]}")
-        else:
-            plt.figure()
-            for alg in range(plots.shape[1]):
-                vals = plots[:, alg, 0]
-                plt.plot(noises, vals, label=alg_names[run[alg]])
-            plt.xlabel("Noise level")
-            plt.xticks(noises)
-            plt.ylabel("Accuracy")
-            plt.ylim([-0.1, 1.1])
-            plt.legend()
-            plt.savefig(f"{output_path}/res_{graph_names[graph_number]}")
+                    f"{output_path}/res_{graph_names[graph_number]}_{alg_names[run[alg]]}.png")
+
+        elif plot_type == 3:
+            for n in range(plots.shape[0]):
+                plt.figure()
+                for i in range(plots.shape[2]):
+                    vals = plots[n, :, i]
+                    if np.all(vals >= 0):
+                        plt.plot(alg_names, vals, label=acc_names[i])
+                plt.xlabel(xlabel)
+                plt.xticks(alg_names)
+                plt.ylabel(ylabel)
+                plt.ylim([-0.1, 1.1])
+                plt.legend()
+                plt.savefig(
+                    f"{output_path}/res_{graph_names[graph_number]}_{noises[n]}.png")
 
 
 @ ex.capture
@@ -917,6 +944,69 @@ def playground():
     noise_type = 1
 
     # output_path = "pg_" + datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
+
+
+def alggs(tmp):
+    return [
+        (tmp[0], {**tmp[1], **update}, tmp[2]) for update in tmp[3]
+    ]
+
+
+@ex.named_config
+def exp4():
+
+    tmp = [
+        # conealign,
+        regal,
+        # _CONE_args,
+        _REGAL_args,
+        3,
+        [
+            {'numtop': 1},
+            {'numtop': 3},
+            {'numtop': 5},
+            {'numtop': 7},
+            {'numtop': 9},
+        ]
+    ]
+
+    xlabel = "numtop"
+
+    alg_names = [
+        1,
+        3,
+        5,
+        7,
+        9
+    ]
+
+    algs = alggs(tmp)
+
+    run = list(range(len(tmp[3])))
+
+    iters = 2
+
+    graph_names = [
+        "arenas005",
+        "facebook005",
+    ]
+
+    graphs = [
+        (lambda x: x, ('data/arenas/source.txt',)),
+        (lambda x: x, ('data/facebook/source.txt',)),
+    ]
+
+    noises = [
+        0.05,
+    ]
+
+    no_disc = True
+    noise_type = None
+
+    plot_type = 3
+
+    # output_path = "exp1_" + \
+    #     datetime.datetime.now().strftime("%Y-%m-%d_%H'%M'%S,%f")
 
 
 @ex.named_config

@@ -955,36 +955,128 @@ def alggs(tmp):
 @ex.named_config
 def exp4():
 
+    # tmp = [
+    #     conealign,
+    #     _CONE_args,
+    #     -4,
+    #     [
+    #         {'dim': 64},
+    #         {'dim': 128},
+    #         {'dim': 256},
+    #         {'dim': 512},
+    #         {'dim': 768},
+    #         {'dim': 1024},
+    #     ]
+    # ]
+    # xlabel = "dim"
+    # alg_names = [
+    #     64,
+    #     128,
+    #     256,
+    #     768,
+    #     1024
+    # ]
+    # run=[1]
+
     tmp = [
-        # conealign,
-        regal,
-        # _CONE_args,
-        _REGAL_args,
-        3,
+        grasp,
+        _GRASP_args,
+        -4,
         [
-            {'numtop': 1},
-            {'numtop': 3},
-            {'numtop': 5},
-            {'numtop': 7},
-            {'numtop': 9},
+            {'k': 15},
+            {'k': 20},
+            {'k': 25},
+            {'q': 90},
+            {'q': 100},
+            {'q': 110},
         ]
     ]
-
-    xlabel = "numtop"
-
+    xlabel = "k-q"
     alg_names = [
-        1,
-        3,
-        5,
-        7,
-        9
+        15,
+        20,
+        25,
+        90,
+        100,
+        110
     ]
+    run = [2]
+
+    # tmp = [
+    #     regal,
+    #     _REGAL_args,
+    #     -4,
+    #     [
+    #         {'untillayer': 1},
+    #         {'untillayer': 2},
+    #         {'untillayer': 3},
+    #         {'untillayer': 4},
+    #         {'untillayer': 5},
+    #     ]
+    # ]
+    # xlabel = "untillayer"
+    # alg_names = [
+    #     1,
+    #     2,
+    #     3,
+    #     4,
+    #     5
+    # ]
+    # run=[3]
+
+    # tmp = [
+    #     eigenalign,
+    #     _LREA_args,
+    #     4,
+    #     [
+    #         {'iters': 5},
+    #         {'iters': 8},
+    #         {'iters': 11},
+    #         {'iters': 14},
+    #         {'iters': 17},
+    #         {'iters': 20},
+    #     ]
+    # ]
+    # xlabel = "iters"
+    # alg_names = [
+    #     5,
+    #     8,
+    #     11,
+    #     14,
+    #     17,
+    #     20,
+    # ]
+    # run = [4]
+
+    # tmp = [
+    #     NSD,
+    #     _NSD_args,
+    #     40,
+    #     [
+    #         {'iters': 15},
+    #         {'iters': 20},
+    #         {'iters': 25},
+    #         {'iters': 30},
+    #         {'iters': 35},
+    #         {'iters': 40},
+    #     ]
+    # ]
+    # xlabel = "iters"
+    # alg_names = [
+    #     15,
+    #     20,
+    #     25,
+    #     30,
+    #     35,
+    #     40,
+    # ]
+    # run = [5]
 
     algs = alggs(tmp)
 
     run = list(range(len(tmp[3])))
 
-    iters = 2
+    iters = 10
 
     graph_names = [
         "arenas005",

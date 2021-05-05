@@ -85,3 +85,38 @@ done
 # bash run_parallel.sh 3 3 "exp1 noise_level=0.02 run=[0] mtype=[10] iters=10 GW_args.opt_dict.epochs=10" gwjv002r DEBUG 1644
 # bash run_parallel.sh 3 3 "exp1 noise_level=0.01 run=[0] mtype=[10] iters=10 GW_args.opt_dict.epochs=10" gwjv001r DEBUG 4245
 # bash run_parallel.sh 3 3 "exp1 noise_level=0.00 run=[0] mtype=[10] iters=10 GW_args.opt_dict.epochs=10" gwjv000r DEBUG 31287
+
+# bash run_parallel.sh 3 1 "exp1r noise_level=0.05 run=[2,3,4] iters=5 no_disc=True"
+
+# bash run_parallel.sh 15 1 "exp1s noise_level=0.05 run=[0] iters=1 gwjv" gwjv005s
+# bash run_parallel.sh 15 1 "exp1s noise_level=0.03 run=[0] iters=1 gwjv" gwjv003
+
+# bash run_parallel.sh 3 1 "exp1r noise_level=0.05 full iters=5" face005
+# bash run_parallel.sh 3 1 "exp1r noise_level=0.03 full iters=5" face003
+# bash run_parallel.sh 3 1 "exp1r noise_level=0.01 full iters=5" face001
+
+# bash run_parallel.sh 1 1 "playground run=[2] nice=5 iters=5" grasp005_2
+# bash run_parallel.sh 1 1 "playground run=[2] nice=5 iters=5 no_disc=True" grasp005nodisc_2
+# bash run_parallel.sh 5 1 "playground run=[2] nice=5" grasp005judith_2
+
+# bash run_parallel.sh 18 3 "exp1r full nice=15 run=[1,2,3,4,5,6,7,8]" facenogw
+
+# python workexp.py -l INFO with playground run=[2,3] win seed=123 noise_level=0.05
+
+# python3 workexp.py -l DEBUG with playground run=[2,3] seed=123 noise_level=0.05 verbose=True
+# python3 workexp.py -l INFO with playground run=[2,3] seed=123 noise_level=0.05 verbose=True
+
+
+
+# python3 workexp.py with exp1 noise_type=1 seed=12311 nice=15
+# python3 workexp.py with exp1 noise_type=2 seed=12312 nice=15
+# python3 workexp.py with exp1 noise_type=3 seed=12313 nice=15
+
+# python3 workexp.py with exp2 noise_type=1 seed=12321
+# python3 workexp.py with exp2 noise_type=2 seed=12322
+# python3 workexp.py with exp2 noise_type=3 seed=12323
+# python3 workexp.py with exp2 noise_type=1 seed=12321
+# python3 workexp.py with exp2 noise_type=2 seed=12322
+# python3 workexp.py with exp2 noise_type=3 seed=12323
+
+# python3 workexp.py with playground GW_args.max_cpu=20 iter=3

@@ -1,3 +1,4 @@
+from . import ex
 from math import log2, floor
 import numpy as np
 import scipy.sparse as sps
@@ -104,7 +105,8 @@ def create_S(A, B, L):
     return sps.csr_matrix(([1]*len(Si), (Sj, Si)), shape=(nedges, nedges), dtype=int)
 
 
-def create_L(A, B, alpha=1, mind=0.00001):
+@ ex.capture
+def create_L(A, B, alpha=1, mind=None):
     n = A.shape[0]
     m = B.shape[0]
 

@@ -101,7 +101,7 @@ def get_degree_sequence(graph, rep_method, kneighbors, current_node):
             try:
                 degree_counts[int(
                     math.log(degree, rep_method.num_buckets))] += weight
-            except:
+            except Exception:
                 print("Node %d has degree %d and will not contribute to feature distribution" % (
                     kn, degree))
         else:

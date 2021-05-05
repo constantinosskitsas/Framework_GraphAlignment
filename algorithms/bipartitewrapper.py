@@ -1,6 +1,6 @@
 try:
     from . import bipartiteMatching as bm
-except:
+except Exception:
     import bipartiteMatching as bm
 import numpy as np
 import scipy.sparse as sps

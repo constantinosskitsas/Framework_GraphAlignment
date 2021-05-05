@@ -2,10 +2,10 @@ import numpy as np
 
 
 def intmatch(n, m, nedges, v1, v2, weight):
-    print(n, m, nedges)
-    print(v1)
-    print(v2)
-    print(weight)
+    # print(n, m, nedges)
+    # print(v1)
+    # print(v2)
+    # print(weight)
 
     n = n + 1
     m = m + 1
@@ -149,7 +149,7 @@ def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
     q = np.zeros(N, float)
     mi = np.zeros(Qp[N - 1], int)
     mj = np.zeros(Qp[N - 1], int)
-    print("Qp[N]", Qp[N - 1])
+    # print("Qp[N]", Qp[N - 1])
     medges = 1
 
     lwork1 = np.ones(m, int)
@@ -162,7 +162,7 @@ def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
         col_nonzeros = Qp[j + 1] - Qp[j]
         if col_nonzeros >= max_col_nonzeros:
             max_col_nonzeros = col_nonzeros
-    print("max_col_nonzeros", max_col_nonzeros)
+    # print("max_col_nonzeros", max_col_nonzeros)
     se1 = np.zeros(max_col_nonzeros + 1, int)
     se2 = np.zeros(max_col_nonzeros + 1, int)
     sw = np.zeros(max_col_nonzeros + 1, float)
@@ -174,7 +174,7 @@ def column_maxmatchsum(M, N, Qp, Qr, Qv, m, n, nedges, li, lj):
         nsmall1 = 1
         nsmall2 = 1
         for nzi in range(Qp[j], Qp[j + 1]):
-            print("nzi", nzi)
+            # print("nzi", nzi)
             i = Qr[nzi]
             v1 = li[i]
             v2 = lj[i]

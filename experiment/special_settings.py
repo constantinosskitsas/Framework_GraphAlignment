@@ -73,8 +73,12 @@ def full():
     }
 
     prep = True
+
     # lalpha = 1
+    # lalpha = None
+
     # mind = None
+    # mind = 1e-8
 
     run = [
         0,      # gwl

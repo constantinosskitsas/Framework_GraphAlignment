@@ -1,4 +1,5 @@
-from . import ex
+from . import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 from networkx import nx
 
 
@@ -24,61 +25,33 @@ def exp4():
     #         {'dim': 1024},
     #     ]
     # ]
-    # xlabel = "dim"
-    # alg_names = [
-    #     64,
-    #     128,
-    #     256,
-    #     768,
-    #     1024
-    # ]
-    # run=[1]
-
-    tmp = [
-        grasp,
-        _GRASP_args,
-        -4,
-        [
-            {'k': 15},
-            {'k': 20},
-            {'k': 25},
-            {'q': 90},
-            {'q': 100},
-            {'q': 110},
-        ]
-    ]
-    xlabel = "k-q"
-    alg_names = [
-        15,
-        20,
-        25,
-        90,
-        100,
-        110
-    ]
-    run = [2]
 
     # tmp = [
-    #     regal,
-    #     _REGAL_args,
+    #     grasp,
+    #     _GRASP_args,
     #     -4,
     #     [
-    #         {'untillayer': 1},
-    #         {'untillayer': 2},
-    #         {'untillayer': 3},
-    #         {'untillayer': 4},
-    #         {'untillayer': 5},
+    #         {'k': 15},
+    #         {'k': 20},
+    #         {'k': 25},
+    #         {'q': 90},
+    #         {'q': 100},
+    #         {'q': 110},
     #     ]
     # ]
-    # xlabel = "untillayer"
-    # alg_names = [
-    #     1,
-    #     2,
-    #     3,
-    #     4,
-    #     5
-    # ]
-    # run=[3]
+
+    tmp = [
+        regal,
+        _REGAL_args,
+        -4,
+        [
+            {'untillayer': 1},
+            {'untillayer': 2},
+            {'untillayer': 3},
+            {'untillayer': 4},
+            {'untillayer': 5},
+        ]
+    ]
 
     # tmp = [
     #     eigenalign,
@@ -93,16 +66,6 @@ def exp4():
     #         {'iters': 20},
     #     ]
     # ]
-    # xlabel = "iters"
-    # alg_names = [
-    #     5,
-    #     8,
-    #     11,
-    #     14,
-    #     17,
-    #     20,
-    # ]
-    # run = [4]
 
     # tmp = [
     #     NSD,
@@ -117,20 +80,23 @@ def exp4():
     #         {'iters': 40},
     #     ]
     # ]
-    # xlabel = "iters"
-    # alg_names = [
-    #     15,
-    #     20,
-    #     25,
-    #     30,
-    #     35,
-    #     40,
-    # ]
-    # run = [5]
 
     algs = alggs(tmp)
 
-    run = list(range(len(tmp[3])))
+    try:
+        run
+    except NameError:
+        run = list(range(len(tmp[3])))
+
+    try:
+        xlabel
+    except NameError:
+        xlabel = list(tmp[3][0].keys())[0]
+
+    try:
+        alg_names
+    except NameError:
+        alg_names = [list(d.values())[0] for d in tmp[3]]
 
     iters = 10
 

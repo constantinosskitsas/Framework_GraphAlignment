@@ -17,12 +17,12 @@ def exp4():
     #     _CONE_args,
     #     -4,
     #     [
-    #         {'dim': 64},
     #         {'dim': 128},
-    #         {'dim': 256},
-    #         {'dim': 512},
-    #         {'dim': 768},
-    #         {'dim': 1024},
+    #         {'dim': 128 * 2},
+    #         {'dim': 128 * 3},
+    #         {'dim': 128 * 4},
+    #         {'dim': 128 * 5},
+    #         {'dim': 128 * 6},
     #     ]
     # ]
 
@@ -40,32 +40,34 @@ def exp4():
     #     ]
     # ]
 
-    tmp = [
-        regal,
-        _REGAL_args,
-        -4,
-        [
-            {'untillayer': 1},
-            {'untillayer': 2},
-            {'untillayer': 3},
-            {'untillayer': 4},
-            {'untillayer': 5},
-        ]
-    ]
-
     # tmp = [
-    #     eigenalign,
-    #     _LREA_args,
-    #     4,
+    #     regal,
+    #     _REGAL_args,
+    #     -4,
     #     [
-    #         {'iters': 5},
-    #         {'iters': 8},
-    #         {'iters': 11},
-    #         {'iters': 14},
-    #         {'iters': 17},
-    #         {'iters': 20},
+    #         {'untillayer': 1},
+    #         {'untillayer': 2},
+    #         {'untillayer': 3},
+    #         {'untillayer': 4},
+    #         {'untillayer': 5},
     #     ]
     # ]
+
+    tmp = [
+        eigenalign,
+        _LREA_args,
+        4,
+        [
+            {'iters': 8},
+            {'iters': 15},
+            {'iters': 20},
+            {'iters': 25},
+            {'iters': 30},
+            {'iters': 35},
+            {'iters': 40},
+            {'iters': 45},
+        ]
+    ]
 
     # tmp = [
     #     NSD,
@@ -101,16 +103,18 @@ def exp4():
     iters = 10
 
     graph_names = [
-        "arenas005",
+        # "arenas005",
         "facebook005",
     ]
 
     graphs = [
-        (lambda x: x, ('data/arenas/source.txt',)),
+        # (lambda x: x, ('data/arenas/source.txt',)),
         (lambda x: x, ('data/facebook/source.txt',)),
     ]
 
     noises = [
+        0.01,
+        0.03,
         0.05,
     ]
 

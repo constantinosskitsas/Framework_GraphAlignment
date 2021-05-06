@@ -2,6 +2,10 @@ from . import ex
 from algorithms import bipartitewrapper as bmw
 import numpy as np
 import scipy
+try:
+    import lapjv
+except:
+    pass
 
 
 def colmax(matrix):

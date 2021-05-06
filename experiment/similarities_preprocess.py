@@ -106,11 +106,11 @@ def create_S(A, B, L):
 
 
 @ ex.capture
-def create_L(A, B, alpha=1, mind=None):
+def create_L(A, B, lalpha=1, mind=None):
     n = A.shape[0]
     m = B.shape[0]
 
-    if alpha is None:
+    if lalpha is None:
         return sps.csr_matrix(np.ones((n, m)))
 
     a = A.sum(1)
@@ -124,7 +124,7 @@ def create_L(A, B, alpha=1, mind=None):
 
     ab_m = [0] * n
     s = 0
-    e = floor(alpha * log2(m))
+    e = floor(lalpha * log2(m))
     for ap in a_p:
         while(e < m and
               abs(b_p[e][1] - ap[1]) <= abs(b_p[s][1] - ap[1])

@@ -14,19 +14,29 @@ def alggs(tmp):
 @ex.named_config
 def exp4():
 
-    # tmp = [
-    #     conealign,
-    #     _CONE_args,
-    #     -4,
-    #     [
-    #         {'dim': 128},
-    #         {'dim': 128 * 2},
-    #         {'dim': 128 * 3},
-    #         {'dim': 128 * 4},
-    #         {'dim': 128 * 5},
-    #         {'dim': 128 * 6},
-    #     ]
-    # ]
+    tmp = [
+        conealign,
+        _CONE_args,
+        -4,
+        [
+            {'dim': 128},  # arenas
+            {'dim': 128 * 2},
+            {'dim': 128 * 3},
+            {'dim': 128 * 4},
+            {'dim': 128 * 5},
+            {'dim': 128 * 6},  # facebook
+            {'dim': 128 * 7},
+            {'dim': 128 * 8},
+            {'dim': 128 * 9},
+            {'dim': 128 * 10},
+            {'dim': 128 * 11},
+            {'dim': 128 * 12},
+            {'dim': 128 * 13},
+            {'dim': 128 * 14},
+            {'dim': 128 * 15},
+            {'dim': 128 * 16},  # astro
+        ]
+    ]
 
     # tmp = [
     #     grasp,
@@ -55,21 +65,21 @@ def exp4():
     #     ]
     # ]
 
-    tmp = [
-        eigenalign,
-        _LREA_args,
-        4,
-        [
-            {'iters': 8},
-            {'iters': 15},
-            {'iters': 20},
-            {'iters': 25},
-            {'iters': 30},
-            {'iters': 35},
-            {'iters': 40},
-            {'iters': 45},
-        ]
-    ]
+    # tmp = [
+    #     eigenalign,
+    #     _LREA_args,
+    #     4,
+    #     [
+    #         {'iters': 8},
+    #         {'iters': 15},
+    #         {'iters': 20},
+    #         {'iters': 25},
+    #         {'iters': 30},
+    #         {'iters': 35},
+    #         {'iters': 40},
+    #         {'iters': 45},
+    #     ]
+    # ]
 
     # tmp = [
     #     NSD,
@@ -105,18 +115,20 @@ def exp4():
     iters = 10
 
     graph_names = [
-        # "arenas005",
-        "facebook005",
+        # "arenas",
+        # "facebook",
+        "astro",
     ]
 
     graphs = [
         # (gen.loadnx, ('data/arenas/source.txt',)),
-        (gen.loadnx, ('data/facebook/source.txt',)),
+        # (gen.loadnx, ('data/facebook/source.txt',)),
+        (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
     ]
 
     noises = [
-        0.01,
-        0.03,
+        # 0.01,
+        # 0.03,
         0.05,
     ]
 

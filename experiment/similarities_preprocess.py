@@ -70,6 +70,7 @@ def test1():
 
 
 def create_S(A, B, L):
+    return None
     n = A.shape[0]
     m = B.shape[0]
 
@@ -103,6 +104,8 @@ def create_S(A, B, L):
             wv[ciAB[ri1]] = -1
 
     return sps.csr_matrix(([1]*len(Si), (Sj, Si)), shape=(nedges, nedges), dtype=int)
+    # return sps.csr_matrix(([1]*len(Si), (Si, Sj)), shape=(nedges, nedges), dtype=int)
+    # return sps.csr_matrix(np.ones((nedges, nedges)), dtype=int)
 
 
 @ ex.capture
@@ -158,6 +161,12 @@ def create_L(A, B, lalpha=1, mind=None):
                 # print(len(lj))
 
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
+
+    # L = sps.csr_matrix((lw, (li, lj)), shape=(n, m))
+    # colsums = np.sum(L.A, axis=1)
+    # pi, pj, pv = sps.find(L)
+    # pv = np.divide(pv, colsums[pi])
+    # return sps.csc_matrix((pv, (pi, pj)), shape=(n, m))
 
 
 def test2():

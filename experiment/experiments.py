@@ -1,7 +1,9 @@
-from . import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
+from . import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args, generate as gen
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 from networkx import nx
 
+
+# mprof run workexp.py with playground run=[1,2,3,4,5] iters=2 win
 
 def alggs(tmp):
     return [
@@ -108,8 +110,8 @@ def exp4():
     ]
 
     graphs = [
-        # (lambda x: x, ('data/arenas/source.txt',)),
-        (lambda x: x, ('data/facebook/source.txt',)),
+        # (gen.loadnx, ('data/arenas/source.txt',)),
+        (gen.loadnx, ('data/facebook/source.txt',)),
     ]
 
     noises = [
@@ -145,7 +147,7 @@ def exp3():
     ]
 
     graphs = [
-        (lambda x: x, ('data/facebook/source.txt',)),
+        (gen.loadnx, ('data/facebook/source.txt',)),
     ]
 
     noises = [
@@ -224,7 +226,7 @@ def exp1():
     ]
 
     graphs = [
-        (lambda x: x, ('data/arenas/source.txt',)),
+        (gen.loadnx, ('data/arenas/source.txt',)),
         (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
     ]
 

@@ -3,7 +3,8 @@ import algorithms
 from experiment import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
 from experiment.special_settings import *
 from experiment.experiments import *
-from experiment.generate import init1, init2
+from experiment.commands import *
+from experiment.generate import init1, init2, loadnx
 from experiment.run import run_exp
 from experiment.save import plotS_G, plot_G, savexls, plotres
 
@@ -160,8 +161,13 @@ def playground():
         #                           0.2, 7, None, None, 3, 1100, 1e-07, 5000)),  # the 5k.. very desc + 331
 
 
+        # (loadnx, ('data/arenas_old/source.txt',)),
+        (loadnx, ('data/arenas/source.txt',)),
+        # (loadnx, ('data/facebook/source.txt',)),
+        # (loadnx, ('data/CA-AstroPh/source.txt',)),
+
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        (lambda x: x, ('data/arenas/source.txt',)),
+        # (lambda x: x, ('data/arenas/source.txt',)),
         # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
         # (lambda x: x, ('data/facebook/source.txt',)),
 
@@ -181,12 +187,12 @@ def playground():
     # no_disc = False
 
     noises = [
-        0.00,
+        # 0.00,
 
-        0.01,
-        0.02,
-        0.03,
-        0.04,
+        # 0.01,
+        # 0.02,
+        # 0.03,
+        # 0.04,
         0.05,
 
         # 0.06,

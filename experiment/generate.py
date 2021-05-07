@@ -52,6 +52,11 @@ def load_as_nx(path):
     return np.array(G.edges)
 
 
+def loadnx(path):
+    G_e = np.loadtxt(path, int)
+    return nx.Graph(G_e.tolist())
+
+
 @ ex.capture
 def noise_types(noise_level, noise_type=1):
     return [

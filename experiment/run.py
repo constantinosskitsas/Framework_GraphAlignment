@@ -1,11 +1,11 @@
-from . import ex
-from . import matching, evaluation, similarities_preprocess
+from . import ex, matching, evaluation, similarities_preprocess
 import numpy as np
 import networkx as nx
 import scipy.sparse as sps
 import os
 import copy
 import time
+import gc
 
 
 def format_output(res):
@@ -25,6 +25,7 @@ def format_output(res):
     return sim, cost
 
 
+# @profile
 @ex.capture
 def alg_exe(alg, data, args):
     return alg.main(data=data, **args)
@@ -40,9 +41,12 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run, mtypes=None, mall=False):
 
     _log.debug(f"{' ' + alg.__name__ +' ':#^35}")
 
+    # gc.disable()
     start = time.time()
     res = alg_exe(alg, data, args)
     _run.log_scalar(f"{alg.__name__}.alg", time.time()-start)
+    # gc.enable()
+    # gc.collect()
 
     sim, cost = format_output(res)
 
@@ -100,6 +104,7 @@ def run_alg(_seed, data, Gt, i, algs, _log, _run, mtypes=None, mall=False):
     return result
 
 
+# @profile
 @ ex.capture
 def preprocess(Src, Tar, REGAL_args, CONE_args):
     # L = similarities_preprocess.create_L(Tar, Src)

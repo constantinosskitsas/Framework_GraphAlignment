@@ -61,6 +61,7 @@ def jv(dist):
     return matching.astype(int).T
 
 
+# @profile
 @ex.capture
 def getmatching(sim, cost, mt, _log):
 

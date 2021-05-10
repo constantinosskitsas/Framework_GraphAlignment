@@ -32,81 +32,90 @@ def alg_exe(alg, data, args):
 
 
 @ ex.capture
-def run_alg(_seed, data, Gt, i, algs, _log, _run, mtypes=None, mall=False):
+def run_alg(_alg, _data, Gt, acc_names, _log, _run):
 
     # random.seed(_seed)
     # np.random.seed(_seed)
 
-    alg, args, mt = algs[i]
+    alg, args, mts, algname = _alg
 
-    _log.debug(f"{' ' + alg.__name__ +' ':#^35}")
+    _log.debug(f"{' ' + algname +' ':#^35}")
+
+    data = copy.deepcopy(_data)
 
     # gc.disable()
     start = time.time()
     res = alg_exe(alg, data, args)
-    _run.log_scalar(f"{alg.__name__}.alg", time.time()-start)
+    _run.log_scalar(f"{algname}.time", time.time()-start)
     # gc.enable()
     # gc.collect()
 
     sim, cost = format_output(res)
 
     try:
-        _run.log_scalar(f"{alg.__name__}.sim.size", sim.size)
-        _run.log_scalar(f"{alg.__name__}.sim.max", sim.max())
-        _run.log_scalar(f"{alg.__name__}.sim.min", sim.min())
-        _run.log_scalar(f"{alg.__name__}.sim.avg", sim.data.mean())
+        _run.log_scalar(f"{algname}.sim.size", sim.size)
+        _run.log_scalar(f"{algname}.sim.max", sim.max())
+        _run.log_scalar(f"{algname}.sim.min", sim.min())
+        _run.log_scalar(f"{algname}.sim.avg", sim.data.mean())
     except Exception:
         pass
     try:
-        _run.log_scalar(f"{alg.__name__}.cost.size", cost.size)
-        _run.log_scalar(f"{alg.__name__}.cost.max", cost.max())
-        _run.log_scalar(f"{alg.__name__}.cost.min", cost.min())
-        _run.log_scalar(f"{alg.__name__}.cost.avg", cost.data.mean())
+        _run.log_scalar(f"{algname}.cost.size", cost.size)
+        _run.log_scalar(f"{algname}.cost.max", cost.max())
+        _run.log_scalar(f"{algname}.cost.min", cost.min())
+        _run.log_scalar(f"{algname}.cost.avg", cost.data.mean())
     except Exception:
         pass
 
-    if mall:
-        res2 = []
-        for mt in mtypes:
-            try:
-
-                start = time.time()
-                ma, mb = matching.getmatching(sim, cost, mt)
-                _run.log_scalar(f"{alg.__name__}.matching({mt})",
-                                time.time()-start)
-
-                res1 = evaluation.evall(ma, mb, data['Src'],
-                                        data['Tar'], Gt, alg=alg.__name__)
-            except Exception:
-                _log.exception("")
-                res1 = np.array([-1, -1, -1, -1, -1])
-            res2.append(res1)
-        result = np.array(res2)[:, 0]
-    else:
+    res2 = []
+    for mt in mts:
+        alg = f"{algname}.{mt}"
         try:
 
             start = time.time()
             ma, mb = matching.getmatching(sim, cost, mt)
-            _run.log_scalar(f"{alg.__name__}.matching({mt})",
-                            time.time()-start)
+            elapsed = time.time()-start
 
-            result = evaluation.evall(ma, mb, data['Src'],
-                                      data['Tar'], Gt, alg=alg.__name__)
+            res1 = evaluation.evall(ma, mb, _data['Src'],
+                                    _data['Tar'], Gt, alg=alg)
         except Exception:
             _log.exception("")
-            result = np.array([-1, -1, -1, -1, -1])
+            elapsed = -1
+            res1 = -np.ones(len(acc_names))
+
+        _run.log_scalar(f"{alg}.time", elapsed)
+
+        for accname, val in zip(acc_names, res1):
+            _run.log_scalar(f"{alg}.{accname}", val)
+
+        res2.append(res1)
+    # result = np.array(res2)[:, 0]
+    result = np.array(res2)
+    # else:
+    #     try:
+
+    #         start = time.time()
+    #         ma, mb = matching.getmatching(sim, cost, mt)
+    #         _run.log_scalar(f"{algname}.matching({mt})",
+    #                         time.time()-start)
+
+    #         result = evaluation.evall(ma, mb, data['Src'],
+    #                                   data['Tar'], Gt, alg=algname)
+    #     except Exception:
+    #         _log.exception("")
+    #         result = np.array([-1, -1, -1, -1, -1])
 
     with np.printoptions(suppress=True, precision=4):
         _log.debug("\n%s", result.astype(float))
 
     _log.debug(f"{'#':#^35}")
 
-    return result
+    return result[:, 0].flatten()
 
 
 # @profile
 @ ex.capture
-def preprocess(Src, Tar, REGAL_args, CONE_args):
+def preprocess(Src, Tar):
     # L = similarities_preprocess.create_L(Tar, Src)
     L = similarities_preprocess.create_L(Src, Tar)
     # L, _ = regal.main({"Src": Src, "Tar": Tar}, **REGAL_args)
@@ -119,7 +128,39 @@ def preprocess(Src, Tar, REGAL_args, CONE_args):
 
 
 @ ex.capture
-def run_algs(Src, Tar, Gt, run, _seed, _run, prep=False, circular=False):
+def run_algs(g, algs, _log, _run, prep=False, circular=False):
+
+    Src_e, Tar_e, Gt = g
+    n = Gt[0].size
+
+    # prefix = f"{output_path}/graphs/{graph_number+1:0>2d}_{noise_level+1:0>2d}_{i+1:0>2d}"
+    # Gt_m = np.c_[np.arange(n), Gt[0]]
+    # np.savetxt(f"{prefix}_Src.txt", Src_e, fmt='%d')
+    # np.savetxt(f"{prefix}_Tar.txt", Tar_e, fmt='%d')
+    # np.savetxt(f"{prefix}_Gt.txt", Gt_m, fmt='%d')
+
+    src = nx.Graph(Src_e.tolist())
+    src_cc = len(max(nx.connected_components(src), key=len))
+    src_disc = src_cc < n
+
+    tar = nx.Graph(Tar_e.tolist())
+    tar_cc = len(max(nx.connected_components(tar), key=len))
+    tar_disc = tar_cc < n
+
+    if (src_disc):
+        _log.warning("Disc. Source: %s < %s", src_cc, n)
+    _run.log_scalar("graph.Source.disc", src_disc)
+    _run.log_scalar("graph.Source.n", n)
+    _run.log_scalar("graph.Source.e", Src_e.shape[0])
+
+    if (tar_disc):
+        _log.warning("Disc. Target: %s < %s", tar_cc, n)
+    _run.log_scalar("graph.Target.disc", tar_disc)
+    _run.log_scalar("graph.Target.n", n)
+    _run.log_scalar("graph.Target.e", Tar_e.shape[0])
+
+    Src = e_to_G(Src_e, n)
+    Tar = e_to_G(Tar_e, n)
 
     if prep:
         start = time.time()
@@ -139,7 +180,9 @@ def run_algs(Src, Tar, Gt, run, _seed, _run, prep=False, circular=False):
         'w': w
     }
 
-    return np.array([run_alg(_seed, copy.deepcopy(data), Gt, i) for i in run])
+    return np.array([
+        run_alg(alg, data, Gt) for alg in algs
+    ]).T
 
 
 def e_to_G(e, n):
@@ -152,11 +195,11 @@ def e_to_G(e, n):
 
 
 @ ex.capture
-def run_exp(G, output_path, noises, _log, _run):
+def run_exp(G, _log):
     res2 = res3 = res4 = None
     res5 = []
     try:
-        os.mkdir(f'{output_path}/graphs')
+        # os.mkdir(f'{output_path}/graphs')
 
         for graph_number, g_n in enumerate(G):
 
@@ -171,36 +214,7 @@ def run_exp(G, output_path, noises, _log, _run):
                 for i, g in enumerate(g_it):
                     _log.info("iteration:(%s/%s)", i+1, len(g_it))
 
-                    Src_e, Tar_e, Gt = g
-                    n = Gt[0].size
-
-                    prefix = f"{output_path}/graphs/{graph_number+1:0>2d}_{noise_level+1:0>2d}_{i+1:0>2d}"
-                    Gt_m = np.c_[np.arange(n), Gt[0]]
-                    np.savetxt(f"{prefix}_Src.txt", Src_e, fmt='%d')
-                    np.savetxt(f"{prefix}_Tar.txt", Tar_e, fmt='%d')
-                    np.savetxt(f"{prefix}_Gt.txt", Gt_m, fmt='%d')
-
-                    src = nx.Graph(Src_e.tolist())
-                    src_cc = len(max(nx.connected_components(src), key=len))
-                    src_disc = src_cc < n
-
-                    tar = nx.Graph(Tar_e.tolist())
-                    tar_cc = len(max(nx.connected_components(tar), key=len))
-                    tar_disc = tar_cc < n
-
-                    if (src_disc):
-                        _log.warning("Disc. Source: %s < %s", src_cc, n)
-                    _run.log_scalar("graph.Source.disc", src_disc)
-                    _run.log_scalar("graph.Source.n", n)
-                    _run.log_scalar("graph.Source.e", Src_e.shape[0])
-
-                    if (tar_disc):
-                        _log.warning("Disc. Target: %s < %s", tar_cc, n)
-                    _run.log_scalar("graph.Target.disc", tar_disc)
-                    _run.log_scalar("graph.Target.n", n)
-                    _run.log_scalar("graph.Target.e", Tar_e.shape[0])
-
-                    res2 = run_algs(e_to_G(Src_e, n), e_to_G(Tar_e, n), Gt)
+                    res2 = run_algs(g)
 
                     with np.printoptions(suppress=True, precision=4):
                         _log.info("\n%s", res2.astype(float))
@@ -215,9 +229,9 @@ def run_exp(G, output_path, noises, _log, _run):
             res4 = np.array(res4)
             res5.append(res4)
     except:
-        np.save(f"{output_path}/_res2", np.array(res2))
-        np.save(f"{output_path}/_res3", np.array(res3))
-        np.save(f"{output_path}/_res4", np.array(res4))
+        # np.save(f"{output_path}/_res2", np.array(res2))
+        # np.save(f"{output_path}/_res3", np.array(res3))
+        # np.save(f"{output_path}/_res4", np.array(res4))
         _log.exception("")
 
-    return np.array(res5)  # (g,n,i,alg,acc)
+    # return np.array(res5)  # (g,n,i,alg,acc)

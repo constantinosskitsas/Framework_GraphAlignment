@@ -1,6 +1,7 @@
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
 import logging
+from algorithms import gwl, conealign, grasp2 as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus
 
 ex = Experiment("ex")
 
@@ -115,7 +116,7 @@ _NSD_args = {
 }
 
 _ISO_args = {
-    'alpha': None,  # 0.6 in full
+    'alpha': 0.6,
     'tol': 1e-12,
     'maxiter': 100
 }
@@ -138,3 +139,29 @@ _KLAU_args = {
     'maxiter': 100,
     'verbose': True
 }
+
+_algs = [
+    (gwl, _GW_args, [4], "GW"),
+    (conealign, _CONE_args, [-4], "CONE"),
+    (grasp, _GRASP_args, [-4], "GRASP"),
+    (regal, _REGAL_args, [-4], "REGAL"),
+    (eigenalign, _LREA_args, [4], "LREA"),
+    (NSD, _NSD_args, [40], "NSD"),
+
+    (isorank, _ISO_args, [4], "ISO"),
+    (netalign, _NET_args, [4], "NET"),
+    (klaus, _KLAU_args, [4], "KLAU")
+]
+
+# _alg_names = [
+#     "GW",
+#     "CONE",
+#     "GRASP",
+#     "REGAL",
+#     "LREA",
+#     "NSD",
+
+#     "ISO",
+#     "NET",
+#     "KLAU"
+# ]

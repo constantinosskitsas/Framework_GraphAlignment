@@ -70,7 +70,7 @@ def test1():
 
 
 def create_S(A, B, L):
-    return None
+    # return None
     n = A.shape[0]
     m = B.shape[0]
 

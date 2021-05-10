@@ -1,6 +1,7 @@
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 import algorithms
-from experiment import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
+# from experiment import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
+from experiment import ex, _algs
 from experiment.special_settings import *
 from experiment.experiments import *
 from experiment.commands import *
@@ -16,57 +17,63 @@ import sys
 import os
 import pickle
 
+import time
+
 
 @ex.config
 def global_config():
 
-    GW_args = _GW_args
-    CONE_args = _CONE_args
-    GRASP_args = _GRASP_args
-    REGAL_args = _REGAL_args
-    LREA_args = _LREA_args
-    NSD_args = _NSD_args
+    # GW_args = _GW_args
+    # CONE_args = _CONE_args
+    # GRASP_args = _GRASP_args
+    # REGAL_args = _REGAL_args
+    # LREA_args = _LREA_args
+    # NSD_args = _NSD_args
 
-    ISO_args = _ISO_args
-    NET_args = _NET_args
-    KLAU_args = _KLAU_args
+    # ISO_args = _ISO_args
+    # NET_args = _NET_args
+    # KLAU_args = _KLAU_args
 
-    GW_mtype = 4
-    CONE_mtype = -4
-    GRASP_mtype = -4
-    REGAL_mtype = -4
-    LREA_mtype = 4
-    NSD_mtype = 40
+    # GW_mtype = 4
+    # CONE_mtype = -4
+    # GRASP_mtype = -4
+    # REGAL_mtype = -4
+    # LREA_mtype = 4
+    # NSD_mtype = 40
 
-    ISO_mtype = 2
-    NET_mtype = 3
-    KLAU_mtype = 3
+    # ISO_mtype = 2
+    # NET_mtype = 3
+    # KLAU_mtype = 3
 
-    algs = [
-        (gwl, GW_args, GW_mtype),
-        (conealign, CONE_args, CONE_mtype),
-        (grasp, GRASP_args, GRASP_mtype),
-        (regal, REGAL_args, REGAL_mtype),
-        (eigenalign, LREA_args, LREA_mtype),
-        (NSD, NSD_args, NSD_mtype),
+    # algs = [
+    #     (gwl, GW_args, GW_mtype),
+    #     (conealign, CONE_args, CONE_mtype),
+    #     (grasp, GRASP_args, GRASP_mtype),
+    #     (regal, REGAL_args, REGAL_mtype),
+    #     (eigenalign, LREA_args, LREA_mtype),
+    #     (NSD, NSD_args, NSD_mtype),
 
-        (isorank, ISO_args, ISO_mtype),
-        (netalign, NET_args, NET_mtype),
-        (klaus, KLAU_args, KLAU_mtype)
+    #     (isorank, ISO_args, ISO_mtype),
+    #     (netalign, NET_args, NET_mtype),
+    #     (klaus, KLAU_args, KLAU_mtype)
+    # ]
+
+    run = [
+        0,      # gwl
+        1,      # conealign
+        2,      # grasp
+        3,      # regal
+        4,      # eigenalign
+        5,      # NSD
+
+        # 6,      # isorank
+        # 7,      # netalign
+        # 8,      # klaus
     ]
 
-    alg_names = [
-        "GW",
-        "CONE",
-        "GRASP",
-        "REGAL",
-        "LREA",
-        "NSD",
+    algs = [_algs[i] for i in run]
 
-        "ISO",
-        "NET",
-        "KLAU"
-    ]
+    # alg_names = [_alg_names[i] for i in run]
 
     acc_names = [
         "acc",
@@ -76,27 +83,13 @@ def global_config():
         "mnc",
     ]
 
-    run = [
-        0,      # gwl
-        1,      # conealign
-        2,      # grasp
-        3,      # regal
+    # graphs = [
+    #     (lambda x: x, ('data/arenas/source.txt',)),
+    # ]
 
-        4,      # eigenalign
-        5,      # NSD
-
-        # 6,      # isorank
-        # 7,      # netalign
-        # 8,      # klaus
-    ]
-
-    graphs = [
-        (lambda x: x, ('data/arenas/source.txt',)),
-    ]
-
-    noises = [
-        0.05
-    ]
+    # noises = [
+    #     0.05
+    # ]
 
     tmp = []
 
@@ -104,15 +97,13 @@ def global_config():
 @ex.named_config
 def playground():
 
-    # iters = 10
-
-    graph_names = [
-        # "barabasi",
-        # "powerlaw",
-        "arenas",
-        # "LFR_span",
-        # "facebook",
-    ]
+    # graph_names = [
+    #     # "barabasi",
+    #     # "powerlaw",
+    #     # "arenas",
+    #     # "LFR_span",
+    #     # "facebook",
+    # ]
 
     # acc_names = [
     #     5, 4, 3, 2, 1
@@ -130,8 +121,8 @@ def playground():
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        # (nx.gnp_random_graph, (50, 0.9)),
-        # (nx.barabasi_albert_graph, (100, 5)),
+        (nx.gnp_random_graph, (50, 0.5)),
+        (nx.barabasi_albert_graph, (50, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
@@ -162,7 +153,7 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        (loadnx, ('data/arenas/source.txt',)),
+        # (loadnx, ('data/arenas/source.txt',)),
         # (loadnx, ('data/facebook/source.txt',)),
         # (loadnx, ('data/CA-AstroPh/source.txt',)),
 
@@ -186,12 +177,14 @@ def playground():
 
     # no_disc = False
 
+    iters = 5
+
     noises = [
         # 0.00,
 
-        # 0.01,
+        0.01,
         # 0.02,
-        # 0.03,
+        0.03,
         # 0.04,
         0.05,
 
@@ -216,9 +209,11 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
 
     path = f"runs/{_run._id}"
 
+    def runid(_id):
+        return _id if _id > 0 else int(_run._id) + _id
+
     def load_path(_id):
-        _id = _id if _id > 0 else int(_run._id) + _id
-        return f"runs/{_id}"
+        return f"runs/{runid(_id)}"
 
     try:
         if not verbose:
@@ -233,7 +228,7 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
 
         if len(load) > 0:
             S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
-            randcheck1 = load[0]
+            randcheck1 = runid(load[0])
         else:
             S_G, randcheck1 = init1()
 
@@ -243,7 +238,7 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
 
         if len(load) > 1:
             G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
-            randcheck2 = load[1]
+            randcheck2 = runid(load[1])
         else:
             G, randcheck2 = init2(S_G)
 
@@ -255,16 +250,24 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
         _log.info("randcheck: %s", randcheck)
         open(f"{path}/_randcheck.txt", "w").write(str(randcheck))
 
-        if len(load) > 2:
-            res5 = np.load(f"{load_path(load[2])}/_res5.npy")
-        else:
-            res5 = run_exp(G, path)
+        # if len(load) > 2:
+        #     res5 = np.load(f"{load_path(load[2])}/_res5.npy")
+        # else:
+        #     res5 = run_exp(G, path)
 
-        np.save(f"{path}/_res5", res5)
+        # np.save(f"{path}/_res5", res5)
 
-        os.makedirs(f"{path}/res")
-        savexls(res5, f"{path}/res")
-        plotres(res5, f"{path}/res")
+        # os.makedirs(f"{path}/res")
+        # savexls(res5, f"{path}/res")
+        # plotres(res5, f"{path}/res")
+
+        # run_exp(G, path)
+        run_exp(G)
+
+        time.sleep(15)  # 10 is default heartbeat time
+
+        e_accs()
+        e_time()
 
     except Exception:
         _log.exception("")

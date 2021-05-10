@@ -4,6 +4,7 @@ import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
 import collections
+import os
 
 
 @ex.capture
@@ -67,7 +68,7 @@ def plot_G(G):
 
 
 @ ex.capture
-def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=None, xls_type=1):
+def savexls(res5, _run, prefix="", graph_names=None, acc_names=None, alg_names=None, xls_type=1):
     graph_names = iter_name(
         res5.shape[0], "g") if graph_names is None else graph_names
     acc_names = iter_name(
@@ -75,9 +76,12 @@ def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=
     alg_names = iter_name(
         res5.shape[3], "alg") if alg_names is None else alg_names
 
+    output_path = f"runs/{_run._id}/res"
+    os.makedirs(output_path, exist_ok=True)
+
     for graph_number, res4 in enumerate(res5):
         writer = pd.ExcelWriter(
-            f"{output_path}/res_{graph_names[graph_number]}.xlsx", engine='openpyxl')
+            f"{output_path}/{prefix}_{graph_names[graph_number]}.xlsx", engine='openpyxl')
 
         for noise_level, res3 in enumerate(res4):
             if xls_type == 1:
@@ -88,7 +92,7 @@ def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=
                     pd.DataFrame(
                         res3[:, :, i],
                         index=[f'it{j+1}' for j in range(res3.shape[0])],
-                        columns=[str(alg_names[run[j]])
+                        columns=[str(alg_names[j])
                                  for j in range(res3.shape[1])],
                     ).to_excel(writer,
                                sheet_name=sn,
@@ -96,7 +100,7 @@ def savexls(res5, output_path, run, graph_names=None, acc_names=None, alg_names=
                                )
             elif xls_type == 2:
                 for i in range(res3.shape[1]):
-                    sn = alg_names[run[i]]
+                    sn = alg_names[i]
                     rownr = (writer.sheets[sn].max_row +
                              1) if sn in writer.sheets else 0
                     pd.DataFrame(

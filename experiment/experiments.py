@@ -1,4 +1,4 @@
-from . import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args, generate as gen
+from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args, generate as gen
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 from networkx import nx
 
@@ -207,23 +207,27 @@ def exp2():
 
 @ex.named_config
 def mall():
-    mall = True
-    mtypes = [1, 2, 3, 30, 4, 40, -1, -2, -3, -30, -4, -40]
-    acc_names = [
-        # "old_douche"
-        "SNN",
-        "SSG",
-        "SLS",
-        "SLSl",
-        "SJV",
-        "SJVl",
-        "CNN",
-        "CSG",
-        "CLS",
-        "CLSl",
-        "CJV",
-        "CJVl",
+    # mall = True
+
+    algs = [
+        (alg, args, [1, 2, 3, 30, 4, 40, -1, -2, -3, -30, -4, -40], algname) for alg, args, _, algname in _algs
     ]
+
+    # acc_names = [
+    #     # "old_douche"
+    #     "SNN",
+    #     "SSG",
+    #     "SLS",
+    #     "SLSl",
+    #     "SJV",
+    #     "SJVl",
+    #     "CNN",
+    #     "CSG",
+    #     "CLS",
+    #     "CLSl",
+    #     "CJV",
+    #     "CJVl",
+    # ]
 
     xls_type = 2
     plot_type = 2

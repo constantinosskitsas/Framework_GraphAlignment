@@ -121,7 +121,7 @@ def eval_align(ma, mb, gmb):
 
 
 @ex.capture
-def evall(ma, mb, Src, Tar, Gt, _log, output_path="", mnc=True, save=False, alg='NoName', eval_type=0):
+def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, output_path="", mnc=True, save=False, eval_type=0):
 
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
@@ -164,6 +164,7 @@ def evall(ma, mb, Src, Tar, Gt, _log, output_path="", mnc=True, save=False, alg=
     acc2 = S3(Src.A, Tar.A, ma, mb)
     acc3 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, True)
     acc4 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, False)
+
     if mnc:
         acc5 = score_MNC(Src, Tar, ma, mb)
     else:

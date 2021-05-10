@@ -123,7 +123,7 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
 
 
 @ ex.capture
-def init1(graphs, iters=1):
+def init1(graphs, iters):
 
     S_G = [
         [alg(*args) for _ in range(iters)] for alg, args in graphs

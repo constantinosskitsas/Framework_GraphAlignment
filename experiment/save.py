@@ -115,7 +115,72 @@ def savexls(res5, _run, prefix="", graph_names=None, acc_names=None, alg_names=N
         writer.save()
 
 
+@ ex.capture
+def saveexls(res5, _run, dim1, dim2, dim3, dim4, dim5, prefix=""):
+
+    output_path = f"runs/{_run._id}/res"
+    os.makedirs(output_path, exist_ok=True)
+
+    for i1, res4 in enumerate(res5):
+        writer = pd.ExcelWriter(
+            f"{output_path}/{prefix}_{dim1[i1]}.xlsx", engine='openpyxl')
+
+        for i2, res3 in enumerate(res4):
+            for _, res2 in enumerate(res3):
+                # for i in range(res3.shape[2]):
+
+                sn = str(dim2[i2])
+                rownr = (writer.sheets[sn].max_row +
+                         1) if sn in writer.sheets else 0
+                pd.DataFrame(
+                    res2,
+                    index=dim4,
+                    columns=dim5,
+                ).to_excel(writer,
+                           sheet_name=sn,
+                           startrow=rownr,
+                           )
+
+        writer.save()
+
+
 @ex.capture
+def plotrees(res4, _run, dim1, dim2, dim3, dim4, prefix="", xlabel="Noise level", ylabel="Accuracy"):
+
+    output_path = f"runs/{_run._id}/res"
+    os.makedirs(output_path, exist_ok=True)
+
+    for i1, res3 in enumerate(res4):
+        for i2, res2 in enumerate(res3):
+            plt.figure()
+            for i3, res1 in enumerate(res2):
+                if np.all(res1 >= 0):
+                    plt.plot(dim4, res1, label=dim3[i3])
+            plt.xlabel(xlabel)
+            plt.xticks(dim4)
+            plt.ylabel(ylabel)
+            plt.ylim([-0.1, 1.1])
+            plt.legend()
+            plt.savefig(
+                f"{output_path}/res_{dim1[i1]}_{dim2[i2]}.png")
+
+        # elif plot_type == 3:
+        #     for n in range(plots.shape[0]):
+        #         plt.figure()
+        #         for i in range(plots.shape[2]):
+        #             vals = plots[n, :, i]
+        #             if np.all(vals >= 0):
+        #                 plt.plot(alg_names, vals, label=acc_names[i])
+        #         plt.xlabel(xlabel)
+        #         plt.xticks(alg_names)
+        #         plt.ylabel(ylabel)
+        #         plt.ylim([-0.1, 1.1])
+        #         plt.legend()
+        #         plt.savefig(
+        #             f"{output_path}/res_{graph_names[graph_number]}_{noises[n]}.png")
+
+
+@ ex.capture
 def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, alg_names=None, plot_type=1, xlabel="Noise level", ylabel="Accuracy"):
     graph_names = iter_name(
         res5.shape[0], "g") if graph_names is None else graph_names

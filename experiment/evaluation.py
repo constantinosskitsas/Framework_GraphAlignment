@@ -121,7 +121,7 @@ def eval_align(ma, mb, gmb):
 
 
 @ex.capture
-def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, output_path="", mnc=True, save=False, eval_type=0):
+def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, output_path="", mnc=True, save=False, eval_type=0):
 
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
@@ -144,39 +144,41 @@ def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, output_path="", mnc=True, save=
     with np.printoptions(suppress=True, precision=4):
         _log.debug("\n%s", res[:, :2].astype(float))
 
-    accs = res[:, 0]
-    best = np.argmax(accs)
+    # ___accs = res[:, 0]
+    # best = np.argmax(___accs)
 
-    if max(accs) < 0:
-        if eval_type:
-            prefix = "#"
-        else:
-            _log.warning("misleading evaluation")
-            prefix = "!"
-    elif eval_type and eval_type != best:
-        _log.warning("eval_type mismatch")
-        prefix = "%"
-    else:
+    # if max(___accs) < 0:
+    #     if eval_type:
+    #         prefix = "#"
+    #     else:
+    #         _log.warning("misleading evaluation")
+    #         prefix = "!"
+    # elif eval_type and eval_type != best:
+    #     _log.warning("eval_type mismatch")
+    #     prefix = "%"
+    # else:
         prefix = ""
 
     acc, accb, alignment = res[eval_type]
 
-    acc2 = S3(Src.A, Tar.A, ma, mb)
-    acc3 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, True)
-    acc4 = ICorS3GT(Src.A, Tar.A, ma, mb, gmb, False)
+    _accs = []
 
-    if mnc:
-        acc5 = score_MNC(Src, Tar, ma, mb)
-    else:
-        acc5 = -1
-
-    accs = (acc2, acc3, acc4, acc5)
+    if 0 in accs:
+        _accs.append(acc)
+    if 1 in accs:
+        _accs.append(S3(Src.A, Tar.A, ma, mb))
+    if 2 in accs:
+        _accs.append(ICorS3GT(Src.A, Tar.A, ma, mb, gmb, True))
+    if 3 in accs:
+        _accs.append(ICorS3GT(Src.A, Tar.A, ma, mb, gmb, False))
+    if 4 in accs:
+        _accs.append(score_MNC(Src, Tar, ma, mb))
 
     if save:
         with open(f'{output_path}/{prefix}{alg}_{best}_.txt', 'wb') as f:
             np.savetxt(f, res[:, :2], fmt='%2.3f')
-            np.savetxt(f, [accs], fmt='%2.3f')
+            np.savetxt(f, [_accs], fmt='%2.3f')
             np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
             np.savetxt(f, alignment, fmt='%5d')
 
-    return np.array([acc, *accs])
+    return np.array(_accs)

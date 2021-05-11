@@ -141,27 +141,22 @@ _KLAU_args = {
 }
 
 _algs = [
-    (gwl, _GW_args, [4], "GW"),
-    (conealign, _CONE_args, [-4], "CONE"),
-    (grasp, _GRASP_args, [-4], "GRASP"),
-    (regal, _REGAL_args, [-4], "REGAL"),
-    (eigenalign, _LREA_args, [4], "LREA"),
-    (NSD, _NSD_args, [40], "NSD"),
+    (gwl, _GW_args, [3], "GW"),
+    (conealign, _CONE_args, [-3], "CONE"),
+    (grasp, _GRASP_args, [-3], "GRASP"),
+    (regal, _REGAL_args, [-3], "REGAL"),
+    (eigenalign, _LREA_args, [3], "LREA"),
+    (NSD, _NSD_args, [30], "NSD"),
 
-    (isorank, _ISO_args, [4], "ISO"),
-    (netalign, _NET_args, [4], "NET"),
-    (klaus, _KLAU_args, [4], "KLAU")
+    (isorank, _ISO_args, [3], "ISO"),
+    (netalign, _NET_args, [3], "NET"),
+    (klaus, _KLAU_args, [3], "KLAU")
 ]
 
-# _alg_names = [
-#     "GW",
-#     "CONE",
-#     "GRASP",
-#     "REGAL",
-#     "LREA",
-#     "NSD",
-
-#     "ISO",
-#     "NET",
-#     "KLAU"
-# ]
+_acc_names = [
+    "acc",
+    "S3",
+    "IC",
+    "S3gt",
+    "mnc",
+]

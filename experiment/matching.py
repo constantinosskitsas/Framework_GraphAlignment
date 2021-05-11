@@ -75,13 +75,17 @@ def getmatching(sim, cost, mt, _log):
         elif mt == 2:
             return superfast(sim, asc=False)
         elif mt == 3:
-            return scipy.optimize.linear_sum_assignment(sim.A, maximize=True)
+            _sim = -sim.A
+            try:
+                return jv(_sim)
+            except Exception:
+                return scipy.optimize.linear_sum_assignment(_sim)
         elif mt == 30:
-            return scipy.optimize.linear_sum_assignment(np.log(sim.A), maximize=True)
-        elif mt == 4:
-            return jv(-sim.A)
-        elif mt == 40:
-            return jv(-np.log(sim.A))
+            _sim = -np.log(sim.A)
+            try:
+                return jv(_sim)
+            except Exception:
+                return scipy.optimize.linear_sum_assignment(_sim)
         elif mt == 98:
             return scipy.sparse.csgraph.min_weight_full_bipartite_matching(sim, maximize=True)
         elif mt == 99:
@@ -95,13 +99,17 @@ def getmatching(sim, cost, mt, _log):
         elif mt == -2:
             return superfast(cost)
         elif mt == -3:
-            return scipy.optimize.linear_sum_assignment(cost.A)
+            _cost = cost.A
+            try:
+                return jv(_cost)
+            except Exception:
+                return scipy.optimize.linear_sum_assignment(_cost)
         elif mt == -30:
-            return scipy.optimize.linear_sum_assignment(np.log(cost.A))
-        elif mt == -4:
-            return jv(cost.A)
-        elif mt == -40:
-            return jv(np.log(cost.A))
+            _cost = np.log(cost.A)
+            try:
+                return jv(_cost)
+            except Exception:
+                return scipy.optimize.linear_sum_assignment(_cost)
         elif mt == -98:
             return scipy.sparse.csgraph.min_weight_full_bipartite_matching(cost)
         elif mt == -99:

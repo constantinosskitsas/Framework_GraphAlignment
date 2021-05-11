@@ -32,7 +32,7 @@ def alg_exe(alg, data, args):
 
 
 @ ex.capture
-def run_alg(_alg, _data, Gt, acc_names, _log, _run):
+def run_alg(_alg, _data, Gt, acc_names, _log, _run, mall):
 
     # random.seed(_seed)
     # np.random.seed(_seed)
@@ -79,7 +79,8 @@ def run_alg(_alg, _data, Gt, acc_names, _log, _run):
             res1 = evaluation.evall(ma, mb, _data['Src'],
                                     _data['Tar'], Gt, alg=alg)
         except Exception:
-            _log.exception("")
+            if not mall:
+                _log.exception("")
             elapsed = -1
             res1 = -np.ones(len(acc_names))
 
@@ -110,7 +111,8 @@ def run_alg(_alg, _data, Gt, acc_names, _log, _run):
 
     _log.debug(f"{'#':#^35}")
 
-    return result[:, 0].flatten()
+    # return result[:, 0].flatten()
+    return result
 
 
 # @profile

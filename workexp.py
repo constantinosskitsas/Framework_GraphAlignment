@@ -1,7 +1,7 @@
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 import algorithms
 # from experiment import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
-from experiment import ex, _algs
+from experiment import ex, _algs, _acc_names
 from experiment.special_settings import *
 from experiment.experiments import *
 from experiment.commands import *
@@ -23,41 +23,6 @@ import time
 @ex.config
 def global_config():
 
-    # GW_args = _GW_args
-    # CONE_args = _CONE_args
-    # GRASP_args = _GRASP_args
-    # REGAL_args = _REGAL_args
-    # LREA_args = _LREA_args
-    # NSD_args = _NSD_args
-
-    # ISO_args = _ISO_args
-    # NET_args = _NET_args
-    # KLAU_args = _KLAU_args
-
-    # GW_mtype = 4
-    # CONE_mtype = -4
-    # GRASP_mtype = -4
-    # REGAL_mtype = -4
-    # LREA_mtype = 4
-    # NSD_mtype = 40
-
-    # ISO_mtype = 2
-    # NET_mtype = 3
-    # KLAU_mtype = 3
-
-    # algs = [
-    #     (gwl, GW_args, GW_mtype),
-    #     (conealign, CONE_args, CONE_mtype),
-    #     (grasp, GRASP_args, GRASP_mtype),
-    #     (regal, REGAL_args, REGAL_mtype),
-    #     (eigenalign, LREA_args, LREA_mtype),
-    #     (NSD, NSD_args, NSD_mtype),
-
-    #     (isorank, ISO_args, ISO_mtype),
-    #     (netalign, NET_args, NET_mtype),
-    #     (klaus, KLAU_args, KLAU_mtype)
-    # ]
-
     run = [
         0,      # gwl
         1,      # conealign
@@ -71,17 +36,24 @@ def global_config():
         # 8,      # klaus
     ]
 
+    accs = [
+        0,      # acc
+        # 1,      # S3
+        # 2,      # IC
+        # 3,      # S3gt
+        # 4,      # mnc
+    ]
+
     algs = [_algs[i] for i in run]
 
-    # alg_names = [_alg_names[i] for i in run]
+    mall = False
 
-    acc_names = [
-        "acc",
-        "S3",
-        "IC",
-        "S3gt",
-        "mnc",
-    ]
+    if mall:
+        algs = [
+            (alg, args, [1, 2, 3, 30, -1, -2, -3, -30], algname) for alg, args, _, algname in algs
+        ]
+
+    acc_names = [_acc_names[i] for i in accs]
 
     # graphs = [
     #     (lambda x: x, ('data/arenas/source.txt',)),
@@ -97,26 +69,14 @@ def global_config():
 @ex.named_config
 def playground():
 
-    # graph_names = [
-    #     # "barabasi",
-    #     # "powerlaw",
-    #     # "arenas",
-    #     # "LFR_span",
-    #     # "facebook",
-    # ]
-
-    # acc_names = [
-    #     5, 4, 3, 2, 1
-    # ]
-
-    # alg_names = [
-    #     "gw1",
-    #     "gw2",
-    #     "gw3",
-    #     "gw4",
-    #     "gw5",
-    #     "gw6",
-    # ]
+    graph_names = [
+        "gnp",
+        "barabasi",
+        # "powerlaw",
+        # "arenas",
+        # "LFR_span",
+        # "facebook",
+    ]
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
@@ -177,7 +137,7 @@ def playground():
 
     # no_disc = False
 
-    iters = 5
+    iters = 6
 
     noises = [
         # 0.00,
@@ -264,10 +224,10 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
         # run_exp(G, path)
         run_exp(G)
 
-        time.sleep(15)  # 10 is default heartbeat time
+        # time.sleep(15)  # 10 is default heartbeat time
 
-        e_accs()
-        e_time()
+        # e_accs()
+        # e_time()
 
     except Exception:
         _log.exception("")

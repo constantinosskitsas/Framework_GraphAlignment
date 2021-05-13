@@ -162,7 +162,7 @@ def plotrees(res4, _run, dim1, dim2, dim3, dim4, prefix="", xlabel="Noise level"
             plt.ylim([-0.1, 1.1])
             plt.legend()
             plt.savefig(
-                f"{output_path}/res_{dim1[i1]}_{dim2[i2]}.png")
+                f"{output_path}/{prefix}_{dim1[i1]}_{dim2[i2]}.png")
 
         # elif plot_type == 3:
         #     for n in range(plots.shape[0]):

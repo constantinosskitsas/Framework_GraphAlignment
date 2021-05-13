@@ -224,10 +224,10 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
         # run_exp(G, path)
         run_exp(G)
 
-        # time.sleep(15)  # 10 is default heartbeat time
+        time.sleep(15)  # 10 is default heartbeat time
 
-        # e_accs()
-        # e_time()
+        e_accs()
+        e_time()
 
     except Exception:
         _log.exception("")

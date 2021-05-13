@@ -8,12 +8,12 @@ from networkx import nx
 def alggs(tmp):
     alg, args, mtype, algname = _algs[tmp[0]]
     return [
-        (alg, {**args, **update}, mtype, algname) for update in tmp[1]
+        (alg, {**args, **update}, mtype, f"{algname}{list(update.values())[0]}") for update in tmp[1]
     ]
 
 
 @ex.named_config
-def exp4():
+def tuning():
 
     # tmp = [
     #     1,
@@ -74,22 +74,9 @@ def exp4():
     #     ]
     # ]
 
-    algs = alggs(tmp)
+    _algs[:] = alggs(tmp)
 
-    # try:
-    #     run
-    # except NameError:
-    #     run = list(range(len(tmp[1])))
-
-    # try:
-    #     xlabel
-    # except NameError:
-    #     xlabel = list(tmp[1][0].keys())[0]
-
-    # try:
-    #     alg_names
-    # except NameError:
-    #     alg_names = [list(d.values())[0] for d in tmp[1]]
+    run = list(range(len(tmp[1])))
 
     iters = 10
 
@@ -106,39 +93,40 @@ def exp4():
     ]
 
     noises = [
-        # 0.01,
-        # 0.03,
+        0.01,
+        0.03,
         0.05,
     ]
 
-    # plot_type = 3
+    save_type = 3
+    xlabel = list(tmp[1][0].keys())[0]
 
 
 @ex.named_config
-def exp3():
+def real():
 
-    CONE_args = {
-        "dim": 512
-    }
+    _CONE_args["dim"] = 512
 
-    # LREA_args = {
-    #     'iters': 40
-    # }
+    _LREA_args["iters"] = 40
 
-    # NSD_args = {
-    #     'iters': 30
-    # }
+    # _algs[1][1]["dim"] = 512
+
+    # _algs[4][1]["iters"] = 40
 
     run = [1, 2, 3, 4, 5]
 
     iters = 10
 
     graph_names = [
-        "facebook",
+        "arenas",
+        # "facebook",
+        # "astro",
     ]
 
     graphs = [
-        (gen.loadnx, ('data/facebook/source.txt',)),
+        (gen.loadnx, ('data/arenas/source.txt',)),
+        # (gen.loadnx, ('data/facebook/source.txt',)),
+        # (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
     ]
 
     noises = [
@@ -152,11 +140,14 @@ def exp3():
 
 
 @ex.named_config
-def exp2():
+def arenasish():
+
+    # use with 'mall'
 
     iters = 10
 
     graph_names = [
+        "arenas",
         "nw_str",
         "watts_str",
         "gnp",
@@ -165,35 +156,11 @@ def exp2():
     ]
 
     graphs = [
+        (gen.loadnx, ('data/arenas/source.txt',)),
         (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
         (nx.watts_strogatz_graph, (1133, 10, 0.5)),
         (nx.gnp_random_graph, (1133, 0.009)),
         (nx.barabasi_albert_graph, (1133, 5)),
-        # (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
-    ]
-
-    noises = [
-        0.00,
-        0.01,
-        0.02,
-        0.03,
-        0.04,
-        0.05,
-    ]
-
-
-@ex.named_config
-def exp1():
-
-    iters = 10
-
-    graph_names = [
-        "arenas",
-        "powerlaw"
-    ]
-
-    graphs = [
-        (gen.loadnx, ('data/arenas/source.txt',)),
         (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
     ]
 
@@ -204,4 +171,31 @@ def exp1():
         0.03,
         0.04,
         0.05,
+    ]
+
+
+@ex.named_config
+def test():
+
+    graph_names = [
+        "test1",
+        "test2",
+    ]
+
+    graphs = [
+        # (gen.loadnx, ('data/arenas/source.txt',)),
+        (nx.gnp_random_graph, (50, 0.5)),
+        (nx.barabasi_albert_graph, (50, 3)),
+    ]
+
+    # run = [1, 3, 5]
+
+    iters = 4
+
+    noises = [
+        0.00,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
     ]

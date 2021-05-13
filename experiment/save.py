@@ -122,26 +122,40 @@ def saveexls(res5, _run, dim1, dim2, dim3, dim4, dim5, prefix=""):
     os.makedirs(output_path, exist_ok=True)
 
     for i1, res4 in enumerate(res5):
-        writer = pd.ExcelWriter(
-            f"{output_path}/{prefix}_{dim1[i1]}.xlsx", engine='openpyxl')
-
-        for i2, res3 in enumerate(res4):
-            for _, res2 in enumerate(res3):
-                # for i in range(res3.shape[2]):
-
-                sn = str(dim2[i2])
-                rownr = (writer.sheets[sn].max_row +
-                         1) if sn in writer.sheets else 0
+        with pd.ExcelWriter(f"{output_path}/{prefix}_{dim1[i1]}.xlsx") as writer:
+            for i2, res3 in enumerate(res4):
+                index = pd.MultiIndex.from_product(
+                    [dim3, dim4], names=["first", "second"]
+                )
                 pd.DataFrame(
-                    res2,
-                    index=dim4,
+                    res3.reshape(
+                        len(dim3)*len(dim4), len(dim5)),
+                    index=index,
                     columns=dim5,
-                ).to_excel(writer,
-                           sheet_name=sn,
-                           startrow=rownr,
-                           )
+                ).to_excel(writer, sheet_name=str(dim2[i2]))
 
-        writer.save()
+                # for i3, res2 in enumerate(res3):
+                #     # for i in range(res3.shape[2]):
+                #     sn = str(dim2[i2])
+                #     rownr = (writer.sheets[sn].max_row +
+                #              1) if sn in writer.sheets else 0
+                #     pd.DataFrame(
+                #         res2,
+                #         index=index,
+                #         columns=dim5,
+                #     ).to_excel(writer,
+                #                sheet_name=sn,
+                #                startrow=rownr+1,
+                #                )
+                # writer.write("abc")
+                # pd.DataFrame(
+                #     [dim3[i3]],
+                #     # header=None,
+                #     # index=False
+                # ).to_excel(writer, sheet_name=sn, startrow=rownr)
+                # writer.sheets[sn].write_string(rownr, 2, str(dim3[i3]))
+
+        # writer.save()
 
 
 @ex.capture
@@ -233,3 +247,66 @@ def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, al
                 plt.legend()
                 plt.savefig(
                     f"{output_path}/res_{graph_names[graph_number]}_{noises[n]}.png")
+
+
+@ ex.capture
+def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, save_type=1):
+
+    # T = [0, 4, 1, 2, 3]
+    # (g,n,i,alg,mt,acc)
+    # (g,n,i,alg,acc)
+    # (g,acc,n,i,alg)
+    T = [0, 4, 3, 1, 2]
+    # (g,acc,alg,n,i)
+    dims = [
+        graph_names,
+        noises,
+        list(range(1, iters+1)),
+        [a[3] for a in algs],
+        algs[0][2],
+        acc_names
+    ]
+
+    # if save_type == 0:
+    #     res5 = np.squeeze(res6, axis=4)
+
+    if save_type == 1:
+        sq = 4
+        res5 = np.squeeze(res6, axis=sq)
+        res5 = res5.transpose(*T)
+
+        del dims[sq]
+        dims = [dims[i] for i in T]
+    elif save_type == 2:
+        T = [T[i] for i in [0, 2, 1, 3, 4]]
+        sq = 5
+        res5 = np.squeeze(res6, axis=sq)
+        res5 = res5.transpose(*T)
+
+        del dims[sq]
+        dims = [dims[i] for i in T]
+    elif save_type == 3:
+        T = [T[i] for i in [3, 1, 2, 0, 4]]
+        sq = 5
+        res5 = np.squeeze(res6, axis=sq)
+        res5 = res5.transpose(*T)
+
+        del dims[sq]
+        dims = [dims[i] for i in T]
+
+    saveexls(res5, prefix="accs",
+             dim1=dims[0],
+             dim2=dims[1],
+             dim3=dims[2],
+             dim4=dims[3],
+             dim5=dims[4],
+             )
+
+    plotrees(np.mean(res5, axis=-1), prefix="accs",
+             dim1=dims[0],
+             dim2=dims[1],
+             dim3=dims[2],
+             dim4=dims[3],
+             )
+
+# python workexp.py -l DEBUG with playground full load=[862,862,862]

@@ -49,12 +49,12 @@ def e_accs(_run, graphs, noises, iters, algs, acc_names, graph_names, _id=None, 
                   dim5=[a[3] for a in algs],
                   )
 
-    save.plotrees(np.mean(arr, axis=2).transpose(0, 3, 2, 1), prefix="accs",
-                  dim1=graph_names,
-                  dim2=acc_names,
-                  dim3=[a[3] for a in algs],
-                  dim4=noises,
-                  )
+    # save.plotrees(np.mean(arr, axis=2).transpose(0, 3, 2, 1), prefix="accs",
+    #               dim1=graph_names,
+    #               dim2=acc_names,
+    #               dim3=[a[3] for a in algs],
+    #               dim4=noises,
+    #               )
 
 
 @ex.command

@@ -32,7 +32,7 @@ def alg_exe(alg, data, args):
 
 
 @ ex.capture
-def run_alg(_alg, _data, Gt, acc_names, _log, _run, mall):
+def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
 
     # random.seed(_seed)
     # np.random.seed(_seed)
@@ -43,10 +43,12 @@ def run_alg(_alg, _data, Gt, acc_names, _log, _run, mall):
 
     data = copy.deepcopy(_data)
 
+    time1 = []
+
     # gc.disable()
     start = time.time()
     res = alg_exe(alg, data, args)
-    _run.log_scalar(f"{algname}.time", time.time()-start)
+    time1.append(time.time()-start)
     # gc.enable()
     # gc.collect()
 
@@ -82,48 +84,37 @@ def run_alg(_alg, _data, Gt, acc_names, _log, _run, mall):
             if not mall:
                 _log.exception("")
             elapsed = -1
-            res1 = -np.ones(len(acc_names))
+            res1 = -np.ones(len(accs))
 
-        _run.log_scalar(f"{alg}.time", elapsed)
-
-        for accname, val in zip(acc_names, res1):
-            _run.log_scalar(f"{alg}.{accname}", val)
-
+        time1.append(elapsed)
         res2.append(res1)
-    # result = np.array(res2)[:, 0]
-    result = np.array(res2)
-    # else:
-    #     try:
 
-    #         start = time.time()
-    #         ma, mb = matching.getmatching(sim, cost, mt)
-    #         _run.log_scalar(f"{algname}.matching({mt})",
-    #                         time.time()-start)
-
-    #         result = evaluation.evall(ma, mb, data['Src'],
-    #                                   data['Tar'], Gt, alg=algname)
-    #     except Exception:
-    #         _log.exception("")
-    #         result = np.array([-1, -1, -1, -1, -1])
+    time1 = np.array(time1)
+    res2 = np.array(res2)
 
     with np.printoptions(suppress=True, precision=4):
-        _log.debug("\n%s", result.astype(float))
+        _log.debug("\n%s", res2.astype(float))
 
     _log.debug(f"{'#':#^35}")
 
-    # return result[:, 0].flatten()
-    return result
+    return time1, res2
 
 
 # @profile
 @ ex.capture
-def preprocess(Src, Tar):
+def preprocess(Src, Tar, _run):
+    start = time.time()
     # L = similarities_preprocess.create_L(Tar, Src)
     L = similarities_preprocess.create_L(Src, Tar)
     # L, _ = regal.main({"Src": Src, "Tar": Tar}, **REGAL_args)
     # L, _ = conealign.main({"Src": Src, "Tar": Tar}, **CONE_args)
+    _run.log_scalar("graph.prep.L", time.time()-start)
+
+    start = time.time()
     # S = similarities_preprocess.create_S(Tar, Src, L)
     S = similarities_preprocess.create_S(Src, Tar, L)
+    _run.log_scalar("graph.prep.S", time.time()-start)
+
     li, lj, w = sps.find(L)
 
     return L, S, li, lj, w
@@ -165,9 +156,7 @@ def run_algs(g, algs, _log, _run, prep=False, circular=False):
     Tar = e_to_G(Tar_e, n)
 
     if prep:
-        start = time.time()
         L, S, li, lj, w = preprocess(Src, Tar)
-        _run.log_scalar("graph.prep", time.time()-start)
     else:
         L = S = sps.eye(1)
         li = lj = w = np.empty(1)
@@ -182,9 +171,15 @@ def run_algs(g, algs, _log, _run, prep=False, circular=False):
         'w': w
     }
 
-    return np.array([
-        run_alg(alg, data, Gt) for alg in algs
-    ]).T
+    time2 = []
+    res3 = []
+
+    for alg in algs:
+        time1, res2 = run_alg(alg, data, Gt)
+        time2.append(time1)
+        res3.append(res2)
+
+    return np.array(time2), np.array(res3)
 
 
 def e_to_G(e, n):
@@ -197,9 +192,11 @@ def e_to_G(e, n):
 
 
 @ ex.capture
-def run_exp(G, _log):
-    res2 = res3 = res4 = None
-    res5 = []
+def run_exp(G, output_path, _log):
+    time2 = time3 = time4 = None
+    time5 = []
+    res3 = res4 = res5 = None
+    res6 = []
     try:
         # os.mkdir(f'{output_path}/graphs')
 
@@ -207,33 +204,43 @@ def run_exp(G, _log):
 
             _log.info("Graph:(%s/%s)", graph_number + 1, len(G))
 
-            res4 = []
+            time4 = []
+            res5 = []
             for noise_level, g_it in enumerate(g_n):
 
                 _log.info("Noise_level:(%s/%s)", noise_level + 1, len(g_n))
 
-                res3 = []
+                time3 = []
+                res4 = []
                 for i, g in enumerate(g_it):
                     _log.info("iteration:(%s/%s)", i+1, len(g_it))
 
-                    res2 = run_algs(g)
+                    time2, res3 = run_algs(g)
 
                     with np.printoptions(suppress=True, precision=4):
-                        _log.info("\n%s", res2.astype(float))
+                        _log.info("\n%s", res3.astype(float))
 
-                    res3.append(res2)
+                    time3.append(time2)
+                    res4.append(res3)
 
-                res3 = np.array(res3)
+                time3 = np.array(time3)
+                res4 = np.array(res4)
                 with np.printoptions(suppress=True, precision=4):
-                    _log.debug("\n%s", res3.astype(float))
-                res4.append(res3)
+                    _log.debug("\n%s", res4.astype(float))
+                time4.append(time3)
+                res5.append(res4)
 
-            res4 = np.array(res4)
-            res5.append(res4)
+            time4 = np.array(time4)
+            res5 = np.array(res5)
+            time5.append(time4)
+            res6.append(res5)
     except:
-        # np.save(f"{output_path}/_res2", np.array(res2))
-        # np.save(f"{output_path}/_res3", np.array(res3))
-        # np.save(f"{output_path}/_res4", np.array(res4))
+        np.save(f"{output_path}/_time2", np.array(time2))
+        np.save(f"{output_path}/_time3", np.array(time3))
+        np.save(f"{output_path}/_time4", np.array(time4))
+        np.save(f"{output_path}/_res3", np.array(res3))
+        np.save(f"{output_path}/_res4", np.array(res4))
+        np.save(f"{output_path}/_res5", np.array(res5))
         _log.exception("")
 
-    # return np.array(res5)  # (g,n,i,alg,acc)
+    return np.array(time5), np.array(res6)  # (g,n,i,alg,mt,acc)

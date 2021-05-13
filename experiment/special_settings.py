@@ -48,7 +48,7 @@ def accall():
 @ex.named_config
 def mall():
     mall = True
-
+    save_type = 2
     # mt_all = [
     #     1, 2, 3, 30, -1, -2, -3, -30 ...
     # ]

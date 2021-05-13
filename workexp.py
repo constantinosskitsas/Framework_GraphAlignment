@@ -7,7 +7,7 @@ from experiment.experiments import *
 from experiment.commands import *
 from experiment.generate import init1, init2, loadnx
 from experiment.run import run_exp
-from experiment.save import plotS_G, plot_G, savexls, plotres
+from experiment.save import plotS_G, plot_G, savexls, plotres, save
 
 import numpy as np
 import scipy.sparse as sps
@@ -72,18 +72,18 @@ def playground():
     graph_names = [
         "gnp",
         "barabasi",
-        # "powerlaw",
-        # "arenas",
+        "powerlaw",
+        "arenas",
         # "LFR_span",
         # "facebook",
     ]
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
-        # (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        (nx.watts_strogatz_graph, (100, 10, 0.5)),
         (nx.gnp_random_graph, (50, 0.5)),
         (nx.barabasi_albert_graph, (50, 3)),
-        # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
+        (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -210,24 +210,28 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
         _log.info("randcheck: %s", randcheck)
         open(f"{path}/_randcheck.txt", "w").write(str(randcheck))
 
-        # if len(load) > 2:
-        #     res5 = np.load(f"{load_path(load[2])}/_res5.npy")
-        # else:
-        #     res5 = run_exp(G, path)
+        if len(load) > 2:
+            time5 = np.load(f"{load_path(load[2])}/_time5.npy")
+            res6 = np.load(f"{load_path(load[2])}/_res6.npy")
+        else:
+            time5, res6 = run_exp(G, path)
 
-        # np.save(f"{path}/_res5", res5)
+        np.save(f"{path}/_time5", time5)
+        np.save(f"{path}/_res6", res6)
 
-        # os.makedirs(f"{path}/res")
+        os.makedirs(f"{path}/res")
+        save(time5, res6, f"{path}/res")
+
         # savexls(res5, f"{path}/res")
         # plotres(res5, f"{path}/res")
 
         # run_exp(G, path)
-        run_exp(G)
+        # run_exp(G)
 
-        time.sleep(15)  # 10 is default heartbeat time
+        # time.sleep(15)  # 10 is default heartbeat time
 
-        e_accs()
-        e_time()
+        # e_accs()
+        # e_time()
 
     except Exception:
         _log.exception("")

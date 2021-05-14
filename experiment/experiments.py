@@ -13,6 +13,33 @@ def alggs(tmp):
 
 
 @ex.named_config
+def scaling():
+
+    iters = 10
+
+    graph_names = [
+        "pl10",
+        "pl100",
+        "pl1000",
+        # "pl10000",
+    ]
+
+    graphs = [
+        (nx.powerlaw_cluster_graph, (10, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
+    ]
+
+    noises = [
+        0.05,
+    ]
+
+    s_trans = (2, 1, 0, 3)
+    xlabel = "powerlaw"
+
+
+@ex.named_config
 def tuning():
 
     # tmp = [
@@ -98,7 +125,7 @@ def tuning():
         0.05,
     ]
 
-    save_type = 3
+    s_trans = (0, 2, 1, 3)
     xlabel = list(tmp[1][0].keys())[0]
 
 
@@ -188,7 +215,7 @@ def test():
         (nx.barabasi_albert_graph, (50, 3)),
     ]
 
-    # run = [1, 3, 5]
+    run = [1, 3, 5]
 
     iters = 4
 

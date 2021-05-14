@@ -67,246 +67,246 @@ def plot_G(G):
                 plotG(Tar.tolist(), 'Tar')
 
 
+# @ ex.capture
+# def savexls(res5, _run, prefix="", graph_names=None, acc_names=None, alg_names=None, xls_type=1):
+#     graph_names = iter_name(
+#         res5.shape[0], "g") if graph_names is None else graph_names
+#     acc_names = iter_name(
+#         res5.shape[4], "acc") if acc_names is None else acc_names
+#     alg_names = iter_name(
+#         res5.shape[3], "alg") if alg_names is None else alg_names
+
+#     output_path = f"runs/{_run._id}/res"
+#     os.makedirs(output_path, exist_ok=True)
+
+#     for graph_number, res4 in enumerate(res5):
+#         writer = pd.ExcelWriter(
+#             f"{output_path}/{prefix}_{graph_names[graph_number]}.xlsx", engine='openpyxl')
+
+#         for noise_level, res3 in enumerate(res4):
+#             if xls_type == 1:
+#                 for i in range(res3.shape[2]):
+#                     sn = str(acc_names[i])
+#                     rownr = (writer.sheets[sn].max_row +
+#                              1) if sn in writer.sheets else 0
+#                     pd.DataFrame(
+#                         res3[:, :, i],
+#                         index=[f'it{j+1}' for j in range(res3.shape[0])],
+#                         columns=[str(alg_names[j])
+#                                  for j in range(res3.shape[1])],
+#                     ).to_excel(writer,
+#                                sheet_name=sn,
+#                                startrow=rownr,
+#                                )
+#             elif xls_type == 2:
+#                 for i in range(res3.shape[1]):
+#                     sn = alg_names[i]
+#                     rownr = (writer.sheets[sn].max_row +
+#                              1) if sn in writer.sheets else 0
+#                     pd.DataFrame(
+#                         res3[:, i, :],
+#                         index=[f'it{j+1}' for j in range(res3.shape[0])],
+#                         columns=[acc_names[j] for j in range(res3.shape[2])],
+#                     ).to_excel(writer,
+#                                sheet_name=sn,
+#                                startrow=rownr,
+#                                )
+
+#         writer.save()
+
+
 @ ex.capture
-def savexls(res5, _run, prefix="", graph_names=None, acc_names=None, alg_names=None, xls_type=1):
-    graph_names = iter_name(
-        res5.shape[0], "g") if graph_names is None else graph_names
-    acc_names = iter_name(
-        res5.shape[4], "acc") if acc_names is None else acc_names
-    alg_names = iter_name(
-        res5.shape[3], "alg") if alg_names is None else alg_names
+def saveexls(res4, dim1, dim2, dim3, dim4, filename):
 
-    output_path = f"runs/{_run._id}/res"
-    os.makedirs(output_path, exist_ok=True)
-
-    for graph_number, res4 in enumerate(res5):
-        writer = pd.ExcelWriter(
-            f"{output_path}/{prefix}_{graph_names[graph_number]}.xlsx", engine='openpyxl')
-
-        for noise_level, res3 in enumerate(res4):
-            if xls_type == 1:
-                for i in range(res3.shape[2]):
-                    sn = str(acc_names[i])
-                    rownr = (writer.sheets[sn].max_row +
-                             1) if sn in writer.sheets else 0
-                    pd.DataFrame(
-                        res3[:, :, i],
-                        index=[f'it{j+1}' for j in range(res3.shape[0])],
-                        columns=[str(alg_names[j])
-                                 for j in range(res3.shape[1])],
-                    ).to_excel(writer,
-                               sheet_name=sn,
-                               startrow=rownr,
-                               )
-            elif xls_type == 2:
-                for i in range(res3.shape[1]):
-                    sn = alg_names[i]
-                    rownr = (writer.sheets[sn].max_row +
-                             1) if sn in writer.sheets else 0
-                    pd.DataFrame(
-                        res3[:, i, :],
-                        index=[f'it{j+1}' for j in range(res3.shape[0])],
-                        columns=[acc_names[j] for j in range(res3.shape[2])],
-                    ).to_excel(writer,
-                               sheet_name=sn,
-                               startrow=rownr,
-                               )
-
-        writer.save()
-
-
-@ ex.capture
-def saveexls(res5, _run, dim1, dim2, dim3, dim4, dim5, prefix=""):
-
-    output_path = f"runs/{_run._id}/res"
-    os.makedirs(output_path, exist_ok=True)
-
-    for i1, res4 in enumerate(res5):
-        with pd.ExcelWriter(f"{output_path}/{prefix}_{dim1[i1]}.xlsx") as writer:
-            for i2, res3 in enumerate(res4):
-                index = pd.MultiIndex.from_product(
-                    [dim3, dim4], names=["first", "second"]
-                )
-                pd.DataFrame(
-                    res3.reshape(
-                        len(dim3)*len(dim4), len(dim5)),
-                    index=index,
-                    columns=dim5,
-                ).to_excel(writer, sheet_name=str(dim2[i2]))
-
-                # for i3, res2 in enumerate(res3):
-                #     # for i in range(res3.shape[2]):
-                #     sn = str(dim2[i2])
-                #     rownr = (writer.sheets[sn].max_row +
-                #              1) if sn in writer.sheets else 0
-                #     pd.DataFrame(
-                #         res2,
-                #         index=index,
-                #         columns=dim5,
-                #     ).to_excel(writer,
-                #                sheet_name=sn,
-                #                startrow=rownr+1,
-                #                )
-                # writer.write("abc")
-                # pd.DataFrame(
-                #     [dim3[i3]],
-                #     # header=None,
-                #     # index=False
-                # ).to_excel(writer, sheet_name=sn, startrow=rownr)
-                # writer.sheets[sn].write_string(rownr, 2, str(dim3[i3]))
-
-        # writer.save()
+    with pd.ExcelWriter(f"{filename}.xlsx") as writer:
+        for i1, res3 in enumerate(res4):
+            index = pd.MultiIndex.from_product(
+                [dim2, dim3], names=["", ""]
+            )
+            pd.DataFrame(
+                res3.reshape(-1, res3.shape[-1]),
+                index=index,
+                columns=dim4,
+            ).to_excel(writer, sheet_name=str(dim1[i1]))
 
 
 @ex.capture
-def plotrees(res4, _run, dim1, dim2, dim3, dim4, prefix="", xlabel="Noise level", ylabel="Accuracy"):
+def plotrees(res3, dim1, dim2, dim3, filename, xlabel="Noise level", ylabel="Accuracy"):
 
-    output_path = f"runs/{_run._id}/res"
-    os.makedirs(output_path, exist_ok=True)
+    for i1, res2 in enumerate(res3):
+        plt.figure()
+        for i2, res1 in enumerate(res2):
+            if np.all(res1 >= 0):
+                plt.plot(dim3, res1, label=dim2[i2])
+        plt.xlabel(xlabel)
+        plt.xticks(dim3)
+        plt.ylabel(ylabel)
+        plt.ylim([-0.1, 1.1])
+        plt.legend()
+        plt.savefig(
+            f"{filename}_{dim1[i1]}.png")
 
-    for i1, res3 in enumerate(res4):
-        for i2, res2 in enumerate(res3):
-            plt.figure()
-            for i3, res1 in enumerate(res2):
-                if np.all(res1 >= 0):
-                    plt.plot(dim4, res1, label=dim3[i3])
-            plt.xlabel(xlabel)
-            plt.xticks(dim4)
-            plt.ylabel(ylabel)
-            plt.ylim([-0.1, 1.1])
-            plt.legend()
-            plt.savefig(
-                f"{output_path}/{prefix}_{dim1[i1]}_{dim2[i2]}.png")
 
-        # elif plot_type == 3:
-        #     for n in range(plots.shape[0]):
-        #         plt.figure()
-        #         for i in range(plots.shape[2]):
-        #             vals = plots[n, :, i]
-        #             if np.all(vals >= 0):
-        #                 plt.plot(alg_names, vals, label=acc_names[i])
-        #         plt.xlabel(xlabel)
-        #         plt.xticks(alg_names)
-        #         plt.ylabel(ylabel)
-        #         plt.ylim([-0.1, 1.1])
-        #         plt.legend()
-        #         plt.savefig(
-        #             f"{output_path}/res_{graph_names[graph_number]}_{noises[n]}.png")
+# @ ex.capture
+# def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, alg_names=None, plot_type=1, xlabel="Noise level", ylabel="Accuracy"):
+#     graph_names = iter_name(
+#         res5.shape[0], "g") if graph_names is None else graph_names
+#     acc_names = iter_name(
+#         res5.shape[4], "acc") if acc_names is None else acc_names
+#     alg_names = iter_name(
+#         res5.shape[3], "alg") if alg_names is None else alg_names
+
+#     for graph_number, res4 in enumerate(res5):
+#         plots = np.mean(res4, axis=1)
+
+#         if plot_type == 1:
+#             plt.figure()
+#             for alg in range(plots.shape[1]):
+#                 vals = plots[:, alg, 0]
+#                 plt.plot(noises, vals, label=alg_names[run[alg]])
+#             plt.xlabel(xlabel)
+#             plt.xticks(noises)
+#             plt.ylabel(ylabel)
+#             plt.ylim([-0.1, 1.1])
+#             plt.legend()
+#             plt.savefig(f"{output_path}/res_{graph_names[graph_number]}.png")
+
+#         elif plot_type == 2:
+#             for alg in range(plots.shape[1]):
+#                 plt.figure()
+#                 for i in range(plots.shape[2]):
+#                     vals = plots[:, alg, i]
+#                     if np.all(vals >= 0):
+#                         plt.plot(noises, vals, label=acc_names[i])
+#                 plt.xlabel(xlabel)
+#                 plt.xticks(noises)
+#                 plt.ylabel(ylabel)
+#                 plt.ylim([-0.1, 1.1])
+#                 plt.legend()
+#                 plt.savefig(
+#                     f"{output_path}/res_{graph_names[graph_number]}_{alg_names[run[alg]]}.png")
+
+#         elif plot_type == 3:
+#             for n in range(plots.shape[0]):
+#                 plt.figure()
+#                 for i in range(plots.shape[2]):
+#                     vals = plots[n, :, i]
+#                     if np.all(vals >= 0):
+#                         plt.plot(alg_names, vals, label=acc_names[i])
+#                 plt.xlabel(xlabel)
+#                 plt.xticks(alg_names)
+#                 plt.ylabel(ylabel)
+#                 plt.ylim([-0.1, 1.1])
+#                 plt.legend()
+#                 plt.savefig(
+#                     f"{output_path}/res_{graph_names[graph_number]}_{noises[n]}.png")
+
+
+def squeeze(res, dims, sq):
+
+    try:
+        res = np.squeeze(res, axis=sq)
+        del dims[sq]
+    except Exception:
+        pass
+
+    return res, dims
+
+
+def trans(res, dims, T):
+    return res.transpose(*T), [dims[i] for i in T]
+
+
+def save_rec(res, dims, filename):
+    if len(res.shape) > 4:
+        for _dim, _res in zip(dims[0], res):
+            save_rec(_res, dims[1:], f"{filename}_{_dim}")
+    else:
+        saveexls(res, filename=filename,
+                 dim1=dims[0],
+                 dim2=dims[1],
+                 dim3=dims[2],
+                 dim4=dims[3],
+                 )
+
+        plotrees(np.mean(res, axis=3), filename=filename,
+                 dim1=dims[0],
+                 dim2=dims[1],
+                 dim3=dims[2],
+                 )
 
 
 @ ex.capture
-def plotres(res5, output_path, run, noises, graph_names=None, acc_names=None, alg_names=None, plot_type=1, xlabel="Noise level", ylabel="Accuracy"):
-    graph_names = iter_name(
-        res5.shape[0], "g") if graph_names is None else graph_names
-    acc_names = iter_name(
-        res5.shape[4], "acc") if acc_names is None else acc_names
-    alg_names = iter_name(
-        res5.shape[3], "alg") if alg_names is None else alg_names
-
-    for graph_number, res4 in enumerate(res5):
-        plots = np.mean(res4, axis=1)
-
-        if plot_type == 1:
-            plt.figure()
-            for alg in range(plots.shape[1]):
-                vals = plots[:, alg, 0]
-                plt.plot(noises, vals, label=alg_names[run[alg]])
-            plt.xlabel(xlabel)
-            plt.xticks(noises)
-            plt.ylabel(ylabel)
-            plt.ylim([-0.1, 1.1])
-            plt.legend()
-            plt.savefig(f"{output_path}/res_{graph_names[graph_number]}.png")
-
-        elif plot_type == 2:
-            for alg in range(plots.shape[1]):
-                plt.figure()
-                for i in range(plots.shape[2]):
-                    vals = plots[:, alg, i]
-                    if np.all(vals >= 0):
-                        plt.plot(noises, vals, label=acc_names[i])
-                plt.xlabel(xlabel)
-                plt.xticks(noises)
-                plt.ylabel(ylabel)
-                plt.ylim([-0.1, 1.1])
-                plt.legend()
-                plt.savefig(
-                    f"{output_path}/res_{graph_names[graph_number]}_{alg_names[run[alg]]}.png")
-
-        elif plot_type == 3:
-            for n in range(plots.shape[0]):
-                plt.figure()
-                for i in range(plots.shape[2]):
-                    vals = plots[n, :, i]
-                    if np.all(vals >= 0):
-                        plt.plot(alg_names, vals, label=acc_names[i])
-                plt.xlabel(xlabel)
-                plt.xticks(alg_names)
-                plt.ylabel(ylabel)
-                plt.ylim([-0.1, 1.1])
-                plt.legend()
-                plt.savefig(
-                    f"{output_path}/res_{graph_names[graph_number]}_{noises[n]}.png")
-
-
-@ ex.capture
-def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, save_type=1):
+def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, mt_names=["mt"], mtsq=True, acsq=True, s_trans=None):
 
     # T = [0, 4, 1, 2, 3]
     # (g,n,i,alg,mt,acc)
     # (g,n,i,alg,acc)
     # (g,acc,n,i,alg)
-    T = [0, 4, 3, 1, 2]
+    # T = [0, 4, 3, 1, 2]
     # (g,acc,alg,n,i)
+    T = [0, 3, 4, 5, 1, 2]
+    # (g,alg,mt,acc,n,i)
     dims = [
         graph_names,
         noises,
         list(range(1, iters+1)),
         [a[3] for a in algs],
-        algs[0][2],
+        mt_names,
         acc_names
     ]
+
+    res, dims = trans(res6, dims, T)
+
+    if acsq:
+        res, dims = squeeze(res, dims, 3)
+
+    if mtsq:
+        res, dims = squeeze(res, dims, 2)
+
+    if s_trans is not None:
+        res, dims = trans(res, dims, s_trans)  # (g,alg,n,i)
+
+    save_rec(res, dims, f"{output_path}/acc")
 
     # if save_type == 0:
     #     res5 = np.squeeze(res6, axis=4)
 
-    if save_type == 1:
-        sq = 4
-        res5 = np.squeeze(res6, axis=sq)
-        res5 = res5.transpose(*T)
+    # if save_type == 1:
+    #     sq = 4
+    #     res5 = np.squeeze(res6, axis=sq)
+    #     res5 = res5.transpose(*T)
 
-        del dims[sq]
-        dims = [dims[i] for i in T]
-    elif save_type == 2:
-        T = [T[i] for i in [0, 2, 1, 3, 4]]
-        sq = 5
-        res5 = np.squeeze(res6, axis=sq)
-        res5 = res5.transpose(*T)
+    #     del dims[sq]
+    #     dims = [dims[i] for i in T]
+    # elif save_type == 2:
+    #     T = [T[i] for i in [0, 2, 1, 3, 4]]
+    #     sq = 5
+    #     res5 = np.squeeze(res6, axis=sq)
+    #     res5 = res5.transpose(*T)
 
-        del dims[sq]
-        dims = [dims[i] for i in T]
-    elif save_type == 3:
-        T = [T[i] for i in [3, 1, 2, 0, 4]]
-        sq = 5
-        res5 = np.squeeze(res6, axis=sq)
-        res5 = res5.transpose(*T)
+    #     del dims[sq]
+    #     dims = [dims[i] for i in T]
+    # elif save_type == 3:
+    #     T = [T[i] for i in [3, 1, 2, 0, 4]]
+    #     sq = 5
+    #     res5 = np.squeeze(res6, axis=sq)
+    #     res5 = res5.transpose(*T)
 
-        del dims[sq]
-        dims = [dims[i] for i in T]
+    #     del dims[sq]
+    #     dims = [dims[i] for i in T]
 
-    saveexls(res5, prefix="accs",
-             dim1=dims[0],
-             dim2=dims[1],
-             dim3=dims[2],
-             dim4=dims[3],
-             dim5=dims[4],
-             )
+    # saveexls(res, filename="accs",
+    #          dim1=dims[-4],
+    #          dim2=dims[-3],
+    #          dim3=dims[-2],
+    #          dim4=dims[-1],
+    #          )
 
-    plotrees(np.mean(res5, axis=-1), prefix="accs",
-             dim1=dims[0],
-             dim2=dims[1],
-             dim3=dims[2],
-             dim4=dims[3],
-             )
+    # plotrees(np.mean(res, axis=-1), filename="accs",
+    #          dim1=dims[-4],
+    #          dim2=dims[-3],
+    #          dim3=dims[-2],
+    #          )
 
 # python workexp.py -l DEBUG with playground full load=[862,862,862]

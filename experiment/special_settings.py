@@ -1,4 +1,4 @@
-from . import ex, _algs
+from . import ex
 
 
 # @ex.named_config
@@ -21,7 +21,7 @@ def debug():
 
 
 @ex.named_config
-def full():
+def prep():
 
     prep = True
 
@@ -30,6 +30,10 @@ def full():
 
     # mind = None
     # mind = 1e-8
+
+
+@ex.named_config
+def rall():
 
     run = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
@@ -47,26 +51,19 @@ def accall():
 
 @ex.named_config
 def mall():
+
     mall = True
-    save_type = 2
-    # mt_all = [
-    #     1, 2, 3, 30, -1, -2, -3, -30 ...
-    # ]
 
-    # mt_names = [
-    #     # "old_douche"
-    #     "SNN",
-    #     "SSG",
-    #     "SJV",
-    #     "SJVl",
-    #     "CNN",
-    #     "CSG",
-    #     "CJV",
-    #     "CJVl",
-    # ]
+    # save_type = 2
 
-    # acc_names = ['acc']
-    # squeeze = 5
-
-    # xls_type = 2
-    # plot_type = 2
+    mt_names = [
+        # "old_douche"
+        "SNN",
+        "SSG",
+        "SJV",
+        "SJVl",
+        "CNN",
+        "CSG",
+        "CJV",
+        "CJVl",
+    ]

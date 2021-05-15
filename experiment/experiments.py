@@ -132,6 +132,8 @@ def tuning():
         ]
     ]
 
+    _NET_args["alpha"] = 0.8
+
     _algs[:] = alggs(tmp)
 
     run = list(range(len(tmp[1])))

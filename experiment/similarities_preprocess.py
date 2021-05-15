@@ -143,7 +143,8 @@ def create_L(A, B, lalpha=1, mind=None):
     lw = []
     for i, bj in enumerate(ab_m):
         for j in bj:
-            d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
+            # d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
+            d = 1 - abs(a[i, 0]-b[j, 0]) / max(a[i, 0], b[j, 0])
             if mind is None:
                 if d > 0:
                     li.append(i)

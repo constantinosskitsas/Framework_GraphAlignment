@@ -48,7 +48,8 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
     for i, bj in enumerate(ab_m):
         for j in bj:
             if weighted:
-                d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
+                # d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
+                d = 1 - abs(a[i, 0]-b[j, 0]) / max(a[i, 0], b[j, 0])
             else:
                 d = 1
             if mind is None:
@@ -80,7 +81,7 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weigh
 
     if lalpha is not None:
         L = create_L(data['Src'], data['Tar'],
-                     lalpha=lalpha, weighted=weighted).A
+                     lalpha=lalpha, weighted=weighted).A  # * 10
 
     n1 = np.shape(Tar)[0]
     n2 = np.shape(Src)[0]

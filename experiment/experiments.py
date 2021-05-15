@@ -16,7 +16,7 @@ def alggs(tmp):
 @ex.named_config
 def scaling():
 
-    iters = 10
+    iters = 5
 
     graph_names = [
         "pl10",
@@ -105,40 +105,20 @@ def tuning():
     tmp = [
         6,
         [
-            {'lalpha': 1},
-            {'lalpha': 5},
-            {'lalpha': 10},
-            {'lalpha': 15},
-            {'lalpha': 20},
-            {'lalpha': 25},
-            {'lalpha': 30},
-            {'lalpha': 35},
-            {'lalpha': 40},
-            {'lalpha': 45},
-            {'lalpha': 50},
-            {'lalpha': 99999},
-            # {'lalpha': 1, "weighted": False},
-            # {'lalpha': 5, "weighted": False},
-            # {'lalpha': 10, "weighted": False},
-            # {'lalpha': 15, "weighted": False},
-            # {'lalpha': 20, "weighted": False},
-            # {'lalpha': 25, "weighted": False},
-            # {'lalpha': 30, "weighted": False},
-            # {'lalpha': 35, "weighted": False},
-            # {'lalpha': 40, "weighted": False},
-            # {'lalpha': 45, "weighted": False},
-            # {'lalpha': 50, "weighted": False},
-            # {'lalpha': 99999, "weighted": False},
+            # {'lalpha': x} for x in [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 99999]
+            {'alpha': x} for x in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
         ]
     ]
 
     # _ISO_args["alpha"] = 0.8
+    _ISO_args["lalpha"] = 40
+    # _ISO_args["weighted"] = False
 
     _algs[:] = alggs(tmp)
 
     run = list(range(len(tmp[1])))
 
-    iters = 10
+    iters = 5
 
     graph_names = [
         "arenas",
@@ -175,7 +155,7 @@ def real():
 
     run = [1, 2, 3, 4, 5]
 
-    iters = 10
+    iters = 5
 
     graph_names = [
         "arenas",

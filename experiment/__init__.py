@@ -118,7 +118,9 @@ _NSD_args = {
 _ISO_args = {
     'alpha': 0.6,
     'tol': 1e-12,
-    'maxiter': 100
+    'maxiter': 100,
+    'lalpha': None,
+    'weighted': True
 }
 
 _NET_args = {

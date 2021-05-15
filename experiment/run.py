@@ -39,7 +39,7 @@ def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
 
     alg, args, mts, algname = _alg
 
-    _log.debug(f"{' ' + algname +' ':#^35}")
+    _log.debug(f"{f' {algname} ':#^35}")
 
     data = copy.deepcopy(_data)
 

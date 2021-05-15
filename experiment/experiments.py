@@ -8,7 +8,8 @@ from networkx import nx
 def alggs(tmp):
     alg, args, mtype, algname = _algs[tmp[0]]
     return [
-        (alg, {**args, **update}, mtype, f"{algname}{list(update.values())[0]}") for update in tmp[1]
+        # (alg, {**args, **update}, mtype, f"{algname}{list(update.values())[0]}") for update in tmp[1]
+        (alg, {**args, **update}, mtype, str(list(update.values())[0])) for update in tmp[1]
     ]
 
 
@@ -64,16 +65,16 @@ def tuning():
     #     ]
     # ]
 
-    tmp = [
-        3,
-        [
-            {'untillayer': 1},
-            {'untillayer': 2},
-            {'untillayer': 3},
-            {'untillayer': 4},
-            {'untillayer': 5},
-        ]
-    ]
+    # tmp = [
+    #     3,
+    #     [
+    #         {'untillayer': 1},
+    #         {'untillayer': 2},
+    #         {'untillayer': 3},
+    #         {'untillayer': 4},
+    #         {'untillayer': 5},
+    #     ]
+    # ]
 
     # tmp = [
     #     4,
@@ -100,6 +101,36 @@ def tuning():
     #         {'iters': 40},
     #     ]
     # ]
+
+    tmp = [
+        6,
+        [
+            # {'lalpha': 1},
+            # {'lalpha': 5},
+            # {'lalpha': 10},
+            # {'lalpha': 15},
+            # {'lalpha': 20},
+            # {'lalpha': 25},
+            # {'lalpha': 30},
+            # {'lalpha': 35},
+            # {'lalpha': 40},
+            # {'lalpha': 45},
+            # {'lalpha': 50},
+            # {'lalpha': 99999},
+            {'lalpha': 1, "weighted": False},
+            {'lalpha': 5, "weighted": False},
+            {'lalpha': 10, "weighted": False},
+            {'lalpha': 15, "weighted": False},
+            {'lalpha': 20, "weighted": False},
+            {'lalpha': 25, "weighted": False},
+            {'lalpha': 30, "weighted": False},
+            {'lalpha': 35, "weighted": False},
+            {'lalpha': 40, "weighted": False},
+            {'lalpha': 45, "weighted": False},
+            {'lalpha': 50, "weighted": False},
+            {'lalpha': 99999, "weighted": False},
+        ]
+    ]
 
     _algs[:] = alggs(tmp)
 

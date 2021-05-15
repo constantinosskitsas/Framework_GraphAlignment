@@ -7,7 +7,7 @@ from experiment.experiments import *
 from experiment.commands import *
 from experiment.generate import init1, init2, loadnx
 from experiment.run import run_exp
-from experiment.save import plotS_G, plot_G, savexls, plotres, save
+from experiment.save import plotS_G, plot_G, save
 
 import numpy as np
 import scipy.sparse as sps

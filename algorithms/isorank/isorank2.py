@@ -97,6 +97,9 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weigh
 
     W1 = d1*Tar
     W2 = d2*Src
+    W2aT = alpha*W2.T
+    K = (1-alpha) * L
+
     S = np.ones((n2, n1)) / (n1 * n2)  # Map target to source
     # IsoRank Algorithm in matrix form
     for it in range(1, maxiter + 1):
@@ -104,7 +107,8 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weigh
         if alpha is None:
             S = W2.T.dot(S).dot(W1)
         else:
-            S = (alpha*W2.T).dot(S).dot(W1) + (1-alpha) * L
+            # S = (alpha*W2.T).dot(S).dot(W1) + (1-alpha) * L
+            S = W2aT.dot(S).dot(W1) + K
         delta = np.linalg.norm(S.flatten()-prev, 2)
         if verbose:
             print("Iteration: ", it, " with delta = ", delta)

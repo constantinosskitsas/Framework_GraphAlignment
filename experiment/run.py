@@ -188,7 +188,8 @@ def e_to_G(e, n):
     G = sps.csr_matrix((np.ones(nedges), e.T), shape=(n, n), dtype=int)
     G += G.T
     G.data = G.data.clip(0, 1)
-    return G
+    # return G
+    return G.A
 
 
 @ ex.capture

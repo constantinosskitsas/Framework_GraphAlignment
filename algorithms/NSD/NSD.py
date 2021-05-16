@@ -164,14 +164,16 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
 # def main(A, B, alpha, iters):
 def main(data, alpha, iters):
 
+    # Src = data['Src'].A
+    # Tar = data['Tar'].A
     Src = data['Src']
     Tar = data['Tar']
 
     # print("hey1")
     X = nsd(
-        Src.A, Tar.A, alpha, iters,
-        np.ones((np.shape(Src)[0], 1)),
-        np.ones((np.shape(Tar)[0], 1))
+        Src, Tar, alpha, iters,
+        np.ones((Src.shape[0], 1)),
+        np.ones((Tar.shape[0], 1))
     )
     # print(X)
     #np.savetxt("array.txt",X, fmt="%s")

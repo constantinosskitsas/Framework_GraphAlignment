@@ -22,11 +22,15 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
 
     a = A.sum(1)
     b = B.sum(1)
+    # print(a)
+    # print(b)
 
-    a_p = [(i, m[0, 0]) for i, m in enumerate(a)]
+    # a_p = [(i, m[0,0]) for i, m in enumerate(a)]
+    a_p = list(enumerate(a))
     a_p.sort(key=lambda x: x[1])
 
-    b_p = [(i, m[0, 0]) for i, m in enumerate(b)]
+    # b_p = [(i, m[0,0]) for i, m in enumerate(b)]
+    b_p = list(enumerate(b))
     b_p.sort(key=lambda x: x[1])
 
     ab_m = [0] * n
@@ -47,11 +51,8 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
     lw = []
     for i, bj in enumerate(ab_m):
         for j in bj:
-            if weighted:
-                # d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
-                d = 1 - abs(a[i, 0]-b[j, 0]) / max(a[i, 0], b[j, 0])
-            else:
-                d = 1
+            # d = 1 - abs(a[i]-b[j]) / a[i]
+            d = 1 - abs(a[i]-b[j]) / max(a[i], b[j])
             if mind is None:
                 if d > 0:
                     li.append(i)
@@ -75,16 +76,19 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
 
 def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weighted=True):
 
-    Src = data['Src'].A
-    Tar = data['Tar'].A
-    L = data['L'].A
+    # Src = data['Src'].A
+    # Tar = data['Tar'].A
+    # L = data['L'].A
+    Src = data['Src']
+    Tar = data['Tar']
+    L = data['L']
 
     if lalpha is not None:
         L = create_L(data['Src'], data['Tar'],
-                     lalpha=lalpha, weighted=weighted).A  # * 10
+                     lalpha=lalpha, weighted=weighted).A
 
-    n1 = np.shape(Tar)[0]
-    n2 = np.shape(Src)[0]
+    n1 = Tar.shape[0]
+    n2 = Src.shape[0]
 
     # normalize the adjacency matrices
     d1 = 1 / Tar.sum(axis=1)

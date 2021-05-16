@@ -70,7 +70,7 @@ def test1():
 
 
 def create_S(A, B, L):
-    # return None
+    return None
     n = A.shape[0]
     m = B.shape[0]
 
@@ -118,11 +118,15 @@ def create_L(A, B, lalpha=1, mind=None):
 
     a = A.sum(1)
     b = B.sum(1)
+    # print(a)
+    # print(b)
 
-    a_p = [(i, m[0, 0]) for i, m in enumerate(a)]
+    # a_p = [(i, m[0,0]) for i, m in enumerate(a)]
+    a_p = list(enumerate(a))
     a_p.sort(key=lambda x: x[1])
 
-    b_p = [(i, m[0, 0]) for i, m in enumerate(b)]
+    # b_p = [(i, m[0,0]) for i, m in enumerate(b)]
+    b_p = list(enumerate(b))
     b_p.sort(key=lambda x: x[1])
 
     ab_m = [0] * n
@@ -143,8 +147,8 @@ def create_L(A, B, lalpha=1, mind=None):
     lw = []
     for i, bj in enumerate(ab_m):
         for j in bj:
-            # d = 1 - abs(a[i, 0]-b[j, 0]) / a[i, 0]
-            d = 1 - abs(a[i, 0]-b[j, 0]) / max(a[i, 0], b[j, 0])
+            # d = 1 - abs(a[i]-b[j]) / a[i]
+            d = 1 - abs(a[i]-b[j]) / max(a[i], b[j])
             if mind is None:
                 if d > 0:
                     li.append(i)

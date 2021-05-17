@@ -185,7 +185,8 @@ def run_algs(g, algs, _log, _run, prep=False, circular=False):
 def e_to_G(e, n):
     # n = np.amax(e) + 1
     nedges = e.shape[0]
-    G = sps.csr_matrix((np.ones(nedges), e.T), shape=(n, n), dtype=int)
+    # G = sps.csr_matrix((np.ones(nedges), e.T), shape=(n, n), dtype=int)
+    G = sps.csr_matrix((np.ones(nedges), e.T), shape=(n, n), dtype=np.int8)
     G += G.T
     G.data = G.data.clip(0, 1)
     # return G

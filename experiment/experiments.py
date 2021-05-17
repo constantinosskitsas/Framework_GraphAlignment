@@ -18,6 +18,7 @@ def scaling():
 
     # Greedied down
     _algs[0][2][0] = 2
+    _CONE_args['window'] = 4
     _algs[1][2][0] = -2
     _algs[2][2][0] = -2
     _algs[3][2][0] = -2
@@ -28,16 +29,16 @@ def scaling():
     iters = 1
 
     graph_names = [
-        "100",
-        "1000",
-        "10000",
+        # "100",
+        # "1000",
+        # "10000",
         "100000",
     ]
 
     graphs = [
-        (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
-        (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
-        (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
         (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
     ]
 
@@ -198,20 +199,24 @@ def arenasish():
 
     graph_names = [
         "arenas",
+        "powerlaw"
         "nw_str",
         "watts_str",
         "gnp",
         "barabasi",
-        "powerlaw"
     ]
 
     graphs = [
+        # with arenasish load=[1-,1-]
+        # 91-
         (gen.loadnx, ('data/arenas/source.txt',)),
+        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+        # 92-0
         (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
         (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        # 92-1
         (nx.gnp_random_graph, (1133, 0.009)),
         (nx.barabasi_albert_graph, (1133, 5)),
-        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
     ]
 
     noises = [

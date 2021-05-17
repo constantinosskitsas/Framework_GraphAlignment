@@ -16,20 +16,29 @@ def alggs(tmp):
 @ex.named_config
 def scaling():
 
-    iters = 5
+    # Greedied down
+    _algs[0][2][0] = 2
+    _algs[1][2][0] = -2
+    _algs[2][2][0] = -2
+    _algs[3][2][0] = -2
+    _algs[4][2][0] = 2
+    _algs[5][2][0] = 2
+    _algs[6][2][0] = 2
+
+    iters = 1
 
     graph_names = [
-        "pl10",
-        "pl100",
-        "pl1000",
-        # "pl10000",
+        "100",
+        "1000",
+        "10000",
+        "100000",
     ]
 
     graphs = [
-        (nx.powerlaw_cluster_graph, (10, 2, 0.5)),
         (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
         (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
     ]
 
     noises = [

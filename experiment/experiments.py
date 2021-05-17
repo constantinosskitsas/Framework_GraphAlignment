@@ -54,66 +54,35 @@ def scaling():
 def tuning():
 
     # tmp = [
-    #     1,
+    #     1,  # CONE
     #     [
-    #         {'dim': 128},  # arenas
-    #         {'dim': 128 * 2},
-    #         {'dim': 128 * 3},
-    #         {'dim': 128 * 4},
-    #         {'dim': 128 * 5},
-    #         {'dim': 128 * 6},  # facebook
-    #         {'dim': 128 * 7},
-    #         {'dim': 128 * 8},
-    #         {'dim': 128 * 9},
-    #         {'dim': 128 * 10},
-    #         {'dim': 128 * 11},
-    #         {'dim': 128 * 12},
-    #         {'dim': 128 * 13},
-    #         {'dim': 128 * 14},
-    #         {'dim': 128 * 15},
-    #         {'dim': 128 * 16},  # astro
+    #         {'dim': 128 * i} for i in range(1, 17)
     #     ]
     # ]
 
     # tmp = [
-    #     3,
+    #     3,  # REGAL
     #     [
-    #         {'untillayer': 1},
-    #         {'untillayer': 2},
-    #         {'untillayer': 3},
-    #         {'untillayer': 4},
-    #         {'untillayer': 5},
+    #         {'untillayer': x} for x in range(1, 6)
     #     ]
     # ]
 
     # tmp = [
-    #     4,
+    #     4,  # LREA
     #     [
-    #         {'iters': 8},
-    #         {'iters': 8 * 2},
-    #         {'iters': 8 * 3},
-    #         {'iters': 8 * 4},
-    #         {'iters': 8 * 5},
-    #         {'iters': 8 * 6},
-    #         {'iters': 8 * 7},
-    #         {'iters': 8 * 8},
+    #         {'iters': 8 * i} for i in range(1, 9)
     #     ]
     # ]
 
     # tmp = [
-    #     5,
+    #     5,  # NSD
     #     [
-    #         {'iters': 15},
-    #         {'iters': 20},
-    #         {'iters': 25},
-    #         {'iters': 30},
-    #         {'iters': 35},
-    #         {'iters': 40},
+    #         {'iters': x} for x in [15, 20, 25, 30, 35, 40]
     #     ]
     # ]
 
     tmp = [
-        6,
+        6,  # ISO
         [
             # {'lalpha': x} for x in [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 99999]
             # {'alpha': x} for x in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
@@ -155,14 +124,6 @@ def tuning():
 
 @ex.named_config
 def real():
-
-    _CONE_args["dim"] = 512
-
-    _LREA_args["iters"] = 40
-
-    # _algs[1][1]["dim"] = 512
-
-    # _algs[4][1]["iters"] = 40
 
     run = [1, 2, 3, 4, 5]
 
@@ -227,6 +188,14 @@ def arenasish():
         0.04,
         0.05,
     ]
+
+
+@ex.named_config
+def tuned():
+    _CONE_args["dim"] = 512
+    _LREA_args["iters"] = 40
+    _ISO_args["alpha"] = 0.9
+    _ISO_args["lalpha"] = 100000  # full dim
 
 
 @ex.named_config

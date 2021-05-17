@@ -1,4 +1,4 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
+# from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 import algorithms
 # from experiment import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
 from experiment import ex, _algs, _acc_names
@@ -16,8 +16,6 @@ import networkx as nx
 import sys
 import os
 import pickle
-
-import time
 
 
 @ex.config

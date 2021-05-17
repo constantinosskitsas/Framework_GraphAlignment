@@ -160,7 +160,7 @@ def arenasish():
 
     graph_names = [
         "arenas",
-        "powerlaw"
+        "powerlaw",
         "nw_str",
         "watts_str",
         "gnp",

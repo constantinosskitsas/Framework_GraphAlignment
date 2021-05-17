@@ -131,7 +131,7 @@ def saveexls(res4, dim1, dim2, dim3, dim4, filename):
 
 
 @ex.capture
-def plotrees(res3, dim1, dim2, dim3, filename, xlabel="Noise level", ylabel="Accuracy"):
+def plotrees(res3, dim1, dim2, dim3, filename, xlabel="Noise level", plot_type=1):
 
     for i1, res2 in enumerate(res3):
         plt.figure()
@@ -140,8 +140,13 @@ def plotrees(res3, dim1, dim2, dim3, filename, xlabel="Noise level", ylabel="Acc
                 plt.plot(dim3, res1, label=dim2[i2])
         plt.xlabel(xlabel)
         plt.xticks(dim3)
-        plt.ylabel(ylabel)
-        plt.ylim([-0.1, 1.1])
+        if plot_type == 1:
+            plt.ylabel("Accuracy")
+            plt.ylim([-0.1, 1.1])
+        else:
+            plt.ylabel("Time[s]")
+            # plt.yscale('log')
+
         plt.legend()
         plt.savefig(
             f"{filename}_{dim1[i1]}.png")
@@ -217,10 +222,10 @@ def trans(res, dims, T):
     return res.transpose(*T), [dims[i] for i in T]
 
 
-def save_rec(res, dims, filename):
+def save_rec(res, dims, filename, plot_type=1):
     if len(res.shape) > 4:
         for _dim, _res in zip(dims[0], res):
-            save_rec(_res, dims[1:], f"{filename}_{_dim}")
+            save_rec(_res, dims[1:], f"{filename}_{_dim}", plot_type)
     else:
         saveexls(res, filename=filename,
                  dim1=dims[0],
@@ -229,7 +234,7 @@ def save_rec(res, dims, filename):
                  dim4=dims[3],
                  )
 
-        plotrees(np.mean(res, axis=3), filename=filename,
+        plotrees(np.mean(res, axis=3), filename=filename, plot_type=plot_type,
                  dim1=dims[0],
                  dim2=dims[1],
                  dim3=dims[2],
@@ -245,6 +250,7 @@ def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, 
     # (g,acc,n,i,alg)
     # T = [0, 4, 3, 1, 2]
     # (g,acc,alg,n,i)
+
     T = [0, 3, 4, 5, 1, 2]
     # (g,alg,mt,acc,n,i)
     dims = [
@@ -256,18 +262,36 @@ def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, 
         acc_names
     ]
 
-    res, dims = trans(res6, dims, T)
+    time6 = np.expand_dims(time5, axis=-1)
 
+    res, dims = trans(res6, dims, T)
+    time, _ = trans(time6, list(range(len(T))), T)
+    # (g,alg,mt,acc,n,i)
+    time_alg = time.take(indices=0, axis=2)
+    time_m = time.take(indices=range(1, time.shape[2]), axis=2)
+
+    # print(len(time))
     if acsq:
         res, dims = squeeze(res, dims, 3)
-
+        time_alg, _ = squeeze(time_alg, [], 3)
+        time_m, _ = squeeze(time_m, [], 3)
+    # print(len(time))
     if mtsq:
         res, dims = squeeze(res, dims, 2)
-
+        time_alg, _ = squeeze(time_alg, [], 2)
+        time_m, _ = squeeze(time_m, [], 2)
+    # print(len(time))
     if s_trans is not None:
         res, dims = trans(res, dims, s_trans)  # (g,alg,n,i)
-
+        mock = list(range(len(s_trans)))
+        time_alg, _ = trans(time_alg, mock, s_trans)  # (g,alg,n,i)
+        time_m, _ = trans(time_m, mock, s_trans)  # (g,alg,n,i)
+    # print(len(time))
     save_rec(res, dims, f"{output_path}/acc")
+    # print(len(dims))
+    # print(time.shape)
+    save_rec(time_alg, dims, f"{output_path}/time_alg", plot_type=2)
+    save_rec(time_m, dims, f"{output_path}/time_matching", plot_type=2)
 
     # if save_type == 0:
     #     res5 = np.squeeze(res6, axis=4)

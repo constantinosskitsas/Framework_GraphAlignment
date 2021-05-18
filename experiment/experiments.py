@@ -101,14 +101,14 @@ def tuning():
     iters = 5
 
     graph_names = [
-        "arenas",
-        # "facebook",
+        # "arenas",
+        "facebook",
         # "astro",
     ]
 
     graphs = [
-        (gen.loadnx, ('data/arenas/source.txt',)),
-        # (gen.loadnx, ('data/facebook/source.txt',)),
+        # (gen.loadnx, ('data/arenas/source.txt',)),
+        (gen.loadnx, ('data/facebook/source.txt',)),
         # (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
     ]
 
@@ -125,7 +125,7 @@ def tuning():
 @ex.named_config
 def real():
 
-    run = [1, 2, 3, 4, 5]
+    run = [1, 2, 3, 4, 5, 6]
 
     iters = 5
 
@@ -137,7 +137,9 @@ def real():
 
     graphs = [
         (gen.loadnx, ('data/arenas/source.txt',)),
+        # with real load=[2-,2-] / iters10 / 0-6
         # (gen.loadnx, ('data/facebook/source.txt',)),
+        # with real load=[3-,3-] / iters5 / 0 + 1-6
         # (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
     ]
 

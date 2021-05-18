@@ -10,20 +10,22 @@ except:
 
 def colmax(matrix):
     ma = np.arange(matrix.shape[0])
-    mb = matrix.argmax(1).A1
+    # mb = matrix.argmax(1).A1
+    mb = matrix.argmax(1).flatten()
     return ma, mb
 
 
 def colmin(matrix):
     ma = np.arange(matrix.shape[0])
-    mb = matrix.argmin(1).A1
+    # mb = matrix.argmin(1).A1
+    mb = matrix.argmin(1).flatten()
     return ma, mb
 
 
 def superfast(l2, asc=True):
     # print(f"superfast: init")
-    l2 = l2.A
-    n = np.shape(l2)[0]
+    # l2 = l2.A
+    n = l2.shape[0]
     ma = np.zeros(n, int)
     mb = np.zeros(n, int)
     rows = set()
@@ -31,7 +33,9 @@ def superfast(l2, asc=True):
     vals = np.argsort(l2, axis=None)
     vals = vals if asc else vals[::-1]
     i = 0
-    for x, y in zip(*np.unravel_index(vals, l2.shape)):
+    # for x, y in zip(*np.unravel_index(vals, l2.shape)):
+    for val in vals:
+        x, y = np.unravel_index(val, l2.shape)
         if x in rows or y in cols:
             continue
         # print(f"superfast: {i}/{n}")
@@ -75,19 +79,21 @@ def getmatching(sim, cost, mt, _log):
         elif mt == 2:
             return superfast(sim, asc=False)
         elif mt == 3:
-            _sim = -sim.A
+            # _sim = -sim.A
+            _sim = -sim
             try:
                 return jv(_sim)
             except Exception:
                 return scipy.optimize.linear_sum_assignment(_sim)
         elif mt == 30:
-            _sim = -np.log(sim.A)
+            # _sim = -np.log(sim.A)
+            _sim = -np.log(sim)
             try:
                 return jv(_sim)
             except Exception:
                 return scipy.optimize.linear_sum_assignment(_sim)
         elif mt == 98:
-            return scipy.sparse.csgraph.min_weight_full_bipartite_matching(sim, maximize=True)
+            return scipy.sparse.csgraph.min_weight_full_bipartite_matching(-sim)
         elif mt == 99:
             return bmw.getmatchings(sim)
 
@@ -99,13 +105,15 @@ def getmatching(sim, cost, mt, _log):
         elif mt == -2:
             return superfast(cost)
         elif mt == -3:
-            _cost = cost.A
+            # _cost = cost.A
+            _cost = cost
             try:
                 return jv(_cost)
             except Exception:
                 return scipy.optimize.linear_sum_assignment(_cost)
         elif mt == -30:
-            _cost = np.log(cost.A)
+            # _cost = np.log(cost.A)
+            _cost = np.log(cost)
             try:
                 return jv(_cost)
             except Exception:
@@ -113,6 +121,28 @@ def getmatching(sim, cost, mt, _log):
         elif mt == -98:
             return scipy.sparse.csgraph.min_weight_full_bipartite_matching(cost)
         elif mt == -99:
-            return bmw.getmatchings(np.exp(-cost.A))
+            return bmw.getmatchings(-cost)
 
     raise Exception("wrong matching config")
+
+
+# @profile
+# def init():
+#     # size = 35000
+#     size = 1000
+#     # sim = np.arange((size*size)).reshape(size, -1)
+#     sim = np.ones((size*size)).reshape(size, -1)
+#     # sim = scipy.sparse.csr_matrix(sim)
+#     return sim
+
+
+# if __name__ == "__main__":
+
+#     sim = init()
+#     print(sim.shape)
+#     print(sim.size)
+#     # while(1):
+#     #     pass
+#     # superfast(sim)
+#     # superfast(sim, asc=False)
+#     colmax(sim)

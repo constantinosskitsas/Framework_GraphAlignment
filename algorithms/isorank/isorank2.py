@@ -84,8 +84,7 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weigh
     L = data['L']
 
     if lalpha is not None:
-        L = create_L(data['Src'], data['Tar'],
-                     lalpha=lalpha, weighted=weighted).A
+        L = create_L(Src, Tar, lalpha=lalpha, weighted=weighted).A
 
     n1 = Tar.shape[0]
     n2 = Src.shape[0]
@@ -101,6 +100,7 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weigh
 
     W1 = d1*Tar
     W2 = d2*Src
+
     W2aT = alpha*W2.T
     K = (1-alpha) * L
 

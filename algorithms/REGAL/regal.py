@@ -51,8 +51,10 @@ from .alignments import get_embeddings, get_embedding_similarities
 def G_to_Adj(G1, G2):
     # adj1 = sps.kron([[1, 0], [0, 0]], G1)
     # adj2 = sps.kron([[0, 0], [0, 1]], G2)
-    adj1 = np.kron([[1, 0], [0, 0]], G1)
-    adj2 = np.kron([[0, 0], [0, 1]], G2)
+    adj1 = np.array([[1, 0], [0, 0]], dtype=np.int8)
+    adj1 = np.kron(adj1, G1)
+    adj2 = np.array([[0, 0], [0, 1]], dtype=np.int8)
+    adj2 = np.kron(adj2, G2)
     adj = adj1 + adj2
     # adj.data = adj.data.clip(0, 1)
     adj = adj.clip(0, 1)

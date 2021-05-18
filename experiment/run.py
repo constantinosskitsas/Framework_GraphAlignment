@@ -16,11 +16,17 @@ def format_output(res):
         sim = res
         cost = None
 
-    if sim is not None:
-        sim = sps.csr_matrix(sim)
+    # if sim is not None:
+    #     sim = sps.csr_matrix(sim)
 
-    if cost is not None:
-        cost = sps.csr_matrix(cost)
+    # if cost is not None:
+    #     cost = sps.csr_matrix(cost)
+
+    if sps.issparse(sim):
+        sim = sim.A
+
+    if sps.issparse(cost):
+        cost = cost.A
 
     return sim, cost
 

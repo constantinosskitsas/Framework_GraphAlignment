@@ -32,14 +32,14 @@ def superfast(l2, asc=True):
     cols = set()
     vals = np.argsort(l2, axis=None)
     vals = vals if asc else vals[::-1]
-    i = 0
+    # i = 0
     # for x, y in zip(*np.unravel_index(vals, l2.shape)):
     for val in vals:
         x, y = np.unravel_index(val, l2.shape)
         if x in rows or y in cols:
             continue
         # print(f"superfast: {i}/{n}")
-        i += 1
+        # i += 1
         ma[x] = x
         mb[x] = y
 

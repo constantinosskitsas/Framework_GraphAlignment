@@ -17,13 +17,14 @@ import scipy.sparse as sps
 
 
 def normout_rowstochastic(P):
-    n = np.shape(P)[0]
+    n = P.shape[0]
     # colsums = sum(P, 1)-1
     colsums = np.sum(P, axis=0)
     # pi, pj, pv = findnz_alt(P)
     pi, pj, pv = sps.find(P)
     pv = np.divide(pv, colsums[pi])
-    Q = sps.csc_matrix((pv, (pi, pj)), shape=(n, n)).toarray()
+    Q = sps.csc_matrix((pv, (pi, pj)), shape=(n, n),
+                       dtype=np.float32).toarray()
     return Q
 
 
@@ -50,22 +51,22 @@ def normout_rowstochastic(P):
 
 
 def nsd(A, B, alpha, iters, Zvecs, Wvecs):
-    A = normout_rowstochastic(A)
-    B = normout_rowstochastic(B)
+    A = normout_rowstochastic(A).T
+    B = normout_rowstochastic(B).T
     nB = np.shape(B)[0]
     nA = np.shape(A)[0]
     # A and B are now row stochastic, so no need for A'x or B'x anywhere
     # operations needed are only Ax or Bx
-    GlobalSim = np.zeros((nA, nB))
+    GlobalSim = np.zeros((nA, nB), dtype=np.float32)
     for i in range(np.shape(Zvecs)[1]):
         print(f"<{i}>")
         z = Zvecs[:, i]
         w = Wvecs[:, i]
         z = z / sum(z)
         w = w / sum(w)
-        Z = np.zeros((nA, iters + 1))  # A
-        W = np.zeros((nB, iters + 1))  # B
-        Sim = np.zeros((nA, nB))
+        Z = np.zeros((nA, iters + 1), dtype=np.float32)  # A
+        W = np.zeros((nB, iters + 1), dtype=np.float32)  # B
+        Sim = np.zeros((nA, nB), dtype=np.float32)
 
         W[:, 0] = w
         Z[:, 0] = z
@@ -75,30 +76,37 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
         # print(B)
         for k in range(1, iters + 1):
             #W[:, k] = np.dot(B.conj(), W[:, k - 1])
-            W[:, k] = np.dot(B.transpose(), W[:, k-1])
+            Z[:, k] = np.dot(A, Z[:, k-1])
             #W[:, k] = np.dot(B.transpose(), W[:, k - 1])
-            Z[:, k] = np.dot(A.transpose(), Z[:, k - 1])
+            W[:, k] = np.dot(B, W[:, k-1])
         print("z")
+        print(iters)
         # print(W)
         for k in range(iters):
-            test1 = pow(alpha, k)
-            test2 = test1 * Z[:, k]
-            sa = np.shape(test2)[0]
-            test2 = test2.reshape((sa, 1))
-            sa = np.shape(W[:, k].conjugate())[0]
-            asd = W[:, k].conjugate().reshape((1, sa))
-            test3 = np.dot(test2, asd)
-            Sim = Sim + test3
-        Sim = (1 - alpha) * Sim
-        test1 = pow(alpha, iters)
-        test2 = test1 * Z[:, iters]
-        sa = np.shape(test2)[0]
-        test2 = test2.reshape((sa, 1))
-        sa = np.shape(W[:, iters].conjugate())[0]
-        asd = W[:, iters].conjugate().reshape((1, sa))
-        test3 = np.dot(test2, asd)
-        Sim = Sim + test3
-        GlobalSim = GlobalSim + Sim
+            # test1 = pow(alpha, k)
+            # test2 = test1 * Z[:, k]
+            # sa = np.shape(test2)[0]
+            # test2 = test2.reshape((sa, 1))
+            # sa = np.shape(W[:, k].conjugate())[0]
+            # asd = W[:, k].conjugate().reshape((1, sa))
+            # test3 = np.dot(test2, asd)
+            # Sim = Sim + test3
+            Sim += np.kron(Z[:, k] * alpha ** k, W[:, k]).reshape(nA, nB)
+
+        # Sim = (1 - alpha) * Sim
+        # test1 = pow(alpha, iters)
+        # test2 = test1 * Z[:, iters]
+        # sa = np.shape(test2)[0]
+        # test2 = test2.reshape((sa, 1))
+        # sa = np.shape(W[:, iters].conjugate())[0]
+        # asd = W[:, iters].conjugate().reshape((1, sa))
+        # test3 = np.dot(test2, asd)
+        # Sim = Sim + test3
+        # GlobalSim = GlobalSim + Sim
+        Sim *= (1 - alpha)
+        Sim += np.kron(Z[:, iters] * alpha ** iters,
+                       W[:, iters]).reshape(nA, nB)
+        GlobalSim += Sim
     return GlobalSim
 
 

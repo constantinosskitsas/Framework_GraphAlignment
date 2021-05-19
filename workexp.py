@@ -211,6 +211,9 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
         if len(load) > 2:
             time5 = np.load(f"{load_path(load[2])}/_time5.npy")
             res6 = np.load(f"{load_path(load[2])}/_res6.npy")
+            # res5 = np.load(f"{load_path(load[2])}/_res5.npy")
+            # res6 = np.expand_dims(res5, axis=-2)
+            # time5 = None
         else:
             time5, res6 = run_exp(G, path)
 

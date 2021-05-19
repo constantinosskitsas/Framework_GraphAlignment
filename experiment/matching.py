@@ -1,4 +1,4 @@
-from . import ex
+from . import ex, quadtree
 from algorithms import bipartitewrapper as bmw
 import numpy as np
 import scipy
@@ -32,6 +32,7 @@ def superfast(l2, asc=True):
     cols = set()
     vals = np.argsort(l2, axis=None)
     vals = vals if asc else vals[::-1]
+
     # i = 0
     # for x, y in zip(*np.unravel_index(vals, l2.shape)):
     for val in vals:
@@ -77,7 +78,12 @@ def getmatching(sim, cost, mt, _log):
         if mt == 1:
             return colmax(sim)
         elif mt == 2:
-            return superfast(sim, asc=False)
+            n = sim.shape[0]
+            if (n & (n-1) == 0) and n != 0:
+                _log.debug("binary! speeding up..")
+                return quadtree.superfast_binbin(sim)
+            else:
+                return superfast(sim, asc=False)
         elif mt == 3:
             # _sim = -sim.A
             _sim = -sim
@@ -103,7 +109,12 @@ def getmatching(sim, cost, mt, _log):
         if mt == -1:
             return colmin(cost)
         elif mt == -2:
-            return superfast(cost)
+            n = cost.shape[0]
+            if (n & (n-1) == 0) and n != 0:
+                _log.debug("binary! speeding up..")
+                return quadtree.superfast_binbin(-cost)
+            else:
+                return superfast(cost)
         elif mt == -3:
             # _cost = cost.A
             _cost = cost

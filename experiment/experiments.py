@@ -26,20 +26,40 @@ def scaling():
     _algs[5][2][0] = 2
     _algs[6][2][0] = 2
 
+    run = [3, 4, 5]
+
     iters = 1
 
     graph_names = [
         # "100",
         # "1000",
         # "10000",
-        "100000",
+        # "100000",
+
+        '1024',
+        '2048',
+        '4096',
+        '8192',
+        '16384',  # 2 ** 14
+        '32768',
+        # '65536',
+        # '131072',
     ]
 
     graphs = [
         # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
         # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
         # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
-        (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
+
+        (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
+        (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
+        (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
     ]
 
     noises = [

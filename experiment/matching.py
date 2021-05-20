@@ -81,7 +81,7 @@ def getmatching(sim, cost, mt, _log):
             n = sim.shape[0]
             if (n & (n-1) == 0) and n != 0:
                 _log.debug("binary! speeding up..")
-                return quadtree.superfast_binbin(sim)
+                return quadtree.superfast_binbin_torch(sim)
             else:
                 return superfast(sim, asc=False)
         elif mt == 3:
@@ -112,7 +112,7 @@ def getmatching(sim, cost, mt, _log):
             n = cost.shape[0]
             if (n & (n-1) == 0) and n != 0:
                 _log.debug("binary! speeding up..")
-                return quadtree.superfast_binbin(-cost)
+                return quadtree.superfast_binbin_torch(-cost)
             else:
                 return superfast(cost)
         elif mt == -3:

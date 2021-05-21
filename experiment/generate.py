@@ -67,22 +67,23 @@ def noise_types(noise_level, noise_type=1):
 
 
 def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
+    print(G)
+    if isinstance(G, list):
 
-    if isinstance(G, dict):
-        dataset = G['dataset']
-        edges = G['edges']
-        noise_level = G['noise_level']
+        _src, _tar, _gt = G
 
-        source = f"data/{dataset}/source.txt"
-        target = f"data/{dataset}/noise_level_{noise_level}/edges_{edges}.txt"
-        grand_truth = f"data/{dataset}/noise_level_{noise_level}/gt_{edges}.txt"
+        Src_e = load_as_nx(_src)
+        Tar_e = load_as_nx(_tar)
 
-        Src_e = load_as_nx(source)
-        Tar_e = load_as_nx(target)
-        gt_e = np.loadtxt(grand_truth, int).T
-
-        # Src = e_to_G(Src_e)
-        # Tar = e_to_G(Tar_e)
+        if isinstance(_gt, str):
+            gt_e = np.loadtxt(_gt, int).T
+        elif _gt is None:
+            gt1 = np.arange(
+                max(np.amax(Src_e), np.amax(Tar_e))+1).reshape(-1, 1)
+            gt_e = np.repeat(gt1, 2, axis=1).T
+            print(gt_e)
+        else:
+            gt_e = np.array(_gt, int)
 
         Gt = (
             gt_e[:, gt_e[1].argsort()][0],
@@ -90,6 +91,28 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
         )
 
         return Src_e, Tar_e, Gt
+
+        # dataset = G['dataset']
+        # edges = G['edges']
+        # noise_level = G['noise_level']
+
+        # source = f"data/{dataset}/source.txt"
+        # target = f"data/{dataset}/noise_level_{noise_level}/edges_{edges}.txt"
+        # grand_truth = f"data/{dataset}/noise_level_{noise_level}/gt_{edges}.txt"
+
+        # Src_e = load_as_nx(source)
+        # Tar_e = load_as_nx(target)
+        # gt_e = np.loadtxt(grand_truth, int).T
+
+        # # Src = e_to_G(Src_e)
+        # # Tar = e_to_G(Tar_e)
+
+        # Gt = (
+        #     gt_e[:, gt_e[1].argsort()][0],
+        #     gt_e[:, gt_e[0].argsort()][1]
+        # )
+
+        # return Src_e, Tar_e, Gt
     elif isinstance(G, str):
         Src_e = load_as_nx(G)
     elif isinstance(G, nx.Graph):

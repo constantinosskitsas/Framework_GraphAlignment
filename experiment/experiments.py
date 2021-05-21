@@ -142,7 +142,64 @@ def tuning():
     xlabel = list(tmp[1][0].keys())[0]
 
 
+def namess(tmp):
+    return [name[-15:] for name in tmp[1]]
+
+
+def graphss(tmp):
+    return [
+        (lambda x:x, [[
+            tmp[0],
+            target,
+            None
+        ]]) for target in tmp[1]
+    ]
+
+
 @ex.named_config
+def real_noise():
+
+    tmp = [
+        "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
+        [
+            f"data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_{i}.txt" for i in [
+                99, 95, 90, 80]
+        ]
+    ]
+    xlabel = "high-school-2013"
+
+    # tmp = [
+    #     "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
+    #     [
+    #         f"data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_{i}.txt" for i in [
+    #             99, 95, 90, 80]
+    #     ]
+    # ]
+    # xlabel = "mammalia-voles"
+
+    # tmp = [
+    #     "data/real world/MultiMagna/yeast0_Y2H1.txt",
+    #     [
+    #         f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
+    #             5, 10, 15, 20, 25]
+    #     ]
+    # ]
+    # xlabel = "yeast_Y2H1"
+
+    graph_names = namess(tmp)
+
+    graphs = graphss(tmp)
+
+    iters = 1
+
+    noises = [
+        1.0,
+    ]
+
+    s_trans = (2, 1, 0, 3)
+
+
+@ ex.named_config
 def real():
 
     run = [1, 2, 3, 4, 5, 6]
@@ -173,7 +230,7 @@ def real():
     ]
 
 
-@ex.named_config
+@ ex.named_config
 def arenasish():
 
     # use with 'mall'
@@ -212,7 +269,7 @@ def arenasish():
     ]
 
 
-@ex.named_config
+@ ex.named_config
 def tuned():
     _CONE_args["dim"] = 512
     _LREA_args["iters"] = 40
@@ -220,7 +277,7 @@ def tuned():
     _ISO_args["lalpha"] = 100000  # full dim
 
 
-@ex.named_config
+@ ex.named_config
 def test():
 
     graph_names = [

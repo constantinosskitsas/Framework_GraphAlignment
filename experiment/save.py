@@ -54,7 +54,10 @@ def plotS_G(S_G, _log):
                             for x in {frozenset(g.nodes[v]["community"]) for v in g}])
             except Exception:
                 pass
-            plotG(g, 'Src')
+            try:
+                plotG(g, 'Src')
+            except Exception:
+                pass
 
 
 @ ex.capture
@@ -267,8 +270,12 @@ def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, 
     res, dims = trans(res6, dims, T)
     time, _ = trans(time6, list(range(len(T))), T)
     # (g,alg,mt,acc,n,i)
-    time_alg = time.take(indices=0, axis=2)
+    time_alg = time.take(indices=[0], axis=2)
     time_m = time.take(indices=range(1, time.shape[2]), axis=2)
+
+    # print(time_alg.shape)
+    # print(time_m.shape)
+    # print(res.shape)
 
     # print(len(time))
     if acsq:

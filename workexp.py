@@ -29,7 +29,7 @@ def global_config():
         4,      # eigenalign
         5,      # NSD
 
-        # 6,      # isorank
+        6,      # isorank
         # 7,      # netalign
         # 8,      # klaus
     ]
@@ -68,20 +68,27 @@ def global_config():
 def playground():
 
     graph_names = [
-        "gnp",
-        "barabasi",
-        "powerlaw",
+        # "gnp",
+        # "barabasi",
+        # "powerlaw",
         "arenas",
         # "LFR_span",
         # "facebook",
+        # "yeast5"
     ]
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
-        (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        (nx.gnp_random_graph, (50, 0.5)),
-        (nx.barabasi_albert_graph, (50, 3)),
-        (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
+        # (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        # (nx.gnp_random_graph, (50, 0.5)),
+        # (nx.barabasi_albert_graph, (50, 3)),
+        # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
+
+        # (lambda x:x, [[
+        #     "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
+        #     "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_99.txt",
+        #     None
+        # ]])
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -111,7 +118,7 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        # (loadnx, ('data/arenas/source.txt',)),
+        (loadnx, ('data/arenas/source.txt',)),
         # (loadnx, ('data/facebook/source.txt',)),
         # (loadnx, ('data/CA-AstroPh/source.txt',)),
 

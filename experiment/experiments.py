@@ -190,7 +190,7 @@ def real_noise():
 
     graphs = graphss(tmp)
 
-    iters = 1
+    iters = 2
 
     noises = [
         1.0,

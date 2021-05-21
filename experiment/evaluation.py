@@ -1,6 +1,7 @@
 from . import ex
 import numpy as np
 import scipy.sparse as sps
+import os
 
 
 def S3(A, B, ma, mb):
@@ -121,7 +122,7 @@ def eval_align(ma, mb, gmb):
 
 
 @ex.capture
-def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, output_path="", mnc=True, save=False, eval_type=0):
+def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, save=False, eval_type=0):
 
     gmb, gmb1 = Gt
     gmb = np.array(gmb, int)
@@ -144,21 +145,6 @@ def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, output_path="", mnc=True,
     with np.printoptions(suppress=True, precision=4):
         _log.debug("\n%s", res[:, :2].astype(float))
 
-    # ___accs = res[:, 0]
-    # best = np.argmax(___accs)
-
-    # if max(___accs) < 0:
-    #     if eval_type:
-    #         prefix = "#"
-    #     else:
-    #         _log.warning("misleading evaluation")
-    #         prefix = "!"
-    # elif eval_type and eval_type != best:
-    #     _log.warning("eval_type mismatch")
-    #     prefix = "%"
-    # else:
-        prefix = ""
-
     acc, accb, alignment = res[eval_type]
 
     _accs = []
@@ -175,7 +161,15 @@ def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, output_path="", mnc=True,
         _accs.append(score_MNC(Src, Tar, ma, mb))
 
     if save:
-        with open(f'{output_path}/{prefix}{alg}_{best}_.txt', 'wb') as f:
+        output_path = f"runs/{_run._id}/alignments"
+
+        os.makedirs(output_path, exist_ok=True)
+
+        i = 0
+        while os.path.exists(f"{output_path}/{alg}_{i}.txt"):
+            i += 1
+
+        with open(f"{output_path}/{alg}_{i}.txt", 'w') as f:
             np.savetxt(f, res[:, :2], fmt='%2.3f')
             np.savetxt(f, [_accs], fmt='%2.3f')
             np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')

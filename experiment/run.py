@@ -77,7 +77,7 @@ def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
 
     res2 = []
     for mt in mts:
-        alg = f"{algname}.{mt}"
+        alg = f"{algname}_{mt}"
         try:
 
             start = time.time()

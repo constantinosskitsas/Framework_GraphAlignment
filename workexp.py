@@ -4,7 +4,6 @@ import algorithms
 from experiment import ex, _algs, _acc_names
 from experiment.special_settings import *
 from experiment.experiments import *
-from experiment.commands import *
 from experiment.generate import init1, init2, loadnx
 from experiment.run import run_exp
 from experiment.save import plotS_G, plot_G, save
@@ -29,7 +28,7 @@ def global_config():
         4,      # eigenalign
         5,      # NSD
 
-        6,      # isorank
+        # 6,      # isorank
         # 7,      # netalign
         # 8,      # klaus
     ]
@@ -53,14 +52,6 @@ def global_config():
 
     acc_names = [_acc_names[i] for i in accs]
 
-    # graphs = [
-    #     (lambda x: x, ('data/arenas/source.txt',)),
-    # ]
-
-    # noises = [
-    #     0.05
-    # ]
-
     tmp = []
 
 
@@ -68,19 +59,19 @@ def global_config():
 def playground():
 
     graph_names = [
-        # "gnp",
-        # "barabasi",
-        # "powerlaw",
-        "arenas",
+        "gnp",
+        "barabasi",
+        "powerlaw",
+        # "arenas",
         # "LFR_span",
         # "facebook",
         # "yeast5"
     ]
 
     graphs = [
-        # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
-        # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        # (nx.gnp_random_graph, (50, 0.5)),
+        (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
+        (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        (nx.gnp_random_graph, (50, 0.5)),
         # (nx.barabasi_albert_graph, (50, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
@@ -118,7 +109,7 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        (loadnx, ('data/arenas/source.txt',)),
+        # (loadnx, ('data/arenas/source.txt',)),
         # (loadnx, ('data/facebook/source.txt',)),
         # (loadnx, ('data/CA-AstroPh/source.txt',)),
 
@@ -170,7 +161,7 @@ def playground():
 
 
 @ex.automain
-def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
+def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
 
     path = f"runs/{_run._id}"
 
@@ -218,9 +209,6 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
         if len(load) > 2:
             time5 = np.load(f"{load_path(load[2])}/_time5.npy")
             res6 = np.load(f"{load_path(load[2])}/_res6.npy")
-            # res5 = np.load(f"{load_path(load[2])}/_res5.npy")
-            # res6 = np.expand_dims(res5, axis=-2)
-            # time5 = None
         else:
             time5, res6 = run_exp(G, path)
 
@@ -229,17 +217,6 @@ def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
 
         os.makedirs(f"{path}/res")
         save(time5, res6, f"{path}/res")
-
-        # savexls(res5, f"{path}/res")
-        # plotres(res5, f"{path}/res")
-
-        # run_exp(G, path)
-        # run_exp(G)
-
-        # time.sleep(15)  # 10 is default heartbeat time
-
-        # e_accs()
-        # e_time()
 
     except Exception:
         _log.exception("")

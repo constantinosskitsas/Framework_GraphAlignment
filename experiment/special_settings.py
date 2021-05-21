@@ -1,5 +1,5 @@
 from . import ex
-
+import logging
 
 # @ex.named_config
 # def gwcost():
@@ -17,7 +17,8 @@ def debug():
 
     verbose = True
     save = True
-    plot = [True, True]
+    # plot = [True, True]
+    ex.logger.setLevel(logging.DEBUG)
 
 
 @ex.named_config
@@ -54,10 +55,7 @@ def mall():
 
     mall = True
 
-    # save_type = 2
-
     mt_names = [
-        # "old_douche"
         "SNN",
         "SSG",
         "SJV",

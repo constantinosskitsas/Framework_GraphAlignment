@@ -67,7 +67,7 @@ def noise_types(noise_level, noise_type=1):
 
 
 def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
-    print(G)
+
     if isinstance(G, list):
 
         _src, _tar, _gt = G

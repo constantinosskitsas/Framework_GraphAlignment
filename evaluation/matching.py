@@ -135,25 +135,3 @@ def getmatching(sim, cost, mt, _log):
             return bmw.getmatchings(-cost)
 
     raise Exception("wrong matching config")
-
-
-# @profile
-# def init():
-#     # size = 35000
-#     size = 1000
-#     # sim = np.arange((size*size)).reshape(size, -1)
-#     sim = np.ones((size*size)).reshape(size, -1)
-#     # sim = scipy.sparse.csr_matrix(sim)
-#     return sim
-
-
-# if __name__ == "__main__":
-
-#     sim = init()
-#     print(sim.shape)
-#     print(sim.size)
-#     # while(1):
-#     #     pass
-#     # superfast(sim)
-#     # superfast(sim, asc=False)
-#     colmax(sim)

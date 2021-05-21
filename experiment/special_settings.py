@@ -1,16 +1,6 @@
 from . import ex
 import logging
 
-# @ex.named_config
-# def gwcost():
-#     GW_args = {
-#         'opt_dict': {
-#             'epochs': 10
-#         }
-#     }
-
-#     # GW_mtype = -4
-
 
 @ex.named_config
 def debug():

@@ -50,6 +50,7 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
 
         # print("dots")
         for k in range(1, iters + 1):
+            # print(k)
             # Z[:, k] = np.dot(A, Z[:, k-1])
             # W[:, k] = np.dot(B, W[:, k-1])
             # Z[k] = np.dot(A, Z[k-1])
@@ -61,6 +62,7 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
         # print("krons")
 
         for k in range(iters):
+            # print(k)
             # Sim += np.kron(Z[:, k] * alpha ** k, W[:, k]).reshape(nA, nB)
             # Sim += np.kron(Z[k] * alpha ** k, W[k])
             Sim += np.dot(
@@ -99,7 +101,7 @@ def main(data, alpha, iters):
     # Tar = data['Tar'].A
     Src = data['Src']
     Tar = data['Tar']
-    L = create_L(Src, Tar, 99999).A
+    # L = create_L(Src, Tar, 99999).A
 
     X = nsd(
         Src, Tar, alpha, iters,

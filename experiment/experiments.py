@@ -1,4 +1,5 @@
-from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args, generate as gen
+from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
+from generation import generate as gen
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 from networkx import nx
 
@@ -36,11 +37,11 @@ def scaling():
         # "10000",
         # "100000",
 
-        '1024',
-        '2048',
-        '4096',
-        '8192',
-        '16384',  # 2 ** 14
+        # '1024',
+        # '2048',
+        # '4096',
+        # '8192',
+        # '16384',  # 2 ** 14
         '32768',
         # '65536',
         # '131072',
@@ -52,17 +53,18 @@ def scaling():
         # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
         # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
 
-        (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
-        (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
-        (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
-        (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
-        (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
+        # (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
+        # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
         (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
         # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
         # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
     ]
 
     noises = [
+        # 0.00,
         0.05,
     ]
 
@@ -275,6 +277,7 @@ def tuned():
     _LREA_args["iters"] = 40
     _ISO_args["alpha"] = 0.9
     _ISO_args["lalpha"] = 100000  # full dim
+    # _ISO_args["lalpha"] = 25
 
 
 @ ex.named_config

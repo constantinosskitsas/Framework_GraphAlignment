@@ -145,8 +145,27 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
     return Src_e, Tar_e,  Gt
 
 
+# def init1(graphs, iters, _run, path=None):
 @ ex.capture
 def init1(graphs, iters):
+
+    # if path is None:
+    #     S_G = np.memmap(f"runs/{_run._id}/_S_G.dat", dtype=object,
+    #                     mode='w+', shape=(len(graphs), iters))
+
+    #     for i, (alg, args) in enumerate(graphs):
+    #         for j in range(iters):
+    #             print(i, j)
+    #             S_G[i, j] = alg(*args)
+    #             S_G.flush()
+
+    #     randcheck = np.random.rand(1)[0]
+
+    # else:
+    #     S_G = np.memmap(f"{path}/_S_G.dat", dtype=object,
+    #                     mode='r', shape=(len(graphs), iters))
+
+    #     randcheck = path
 
     S_G = [
         [alg(*args) for _ in range(iters)] for alg, args in graphs
@@ -155,8 +174,27 @@ def init1(graphs, iters):
     return S_G, np.random.rand(1)[0]
 
 
+# def init2(S_G, noises, _run, path=None):
 @ ex.capture
 def init2(S_G, noises):
+
+    # if path is None:
+    #     G = np.memmap(f"runs/{_run._id}/_G.dat", dtype=object,
+    #                   mode='w+', shape=(S_G.shape[0], len(noises), S_G.shape[1]))
+
+    #     for i, gi in enumerate(S_G):
+    #         for j, noise in enumerate(noises):
+    #             for k, g in enumerate(gi):
+    #                 G[i, j, k] = generate_graphs(g, **noise_types(noise))
+    #                 G.flush()
+
+    #     randcheck = np.random.rand(1)[0]
+
+    # else:
+    #     G = np.memmap(f"{path}/_S_G.dat", dtype=object,
+    #                   mode='r', shape=(S_G.shape[0], len(noises), S_G.shape[1]))
+
+    #     randcheck = path
 
     G = [
         [

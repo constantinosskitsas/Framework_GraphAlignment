@@ -152,11 +152,11 @@ def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, save=False, eval_type=0):
     if 0 in accs:
         _accs.append(acc)
     if 1 in accs:
-        _accs.append(S3(Src.A, Tar.A, ma, mb))
+        _accs.append(S3(Src, Tar, ma, mb))
     if 2 in accs:
-        _accs.append(ICorS3GT(Src.A, Tar.A, ma, mb, gmb, True))
+        _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, True))
     if 3 in accs:
-        _accs.append(ICorS3GT(Src.A, Tar.A, ma, mb, gmb, False))
+        _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, False))
     if 4 in accs:
         _accs.append(score_MNC(Src, Tar, ma, mb))
 

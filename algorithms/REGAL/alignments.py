@@ -13,10 +13,11 @@ def get_embedding_similarities(embed, embed2=None, sim_measure="euclidean", num_
         embed2 = embed
 
     # if num_top is not None:  # KD tree with only top similarities computed
+    # similarity_matrix = None
     similarity_matrix = kd_align(
         embed, embed2, distance_metric=sim_measure, num_top=num_top)
     # return kd_sim
-
+    print("emb")
   # All pairwise distance computation
     # if sim_measure == "cosine":
     #     similarity_matrix = sklearn.metrics.pairwise.cosine_similarity(

@@ -4,9 +4,10 @@ import algorithms
 from experiment import ex, _algs, _acc_names
 from experiment.special_settings import *
 from experiment.experiments import *
-from experiment.generate import init1, init2, loadnx
 from experiment.run import run_exp
 from experiment.save import plotS_G, plot_G, save
+
+from generation.generate import init1, init2, loadnx
 
 import numpy as np
 import scipy.sparse as sps
@@ -185,6 +186,7 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
         if len(load) > 0:
             S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
             randcheck1 = runid(load[0])
+            # S_G, randcheck1 = init1(path=load_path(load[0]))
         else:
             S_G, randcheck1 = init1()
 
@@ -195,6 +197,7 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
         if len(load) > 1:
             G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
             randcheck2 = runid(load[1])
+            # G, randcheck2 = init2(S_G, path=load_path(load[1]))
         else:
             G, randcheck2 = init2(S_G)
 

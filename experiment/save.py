@@ -140,15 +140,8 @@ def save_rec(res, dims, filename, plot_type=1):
 @ ex.capture
 def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, mt_names=["mt"], mtsq=True, acsq=True, s_trans=None):
 
-    # T = [0, 4, 1, 2, 3]
-    # (g,n,i,alg,mt,acc)
-    # (g,n,i,alg,acc)
-    # (g,acc,n,i,alg)
-    # T = [0, 4, 3, 1, 2]
-    # (g,acc,alg,n,i)
-
     T = [0, 3, 4, 5, 1, 2]
-    # (g,alg,mt,acc,n,i)
+
     dims = [
         graph_names,
         noises,
@@ -160,75 +153,31 @@ def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, 
 
     time6 = np.expand_dims(time5, axis=-1)
 
+    # (g,n,i,alg,mt,acc)
     res, dims = trans(res6, dims, T)
     time, _ = trans(time6, list(range(len(T))), T)
     # (g,alg,mt,acc,n,i)
+
     time_alg = time.take(indices=[0], axis=2)
+    ta_dims = dims.copy()
     time_m = time.take(indices=range(1, time.shape[2]), axis=2)
+    tm_dims = dims.copy()
 
-    # print(time_alg.shape)
-    # print(time_m.shape)
-    # print(res.shape)
-
-    # print(len(time))
     if acsq:
         res, dims = squeeze(res, dims, 3)
-        time_alg, _ = squeeze(time_alg, [], 3)
-        time_m, _ = squeeze(time_m, [], 3)
-    # print(len(time))
+        time_alg, ta_dims = squeeze(time_alg, ta_dims, 3)
+        time_m, tm_dims = squeeze(time_m, tm_dims, 3)
+
     if mtsq:
         res, dims = squeeze(res, dims, 2)
-        time_alg, _ = squeeze(time_alg, [], 2)
-        time_m, _ = squeeze(time_m, [], 2)
-    # print(len(time))
+        time_alg, ta_dims = squeeze(time_alg, ta_dims, 2)
+        time_m, tm_dims = squeeze(time_m, tm_dims, 2)
+
     if s_trans is not None:
         res, dims = trans(res, dims, s_trans)  # (g,alg,n,i)
-        mock = list(range(len(s_trans)))
-        time_alg, _ = trans(time_alg, mock, s_trans)  # (g,alg,n,i)
-        time_m, _ = trans(time_m, mock, s_trans)  # (g,alg,n,i)
-    # print(len(time))
+        time_alg, ta_dims = trans(time_alg, ta_dims, s_trans)  # (g,alg,n,i)
+        time_m, tm_dims = trans(time_m, tm_dims, s_trans)  # (g,alg,n,i)
+
     save_rec(res, dims, f"{output_path}/acc")
-    # print(len(dims))
-    # print(time.shape)
-    save_rec(time_alg, dims, f"{output_path}/time_alg", plot_type=2)
-    save_rec(time_m, dims, f"{output_path}/time_matching", plot_type=2)
-
-    # if save_type == 0:
-    #     res5 = np.squeeze(res6, axis=4)
-
-    # if save_type == 1:
-    #     sq = 4
-    #     res5 = np.squeeze(res6, axis=sq)
-    #     res5 = res5.transpose(*T)
-
-    #     del dims[sq]
-    #     dims = [dims[i] for i in T]
-    # elif save_type == 2:
-    #     T = [T[i] for i in [0, 2, 1, 3, 4]]
-    #     sq = 5
-    #     res5 = np.squeeze(res6, axis=sq)
-    #     res5 = res5.transpose(*T)
-
-    #     del dims[sq]
-    #     dims = [dims[i] for i in T]
-    # elif save_type == 3:
-    #     T = [T[i] for i in [3, 1, 2, 0, 4]]
-    #     sq = 5
-    #     res5 = np.squeeze(res6, axis=sq)
-    #     res5 = res5.transpose(*T)
-
-    #     del dims[sq]
-    #     dims = [dims[i] for i in T]
-
-    # saveexls(res, filename="accs",
-    #          dim1=dims[-4],
-    #          dim2=dims[-3],
-    #          dim3=dims[-2],
-    #          dim4=dims[-1],
-    #          )
-
-    # plotrees(np.mean(res, axis=-1), filename="accs",
-    #          dim1=dims[-4],
-    #          dim2=dims[-3],
-    #          dim3=dims[-2],
-    #          )
+    save_rec(time_alg, ta_dims, f"{output_path}/time_alg", plot_type=2)
+    save_rec(time_m, tm_dims, f"{output_path}/time_matching", plot_type=2)

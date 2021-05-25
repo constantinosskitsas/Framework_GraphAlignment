@@ -1,4 +1,5 @@
-from . import ex, similarities_preprocess
+from . import ex
+from generation import similarities_preprocess
 from evaluation import matching, evaluation
 import numpy as np
 import networkx as nx

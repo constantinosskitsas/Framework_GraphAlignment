@@ -172,54 +172,55 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
     def load_path(_id):
         return f"runs/{runid(_id)}"
 
+    # try:
+    if not verbose:
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+        algorithms.GWL.dev.util.logger.disabled = True
+
     try:
-        if not verbose:
-            sys.stdout = open(os.devnull, 'w')
-            sys.stderr = open(os.devnull, 'w')
-            algorithms.GWL.dev.util.logger.disabled = True
-
-        try:
-            os.nice(nice)
-        except Exception:
-            pass
-
-        if len(load) > 0:
-            S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
-            randcheck1 = runid(load[0])
-            # S_G, randcheck1 = init1(path=load_path(load[0]))
-        else:
-            S_G, randcheck1 = init1()
-
-        pickle.dump(S_G, open(f"{path}/_S_G.pickle", "wb"))
-        if len(plot) > 0 and plot[0]:
-            plotS_G(S_G)
-
-        if len(load) > 1:
-            G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
-            randcheck2 = runid(load[1])
-            # G, randcheck2 = init2(S_G, path=load_path(load[1]))
-        else:
-            G, randcheck2 = init2(S_G)
-
-        pickle.dump(G, open(f"{path}/_G.pickle", "wb"))
-        if len(plot) > 1 and plot[1]:
-            plot_G(G)
-
-        randcheck = (randcheck1, randcheck2)
-        _log.info("randcheck: %s", randcheck)
-        open(f"{path}/_randcheck.txt", "w").write(str(randcheck))
-
-        if len(load) > 2:
-            time5 = np.load(f"{load_path(load[2])}/_time5.npy")
-            res6 = np.load(f"{load_path(load[2])}/_res6.npy")
-        else:
-            time5, res6 = run_exp(G, path)
-
-        np.save(f"{path}/_time5", time5)
-        np.save(f"{path}/_res6", res6)
-
-        os.makedirs(f"{path}/res")
-        save(time5, res6, f"{path}/res")
-
+        os.nice(nice)
     except Exception:
-        _log.exception("")
+        pass
+
+    if len(load) > 0:
+        S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
+        randcheck1 = runid(load[0])
+        # S_G, randcheck1 = init1(path=load_path(load[0]))
+    else:
+        S_G, randcheck1 = init1()
+
+    pickle.dump(S_G, open(f"{path}/_S_G.pickle", "wb"))
+    if len(plot) > 0 and plot[0]:
+        plotS_G(S_G)
+
+    if len(load) > 1:
+        G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
+        randcheck2 = runid(load[1])
+        # G, randcheck2 = init2(S_G, path=load_path(load[1]))
+    else:
+        G, randcheck2 = init2(S_G)
+
+    pickle.dump(G, open(f"{path}/_G.pickle", "wb"))
+    if len(plot) > 1 and plot[1]:
+        plot_G(G)
+
+    randcheck = (randcheck1, randcheck2)
+    _log.info("randcheck: %s", randcheck)
+    open(f"{path}/_randcheck.txt", "w").write(str(randcheck))
+
+    if len(load) > 2:
+        time5 = np.load(f"{load_path(load[2])}/_time5.npy")
+        res6 = np.load(f"{load_path(load[2])}/_res6.npy")
+    else:
+        time5, res6 = run_exp(G, path)
+
+    np.save(f"{path}/_time5", time5)
+    np.save(f"{path}/_res6", res6)
+
+    os.makedirs(f"{path}/res")
+    save(time5, res6, f"{path}/res")
+
+    # except Exception:
+    #     _log.exception("")
+    #     raise

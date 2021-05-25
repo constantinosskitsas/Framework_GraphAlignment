@@ -248,9 +248,12 @@ def run_exp(G, output_path, _log):
         np.save(f"{output_path}/_time2", np.array(time2))
         np.save(f"{output_path}/_time3", np.array(time3))
         np.save(f"{output_path}/_time4", np.array(time4))
+        np.save(f"{output_path}/_time5", np.array(time5))
         np.save(f"{output_path}/_res3", np.array(res3))
         np.save(f"{output_path}/_res4", np.array(res4))
         np.save(f"{output_path}/_res5", np.array(res5))
-        _log.exception("")
+        np.save(f"{output_path}/_res6", np.array(res6))
+        # _log.exception("")
+        raise
 
     return np.array(time5), np.array(res6)  # (g,n,i,alg,mt,acc)

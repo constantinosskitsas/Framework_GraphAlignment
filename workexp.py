@@ -40,6 +40,7 @@ def global_config():
         # 2,      # IC
         # 3,      # S3gt
         # 4,      # mnc
+        # 5,      # pmnc
     ]
 
     algs = [_algs[i] for i in run]
@@ -61,18 +62,20 @@ def playground():
 
     graph_names = [
         "gnp",
-        "barabasi",
-        "powerlaw",
+        # "barabasi",
+        # "powerlaw",
         # "arenas",
         # "LFR_span",
         # "facebook",
+        # "astro",
         # "yeast5"
     ]
 
     graphs = [
-        (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
-        (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        (nx.gnp_random_graph, (50, 0.5)),
+        # (nx.newman_watts_strogatz_graph, (20, 3, 0.5)),
+        # (nx.newman_watts_strogatz_graph, (100, 3, 0.0)),
+        # (nx.watts_strogatz_graph, (100, 10, 0.5)),
+        (nx.gnp_random_graph, (35000, 0.0003)),
         # (nx.barabasi_albert_graph, (50, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
@@ -137,13 +140,13 @@ def playground():
     iters = 6
 
     noises = [
-        # 0.00,
+        0.00,
 
-        0.01,
-        # 0.02,
-        0.03,
-        # 0.04,
-        0.05,
+        # 0.01,
+        # # 0.02,
+        # 0.03,
+        # # 0.04,
+        # 0.05,
 
         # 0.06,
         # 0.07,

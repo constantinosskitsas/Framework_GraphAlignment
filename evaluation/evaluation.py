@@ -103,6 +103,30 @@ def score_MNC(adj1, adj2, countera, counterb):
         return -1
 
 
+def panos_MNC(adj1, adj2, ma, mb):
+    # src_exp = adj1[ma][:, ma]
+    src_exp = adj1
+    src_act = adj2[mb][:, mb]
+
+    good = 0
+    total = 0
+
+    for i in range(src_exp.shape[0]):
+        for j in range(src_exp.shape[1]):
+            if src_exp[i, j] == 1 or src_act[i, j] == 1:
+                if src_exp[i, j] == src_act[i, j]:
+                    good += 1
+                total += 1
+    # with np.printoptions(linewidth=1000, suppress=True, threshold=np.inf):
+    #     print(adj2)
+    #     print(adj1)
+    #     print(mb)
+    #     print(adj1[mb][:, mb])
+    #     print(diff)
+    #     print(np.mean(diff == 0))
+    return good/total
+
+
 def eval_align(ma, mb, gmb):
 
     try:
@@ -121,6 +145,7 @@ def eval_align(ma, mb, gmb):
     return gacc, acc, alignment
 
 
+# @profile
 @ex.capture
 def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, save=False, eval_type=0):
 
@@ -159,6 +184,8 @@ def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, save=False, eval_type=0):
         _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, False))
     if 4 in accs:
         _accs.append(score_MNC(Src, Tar, ma, mb))
+    if 5 in accs:
+        _accs.append(panos_MNC(Src, Tar, ma, mb))
 
     if save:
         output_path = f"runs/{_run._id}/alignments"

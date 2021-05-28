@@ -118,13 +118,18 @@ def scaling():
     _algs[5][2][0] = 2
     _algs[6][2][0] = 2
 
+    _CONE_args["dim"] = 256
+    _GRASP_args["n_eig"] = 256
+    _ISO_args["alpha"] = 0.9
+    _ISO_args["lalpha"] = 100000  # full dim
+
     # run = [3, 4, 5]
     run = [1, 2, 3, 4, 5, 6]
 
     iters = 5
 
     tmp = [
-        2**i for i in range(10, 13)
+        2**i for i in range(10, 15)
     ]
 
     # graphs = aaa(tmp, dist_type=0)
@@ -391,10 +396,10 @@ def arenasish():
 
 @ ex.named_config
 def tuned():
-    # _CONE_args["dim"] = 512
-    _CONE_args["dim"] = 256
-    _GRASP_args["n_eig"] = 256
-    # _LREA_args["iters"] = 40
+    _CONE_args["dim"] = 512
+    # _CONE_args["dim"] = 256
+    # _GRASP_args["n_eig"] = 256
+    _LREA_args["iters"] = 40
     _ISO_args["alpha"] = 0.9
     _ISO_args["lalpha"] = 100000  # full dim
     # _ISO_args["lalpha"] = 25

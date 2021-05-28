@@ -375,148 +375,148 @@ def calc_correspondence_matrix_ortho(A, B, k):
     return C_normalized
 
 
-def nearest_neighbor_matching(G1_emb, G2_emb):
-    n = np.shape(G1_emb)[1]
-    nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(G1_emb.T)
-    distances, indices = nbrs.kneighbors(G2_emb.T)
-    indices = np.c_[np.linspace(0, n-1, n).astype(int), indices.astype(int)]
-    return indices
-#
+# def nearest_neighbor_matching(G1_emb, G2_emb):
+#     n = np.shape(G1_emb)[1]
+#     nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(G1_emb.T)
+#     distances, indices = nbrs.kneighbors(G2_emb.T)
+#     indices = np.c_[np.linspace(0, n-1, n).astype(int), indices.astype(int)]
+#     return indices
+# #
 
 
-def hungarian_matching(G1_emb, G2_emb):
-    import lapjv
-    print('hungarian_matching: calculating distance matrix')
+# def hungarian_matching(G1_emb, G2_emb):
+#     import lapjv
+#     print('hungarian_matching: calculating distance matrix')
 
-    dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
-    n = np.shape(dist)[0]
-    # print(np.shape(dist))
-    print('hungarian_matching: calculating matching')
-    cols, rows, _ = lapjv.lapjv(dist)
-    matching = np.c_[cols, np.linspace(0, n-1, n).astype(int)]
-    matching = matching[matching[:, 0].argsort()]
-    return matching.astype(int)
-
-
-def iterative_closest_point(V1, V2, C, it, k, match, Cor1, Cor2, q):
-    G1 = V1[:, 0: k].T
-    G2_emb = V2[:, 0: k].T
-    n = np.shape(G2_emb)[1]
-
-    for i in range(0, it):
-
-        print('icp iteration '+str(i))
-        G1_emb = C@V1[:, 0:k].T
-       # print('calculating hungarian in icp')
-        M = []
-
-        if (match == 1):
-            M = nearest_neighbor_matching(G1_emb, G2_emb)
-        if match == 2:
-            M = sort_greedy(G1_emb, G2_emb)
-        if match == 3:
-            M = hungarian_matching(G1_emb, G2_emb)
-        G2_cur = np.zeros([k, n])
-       ## print('finding nearest neighbors in eigenvector matrix icp')
-        for j in range(0, n):
-
-            G2idx = M[j, 1]
-            G2_cur[:, G2idx] = G2_emb[:, j]
-       ## print('calculating correspondence matrix in icp')
-        # C=calc_correspondence_matrix(G1,G2_cur,k)
-        C = calc_correspondence_matrix_ortho(G1, G2_cur, k)
-        #calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1[:,0:k], V2[:,0:k], k, q)
-        #C = calc_correspondence_matrix_ortho_diag(G1, G2_cur, k)
-        C_show = C
-        # C_show[C_show < 0.13] = 0.0
-       # plt.imshow(np.abs(C_show))
-       # plt.show()
-
-       # print('calculated correspondence matrix in icp')
-       # print('\n')
-    G1_emb = C@V1[:, 0:k].T
-
-    if (match == 1):
-        M = nearest_neighbor_matching(G1_emb, G2_emb)
-    if match == 2:
-        M = sort_greedy(G1_emb, G2_emb)
-    if match == 3:
-        M = hungarian_matching(G1_emb, G2_emb)
-    print('\n')
-    return dict(M.astype(int))
+#     dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
+#     n = np.shape(dist)[0]
+#     # print(np.shape(dist))
+#     print('hungarian_matching: calculating matching')
+#     cols, rows, _ = lapjv.lapjv(dist)
+#     matching = np.c_[cols, np.linspace(0, n-1, n).astype(int)]
+#     matching = matching[matching[:, 0].argsort()]
+#     return matching.astype(int)
 
 
-def greedyNN(G1_emb, G2_emb):
-    print('greedyNN: calculating distance matrix')
+# def iterative_closest_point(V1, V2, C, it, k, match, Cor1, Cor2, q):
+#     G1 = V1[:, 0: k].T
+#     G2_emb = V2[:, 0: k].T
+#     n = np.shape(G2_emb)[1]
 
-    dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
-    n = np.shape(dist)[0]
-    # print(np.shape(dist))
-    print('greedyNN: calculating matching')
-    idx = np.argsort(dist, axis=0)
-    matching = np.ones([n, 1])*(n+1)
-    for i in range(0, n):
-        matched = False
-        cur_idx = 0
-        while(not matched):
-            # print([cur_idx,i])
-            if(not idx[cur_idx, i] in matching):
-                matching[i, 0] = idx[cur_idx, i]
+#     for i in range(0, it):
 
-                matched = True
-            else:
-                cur_idx += 1
-                # print(cur_idx)
+#         print('icp iteration '+str(i))
+#         G1_emb = C@V1[:, 0:k].T
+#        # print('calculating hungarian in icp')
+#         M = []
 
-    matching = np.c_[np.linspace(0, n-1, n).astype(int), matching]
-    return matching.astype(int)
+#         if (match == 1):
+#             M = nearest_neighbor_matching(G1_emb, G2_emb)
+#         if match == 2:
+#             M = sort_greedy(G1_emb, G2_emb)
+#         if match == 3:
+#             M = hungarian_matching(G1_emb, G2_emb)
+#         G2_cur = np.zeros([k, n])
+#        ## print('finding nearest neighbors in eigenvector matrix icp')
+#         for j in range(0, n):
 
+#             G2idx = M[j, 1]
+#             G2_cur[:, G2idx] = G2_emb[:, j]
+#        ## print('calculating correspondence matrix in icp')
+#         # C=calc_correspondence_matrix(G1,G2_cur,k)
+#         C = calc_correspondence_matrix_ortho(G1, G2_cur, k)
+#         #calc_C_as_in_quasiharmonicpaper(Cor1, Cor2, V1[:,0:k], V2[:,0:k], k, q)
+#         #C = calc_correspondence_matrix_ortho_diag(G1, G2_cur, k)
+#         C_show = C
+#         # C_show[C_show < 0.13] = 0.0
+#        # plt.imshow(np.abs(C_show))
+#        # plt.show()
 
-def sort_greedy(G1_emb, G2_emb):
-    print('sortGreedy: calculating distance matrix')
+#        # print('calculated correspondence matrix in icp')
+#        # print('\n')
+#     G1_emb = C@V1[:, 0:k].T
 
-    dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
-    n = np.shape(dist)[0]
-    # print(np.shape(dist))
-    print('sortGreedy: calculating matching')
-    dist_platt = np.ndarray.flatten(dist)
-    idx = np.argsort(dist_platt)
-    k = idx//n
-    r = idx % n
-    idx_matr = np.c_[k, r]
-   # print(idx_matr)
-    G1_elements = set()
-    G2_elements = set()
-    i = 0
-    j = 0
-    matching = np.ones([n, 2])*(n+1)
-    while(len(G1_elements) < n):
-        if (not idx_matr[i, 0] in G1_elements) and (not idx_matr[i, 1] in G2_elements):
-            # print(idx_matr[i,:])
-            matching[j, :] = idx_matr[i, :]
-
-            G1_elements.add(idx_matr[i, 0])
-            G2_elements.add(idx_matr[i, 1])
-            j += 1
-            # print(len(G1_elements))
-
-        i += 1
-
-   # print(idx)
-    matching = np.c_[matching[:, 1], matching[:, 0]]
-    matching = matching[matching[:, 0].argsort()]
-    return matching.astype(int)
+#     if (match == 1):
+#         M = nearest_neighbor_matching(G1_emb, G2_emb)
+#     if match == 2:
+#         M = sort_greedy(G1_emb, G2_emb)
+#     if match == 3:
+#         M = hungarian_matching(G1_emb, G2_emb)
+#     print('\n')
+#     return dict(M.astype(int))
 
 
-def eval_matching(matching, gt):
+# def greedyNN(G1_emb, G2_emb):
+#     print('greedyNN: calculating distance matrix')
 
-    n = float(len(gt))
-    acc = 0.0
-    for i in matching:
-        if i in gt and matching[i] == gt[i]:
-            acc += 1.0
-   # print(acc/n)
-    return acc/n
+#     dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
+#     n = np.shape(dist)[0]
+#     # print(np.shape(dist))
+#     print('greedyNN: calculating matching')
+#     idx = np.argsort(dist, axis=0)
+#     matching = np.ones([n, 1])*(n+1)
+#     for i in range(0, n):
+#         matched = False
+#         cur_idx = 0
+#         while(not matched):
+#             # print([cur_idx,i])
+#             if(not idx[cur_idx, i] in matching):
+#                 matching[i, 0] = idx[cur_idx, i]
+
+#                 matched = True
+#             else:
+#                 cur_idx += 1
+#                 # print(cur_idx)
+
+#     matching = np.c_[np.linspace(0, n-1, n).astype(int), matching]
+#     return matching.astype(int)
+
+
+# def sort_greedy(G1_emb, G2_emb):
+#     print('sortGreedy: calculating distance matrix')
+
+#     dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
+#     n = np.shape(dist)[0]
+#     # print(np.shape(dist))
+#     print('sortGreedy: calculating matching')
+#     dist_platt = np.ndarray.flatten(dist)
+#     idx = np.argsort(dist_platt)
+#     k = idx//n
+#     r = idx % n
+#     idx_matr = np.c_[k, r]
+#    # print(idx_matr)
+#     G1_elements = set()
+#     G2_elements = set()
+#     i = 0
+#     j = 0
+#     matching = np.ones([n, 2])*(n+1)
+#     while(len(G1_elements) < n):
+#         if (not idx_matr[i, 0] in G1_elements) and (not idx_matr[i, 1] in G2_elements):
+#             # print(idx_matr[i,:])
+#             matching[j, :] = idx_matr[i, :]
+
+#             G1_elements.add(idx_matr[i, 0])
+#             G2_elements.add(idx_matr[i, 1])
+#             j += 1
+#             # print(len(G1_elements))
+
+#         i += 1
+
+#    # print(idx)
+#     matching = np.c_[matching[:, 1], matching[:, 0]]
+#     matching = matching[matching[:, 0].argsort()]
+#     return matching.astype(int)
+
+
+# def eval_matching(matching, gt):
+
+#     n = float(len(gt))
+#     acc = 0.0
+#     for i in matching:
+#         if i in gt and matching[i] == gt[i]:
+#             acc += 1.0
+#    # print(acc/n)
+#     return acc/n
 
 
 def read_regal_matrix(file):

@@ -110,17 +110,43 @@ def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
 
 # @profile
 @ ex.capture
-def preprocess(Src, Tar, _run):
+def preprocess(Src, Tar, gt, _run):
     start = time.time()
     # L = similarities_preprocess.create_L(Tar, Src)
     L = similarities_preprocess.create_L(Src, Tar)
+    # print(L.shape)
+
+    # gt1 = gt[0]
+    # gt0 = np.arange(gt[0].size)
+
+    # L = sps.coo_matrix((np.ones(gt0.size).tolist(
+    # ), (gt0.tolist(), gt1.tolist())), shape=(gt0.size, gt0.size)).A
+
+    # n = 1000
+    # x = 20
+
+    # for _ in range(x):
+    #     ii = np.random.permutation(1133)[:n]
+    #     jj = np.random.permutation(1133)[:n]
+
+    #     for i, j in zip(ii, jj):
+    #         L[i, j] = 1
+    #         # L[i, j] = 0.1
+
+    # # L[1] = 1
+
+    # L = sps.csr_matrix(L, dtype=float)
+
+    # print(L.size)
+
     # L, _ = regal.main({"Src": Src, "Tar": Tar}, **REGAL_args)
     # L, _ = conealign.main({"Src": Src, "Tar": Tar}, **CONE_args)
     _run.log_scalar("graph.prep.L", time.time()-start)
 
     start = time.time()
     # S = similarities_preprocess.create_S(Tar, Src, L)
-    S = similarities_preprocess.create_S(Src, Tar, L)
+    S = similarities_preprocess.create_S(
+        sps.csr_matrix(Src), sps.csr_matrix(Tar), L)
     _run.log_scalar("graph.prep.S", time.time()-start)
 
     li, lj, w = sps.find(L)
@@ -164,7 +190,7 @@ def run_algs(g, algs, _log, _run, prep=False, circular=False):
     Tar = e_to_G(Tar_e, n)
 
     if prep:
-        L, S, li, lj, w = preprocess(Src, Tar)
+        L, S, li, lj, w = preprocess(Src, Tar, Gt)
     else:
         L = S = sps.eye(1)
         li = lj = w = np.empty(1)

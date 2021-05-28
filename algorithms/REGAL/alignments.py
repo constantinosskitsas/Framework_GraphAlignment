@@ -29,6 +29,7 @@ def get_embedding_similarities(embed, embed2=None, sim_measure="euclidean", num_
 
     return similarity_matrix, sklearn.metrics.pairwise.euclidean_distances(
         embed, embed2)
+    # return None, -similarity_matrix
 
 # Split embeddings in half (TODO generalize to different numbers and sizes of networks)
 

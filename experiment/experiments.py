@@ -2,9 +2,10 @@ from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_arg
 from generation import generate as gen
 from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 from networkx import nx
-
+import numpy as np
 
 # mprof run workexp.py with playground run=[1,2,3,4,5] iters=2 win
+
 
 def alggs(tmp):
     alg, args, mtype, algname = _algs[tmp[0]]
@@ -14,12 +15,90 @@ def alggs(tmp):
     ]
 
 
+# @ex.named_config
+# def scaling():
+
+#     # Greedied down
+#     _algs[0][2][0] = 2
+#     _CONE_args['window'] = 4
+#     _algs[1][2][0] = -2
+#     _algs[2][2][0] = -2
+#     _algs[3][2][0] = -2
+#     _algs[4][2][0] = 2
+#     _algs[5][2][0] = 2
+#     _algs[6][2][0] = 2
+
+#     run = [3, 4, 5]
+
+#     iters = 1
+
+#     graph_names = [
+#         # "100",
+#         # "1000",
+#         # "10000",
+#         # "100000",
+
+#         # '1024',
+#         # '2048',
+#         # '4096',
+#         # '8192',
+#         # '16384',  # 2 ** 14
+#         '32768',
+#         # '65536',
+#         # '131072',
+#     ]
+
+#     graphs = [
+#         # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
+
+#         # (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
+#         (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
+#         # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
+#     ]
+
+#     noises = [
+#         # 0.00,
+#         0.05,
+#     ]
+
+#     s_trans = (2, 1, 0, 3)
+#     xlabel = "powerlaw"
+
+def aaa(vals):
+    g = []
+    for val in vals:
+        normald = np.random.normal(10, 1, val)
+        normald = [round(num) for num in normald]
+        usum = sum(normald)
+        if usum % 2 == 1:
+            max_value = max(normald)
+            max_index = normald.index(max_value)
+            normald[max_index] = normald[max_index]-1
+        G2 = nx.configuration_model(normald, nx.Graph)
+        # G2.remove_edges_from(nx.selfloop_edges(G2))
+        g.append((lambda x: x, (G2,)))
+    return g
+    # normald = np.random.normal(10, 2, 1000) make it 1 for standard
+
+
+def ggg(vals):
+    return [str(x) for x in vals]
+
+
 @ex.named_config
 def scaling():
 
     # Greedied down
     _algs[0][2][0] = 2
-    _CONE_args['window'] = 4
+    # _CONE_args['window'] = 4
     _algs[1][2][0] = -2
     _algs[2][2][0] = -2
     _algs[3][2][0] = -2
@@ -29,39 +108,46 @@ def scaling():
 
     run = [3, 4, 5]
 
-    iters = 1
+    iters = 5
 
-    graph_names = [
-        # "100",
-        # "1000",
-        # "10000",
-        # "100000",
-
-        # '1024',
-        # '2048',
-        # '4096',
-        # '8192',
-        # '16384',  # 2 ** 14
-        '32768',
-        # '65536',
-        # '131072',
+    tmp = [
+        2**i for i in range(10, 13)
     ]
 
-    graphs = [
-        # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
+    graph_names = ggg(tmp)
+    # [
+    #     # "100",
+    #     # "1000",
+    #     # "10000",
+    #     # "100000",
 
-        # (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
-        (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
-        # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
-    ]
+    #     '1024',
+    #     '2048',
+    #     '4096',
+    #     '8192',
+    #     '16384',  # 2 ** 14
+    #     # '32768',
+    #     # '65536',
+    #     # '131072',
+    # ]
+
+    graphs = aaa(tmp)
+    # [
+    # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
+
+    # (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
+    # (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
+    # (nx.gnp_random_graph, (32768, 0.0003)),
+    # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
+    # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
+    # ]
 
     noises = [
         # 0.00,
@@ -69,7 +155,7 @@ def scaling():
     ]
 
     s_trans = (2, 1, 0, 3)
-    xlabel = "powerlaw"
+    xlabel = "k_normal"
 
 
 @ex.named_config
@@ -81,6 +167,14 @@ def tuning():
     #         {'dim': 128 * i} for i in range(1, 17)
     #     ]
     # ]
+
+    # tmp = [
+    #     2,  # grasp
+    #     [
+    #         {'n_eig': x} for x in [128, 512, 1024]
+    #     ]
+    # ]
+    # _algs[2][2][0] = -2
 
     # tmp = [
     #     3,  # REGAL
@@ -126,12 +220,14 @@ def tuning():
         # "arenas",
         "facebook",
         # "astro",
+        # "gnp"
     ]
 
     graphs = [
         # (gen.loadnx, ('data/arenas/source.txt',)),
         (gen.loadnx, ('data/facebook/source.txt',)),
         # (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
+        # (nx.gnp_random_graph, (2**15, 0.0003)),
     ]
 
     noises = [

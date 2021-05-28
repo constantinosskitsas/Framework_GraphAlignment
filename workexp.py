@@ -61,7 +61,7 @@ def global_config():
 def playground():
 
     graph_names = [
-        "gnp",
+        # "gnp",
         # "barabasi",
         # "powerlaw",
         # "arenas",
@@ -69,13 +69,24 @@ def playground():
         # "facebook",
         # "astro",
         # "yeast5"
+        "k_normal"
     ]
+
+    tmp = [
+        list(range(200)) for _ in range(5)
+    ]
+
+    tmp = np.array(tmp).flatten()
+    # print(tmp)
 
     graphs = [
         # (nx.newman_watts_strogatz_graph, (20, 3, 0.5)),
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.0)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        (nx.gnp_random_graph, (35000, 0.0003)),
+        # (nx.gnp_random_graph, (35000, 0.0003)),
+        # (nx.gnp_random_graph, (1000, 0.01)),
+        # (nx.random_regular_graph, (1000, 0.01)),
+        (nx.generators.degree_seq.configuration_model, (tmp.tolist(), nx.Graph)),
         # (nx.barabasi_albert_graph, (50, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
@@ -140,13 +151,13 @@ def playground():
     iters = 6
 
     noises = [
-        0.00,
+        # 0.00,
 
         # 0.01,
         # # 0.02,
         # 0.03,
         # # 0.04,
-        # 0.05,
+        0.05,
 
         # 0.06,
         # 0.07,

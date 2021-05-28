@@ -118,7 +118,7 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weigh
             S = W2.T.dot(S).dot(W1)
         else:
             # S = (alpha*W2.T).dot(S).dot(W1) + (1-alpha) * L
-            S = W2.T.dot(S).dot(W1) + K
+            S = W2aT.dot(S).dot(W1) + K
             # W2aT.dot(S, out=S)
             # S.dot(W1, out=S)
             # S += K

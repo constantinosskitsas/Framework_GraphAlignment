@@ -72,18 +72,30 @@ def alggs(tmp):
 #     s_trans = (2, 1, 0, 3)
 #     xlabel = "powerlaw"
 
-def aaa(vals):
+def aaa(vals, dist_type=0):
     g = []
     for val in vals:
-        normald = np.random.normal(10, 1, val)
-        normald = [round(num) for num in normald]
-        usum = sum(normald)
+        if dist_type == 0:
+            dist = np.random.randint(15, 21, val)
+        if dist_type == 1:
+            dist = nx.utils.powerlaw_sequence(val, 2.5)
+            dist = np.array(dist)
+            dist = dist.round()
+            dist += 1
+            dist = dist.tolist()
+        if dist_type == 2:
+            dist = np.random.normal(10, 1, val)
+        if dist_type == 3:
+            dist = np.random.poisson(lam=10, size=val)
+
+        dist = [round(num) for num in dist]
+        usum = sum(dist)
         if usum % 2 == 1:
-            max_value = max(normald)
-            max_index = normald.index(max_value)
-            normald[max_index] = normald[max_index]-1
-        G2 = nx.configuration_model(normald, nx.Graph)
-        # G2.remove_edges_from(nx.selfloop_edges(G2))
+            max_value = max(dist)
+            max_index = dist.index(max_value)
+            dist[max_index] = dist[max_index]-1
+        G2 = nx.configuration_model(dist, nx.Graph)
+        G2.remove_edges_from(nx.selfloop_edges(G2))
         g.append((lambda x: x, (G2,)))
     return g
     # normald = np.random.normal(10, 2, 1000) make it 1 for standard
@@ -106,7 +118,8 @@ def scaling():
     _algs[5][2][0] = 2
     _algs[6][2][0] = 2
 
-    run = [3, 4, 5]
+    # run = [3, 4, 5]
+    run = [1, 2, 3, 4, 5, 6]
 
     iters = 5
 
@@ -114,8 +127,18 @@ def scaling():
         2**i for i in range(10, 13)
     ]
 
+    # graphs = aaa(tmp, dist_type=0)
+    # xlabel = "kdist"
+    graphs = aaa(tmp, dist_type=1)
+    xlabel = "powerlaw"
+    # graphs = aaa(tmp, dist_type=2)
+    # xlabel = "normal"
+    # graphs = aaa(tmp, dist_type=3)
+    # xlabel = "poisson"
+
     graph_names = ggg(tmp)
-    # [
+
+    # graph_names = [
     #     # "100",
     #     # "1000",
     #     # "10000",
@@ -125,28 +148,27 @@ def scaling():
     #     '2048',
     #     '4096',
     #     '8192',
-    #     '16384',  # 2 ** 14
+    #     # '16384',  # 2 ** 14
     #     # '32768',
     #     # '65536',
     #     # '131072',
     # ]
 
-    graphs = aaa(tmp)
-    # [
-    # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
+    # graphs = [
+    #     # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
+    #     # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
+    #     # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
+    #     # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
 
-    # (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
-    # (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
-    # (nx.gnp_random_graph, (32768, 0.0003)),
-    # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
-    # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
+    #     (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
+    #     (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
+    #     (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
+    #     (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
+    #     # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
+    #     # (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
+    #     # (nx.gnp_random_graph, (32768, 0.0003)),
+    #     # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
+    #     # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
     # ]
 
     noises = [
@@ -155,7 +177,7 @@ def scaling():
     ]
 
     s_trans = (2, 1, 0, 3)
-    xlabel = "k_normal"
+    # xlabel = "k_normal"
 
 
 @ex.named_config
@@ -369,8 +391,10 @@ def arenasish():
 
 @ ex.named_config
 def tuned():
-    _CONE_args["dim"] = 512
-    _LREA_args["iters"] = 40
+    # _CONE_args["dim"] = 512
+    _CONE_args["dim"] = 256
+    _GRASP_args["n_eig"] = 256
+    # _LREA_args["iters"] = 40
     _ISO_args["alpha"] = 0.9
     _ISO_args["lalpha"] = 100000  # full dim
     # _ISO_args["lalpha"] = 25

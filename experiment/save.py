@@ -178,6 +178,10 @@ def save(time5, res6, output_path, noises, iters, algs, acc_names, graph_names, 
         time_alg, ta_dims = trans(time_alg, ta_dims, s_trans)  # (g,alg,n,i)
         time_m, tm_dims = trans(time_m, tm_dims, s_trans)  # (g,alg,n,i)
 
+    print(res.shape, dims)
+    print(time_alg.shape, ta_dims)
+    print(time_m.shape, tm_dims)
+
     save_rec(res, dims, f"{output_path}/acc")
     save_rec(time_alg, ta_dims, f"{output_path}/time_alg", plot_type=2)
     save_rec(time_m, tm_dims, f"{output_path}/time_matching", plot_type=2)

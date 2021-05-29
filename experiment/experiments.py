@@ -129,7 +129,10 @@ def scaling():
     iters = 5
 
     tmp = [
-        2**i for i in range(10, 15)
+        # 2**i for i in range(10, 14)
+        # 2 ** 15,
+        2 ** 16,
+        # 2 ** 17,
     ]
 
     # graphs = aaa(tmp, dist_type=0)

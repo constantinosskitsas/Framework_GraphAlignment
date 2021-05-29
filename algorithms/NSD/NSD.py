@@ -64,15 +64,18 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
         for k in range(iters):
             # print(k)
             # Sim += np.kron(Z[:, k] * alpha ** k, W[:, k]).reshape(nA, nB)
-            # Sim += np.kron(Z[k] * alpha ** k, W[k])
-            Sim += np.dot(
-                (Z[k] * factor).reshape(nA, 1), W[k].reshape(1, nB)
-            )
+            # Sim += np.kron(Z[k] * factor, W[k]).reshape(nA, nB)
+            # Sim += np.dot(
+            #     (Z[k] * factor).reshape(nA, 1), W[k].reshape(1, nB)
+            # )
+            for i, w in enumerate(W[k]):
+                Sim[:, i] += Z[k] * factor * w
             factor *= alpha
-        Sim += np.dot(
-            (Z[k] * alpha ** iters).reshape(nA, 1), W[k].reshape(1, nB)
-        )
-
+        # Sim += np.dot(
+        #     (Z[iters] * alpha ** iters).reshape(nA, 1), W[iters].reshape(1, nB)
+        # )
+        for i, w in enumerate(W[iters]):
+            Sim[:, i] += Z[iters] * factor * w
         # for k in range(iters):
         #     Z[k] *= factor
         #     factor *= alpha

@@ -57,6 +57,27 @@ def global_config():
     tmp = []
 
 
+def configg():
+    tmp = [
+        # list(range(50)) for _ in range(6)
+        # list(range(100)) for _ in range(3)
+        # list(range(150)) for _ in range(2)
+        list(range(300)) for _ in range(1)
+    ]
+
+    tmp = np.array(tmp)
+
+    # tmp = tmp.T
+
+    tmp = tmp.flatten()
+
+    G = nx.generators.degree_seq.configuration_model(tmp.tolist(), nx.Graph)
+
+    G.remove_edges_from(nx.selfloop_edges(G))
+
+    return lambda x: x, (G,)
+
+
 @ex.named_config
 def playground():
 
@@ -64,29 +85,25 @@ def playground():
         # "gnp",
         # "barabasi",
         # "powerlaw",
-        # "arenas",
+        "arenas",
         # "LFR_span",
         # "facebook",
         # "astro",
         # "yeast5"
-        "k_normal"
+        # "k_normal"
     ]
 
-    tmp = [
-        list(range(200)) for _ in range(5)
-    ]
-
-    tmp = np.array(tmp).flatten()
     # print(tmp)
 
     graphs = [
+        # configg(),
         # (nx.newman_watts_strogatz_graph, (20, 3, 0.5)),
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.0)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
         # (nx.gnp_random_graph, (35000, 0.0003)),
         # (nx.gnp_random_graph, (1000, 0.01)),
         # (nx.random_regular_graph, (1000, 0.01)),
-        (nx.generators.degree_seq.configuration_model, (tmp.tolist(), nx.Graph)),
+
         # (nx.barabasi_albert_graph, (50, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
@@ -124,7 +141,7 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        # (loadnx, ('data/arenas/source.txt',)),
+        (loadnx, ('data/arenas/source.txt',)),
         # (loadnx, ('data/facebook/source.txt',)),
         # (loadnx, ('data/CA-AstroPh/source.txt',)),
 

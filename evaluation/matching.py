@@ -94,7 +94,8 @@ def getmatching(sim, cost, mt, _log):
         n = mat_to_min.shape[0]
         if (n & (n-1) == 0) and n != 0:  # if n is a power of 2
             _log.debug("binary! speeding up..")
-            return quadtree.superfast_binbin_torch(-mat_to_min)
+            mat_to_min *= -1
+            return quadtree.superfast_binbin_torch(mat_to_min)
         else:
             return superfast(mat_to_min)
     elif mt == 3:

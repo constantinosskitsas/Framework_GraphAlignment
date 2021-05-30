@@ -4,58 +4,101 @@ import scipy.sparse as sps
 import os
 
 
+def EC(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
+
+    intersection = np.sum(comb == 2)
+
+    return intersection / np.sum(A == 1)
+
+
+def ICS(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
+
+    intersection = np.sum(comb == 2)
+    induced = np.sum(adj2 == 1)
+
+    return intersection / induced
+
+
 def S3(A, B, ma, mb):
-    A1 = np.sum(A, 0)
-    B1 = np.sum(B, 0)
-    EdA1 = np.sum(A1)
-    EdB1 = np.sum(B1)
-    Ce = 0
-    source = 0
-    target = 0
-    res = 0
-    for ai, bi in zip(ma, mb):
-        source = A1[ai]
-        target = B1[bi]
-        if source == target:  # equality goes in either of the cases below, different case for...
-            Ce = Ce+source
-        elif source < target:
-            Ce = Ce+source
-        elif source > target:
-            Ce = Ce+target
-    div = EdA1+EdB1-Ce
-    # print(EdA1)
-    # print(EdB1)
-    # print(Ce)
-    res = Ce/div
-    return res
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
+
+    intersection = np.sum(comb == 2)
+    induced = np.sum(adj2 == 1)
+    denom = np.sum(A == 1) + induced - intersection
+
+    return intersection / denom
 
 
-def ICorS3GT(A, B, ma, mb, gmb, IC):
-    A1 = np.sum(A, 0)
-    B1 = np.sum(B, 0)
-    EdA1 = np.sum(A1)
-    EdB1 = np.sum(B1)
+def jacc(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
 
-    Ce = 0
-    source = 0
-    target = 0
-    res = 0
-    for ai, bi in zip(ma, mb):
-        if (gmb[ai] == bi):
-            source = A1[ai]
-            target = B1[bi]
-            if source == target:  # equality goes in either of the cases below, different case for...
-                Ce = Ce+source
-            elif source < target:
-                Ce = Ce+source
-            elif source > target:
-                Ce = Ce+target
-    if IC == True:
-        res = Ce/EdA1
-    else:
-        div = EdA1+EdB1-Ce
-        res = Ce/div
-    return res
+    intersection = np.sum(comb == 2)
+    union = np.sum(A == 1) + np.sum(B == 1) - intersection
+
+    return intersection / union
+
+# def S3(A, B, ma, mb):
+#     A1 = np.sum(A, 0)
+#     B1 = np.sum(B, 0)
+#     EdA1 = np.sum(A1)
+#     EdB1 = np.sum(B1)
+#     Ce = 0
+#     source = 0
+#     target = 0
+#     res = 0
+#     for ai, bi in zip(ma, mb):
+#         source = A1[ai]
+#         target = B1[bi]
+#         if source == target:  # equality goes in either of the cases below, different case for...
+#             Ce = Ce+source
+#         elif source < target:
+#             Ce = Ce+source
+#         elif source > target:
+#             Ce = Ce+target
+#     div = EdA1+EdB1-Ce
+#     # print(EdA1)
+#     # print(EdB1)
+#     # print(Ce)
+#     res = Ce/div
+#     return res
+
+
+# def ICorS3GT(A, B, ma, mb, gmb, IC):
+#     A1 = np.sum(A, 0)
+#     B1 = np.sum(B, 0)
+#     EdA1 = np.sum(A1)
+#     EdB1 = np.sum(B1)
+
+#     Ce = 0
+#     source = 0
+#     target = 0
+#     res = 0
+#     for ai, bi in zip(ma, mb):
+#         if (gmb[ai] == bi):
+#             source = A1[ai]
+#             target = B1[bi]
+#             if source == target:  # equality goes in either of the cases below, different case for...
+#                 Ce = Ce+source
+#             elif source < target:
+#                 Ce = Ce+source
+#             elif source > target:
+#                 Ce = Ce+target
+#     if IC == True:
+#         res = Ce/EdA1
+#     else:
+#         div = EdA1+EdB1-Ce
+#         res = Ce/div
+#     return res
 
 
 def score_MNC(adj1, adj2, countera, counterb):
@@ -103,28 +146,28 @@ def score_MNC(adj1, adj2, countera, counterb):
         return -1
 
 
-def panos_MNC(adj1, adj2, ma, mb):
-    # src_exp = adj1[ma][:, ma]
-    src_exp = adj1
-    src_act = adj2[mb][:, mb]
+# def panos_MNC(adj1, adj2, ma, mb):
+#     # src_exp = adj1[ma][:, ma]
+#     src_exp = adj1
+#     src_act = adj2[mb][:, mb]
 
-    good = 0
-    total = 0
+#     good = 0
+#     total = 0
 
-    for i in range(src_exp.shape[0]):
-        for j in range(src_exp.shape[1]):
-            if src_exp[i, j] == 1 or src_act[i, j] == 1:
-                if src_exp[i, j] == src_act[i, j]:
-                    good += 1
-                total += 1
-    # with np.printoptions(linewidth=1000, suppress=True, threshold=np.inf):
-    #     print(adj2)
-    #     print(adj1)
-    #     print(mb)
-    #     print(adj1[mb][:, mb])
-    #     print(diff)
-    #     print(np.mean(diff == 0))
-    return good/total
+#     for i in range(src_exp.shape[0]):
+#         for j in range(src_exp.shape[1]):
+#             if src_exp[i, j] == 1 or src_act[i, j] == 1:
+#                 if src_exp[i, j] == src_act[i, j]:
+#                     good += 1
+#                 total += 1
+#     # with np.printoptions(linewidth=1000, suppress=True, threshold=np.inf):
+#     #     print(adj2)
+#     #     print(adj1)
+#     #     print(mb)
+#     #     print(adj1[mb][:, mb])
+#     #     print(diff)
+#     #     print(np.mean(diff == 0))
+#     return good/total
 
 
 def eval_align(ma, mb, gmb):
@@ -177,15 +220,23 @@ def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, save=False, eval_type=0):
     if 0 in accs:
         _accs.append(acc)
     if 1 in accs:
-        _accs.append(S3(Src, Tar, ma, mb))
+        _accs.append(EC(Src, Tar, ma, mb))
     if 2 in accs:
-        _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, True))
+        _accs.append(ICS(Src, Tar, ma, mb))
     if 3 in accs:
-        _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, False))
+        _accs.append(S3(Src, Tar, ma, mb))
     if 4 in accs:
-        _accs.append(score_MNC(Src, Tar, ma, mb))
+        _accs.append(jacc(Src, Tar, ma, mb))
     if 5 in accs:
-        _accs.append(panos_MNC(Src, Tar, ma, mb))
+        _accs.append(score_MNC(Src, Tar, ma, mb))
+    # if 2 in accs:
+    #     _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, True))
+    # if 3 in accs:
+    #     _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, False))
+    # if 4 in accs:
+    #     _accs.append(score_MNC(Src, Tar, ma, mb))
+    # if 5 in accs:
+    #     _accs.append(panos_MNC(Src, Tar, ma, mb))
 
     if save:
         output_path = f"runs/{_run._id}/alignments"

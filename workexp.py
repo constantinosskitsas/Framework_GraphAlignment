@@ -36,11 +36,11 @@ def global_config():
 
     accs = [
         0,      # acc
-        # 1,      # S3
-        # 2,      # IC
-        # 3,      # S3gt
-        # 4,      # mnc
-        # 5,      # pmnc
+        # 1,      # EC
+        # 2,      # ICS
+        # 3,      # S3
+        # 4,      # jacc
+        # 5,      # mnc
     ]
 
     algs = [_algs[i] for i in run]

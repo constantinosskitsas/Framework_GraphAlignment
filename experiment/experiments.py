@@ -85,6 +85,7 @@ def aaa(vals, dist_type=0):
             dist = dist.tolist()
         if dist_type == 2:
             dist = np.random.normal(10, 1, val)
+            # dist = np.random.normal(val, 1, 2**14)
         if dist_type == 3:
             dist = np.random.poisson(lam=10, size=val)
 
@@ -133,6 +134,7 @@ def scaling():
         # 2 ** 15,
         2 ** 16,
         # 2 ** 17,
+        # 10, 100, 1000, 10000
     ]
 
     # graphs = aaa(tmp, dist_type=0)

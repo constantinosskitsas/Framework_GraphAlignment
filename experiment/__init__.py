@@ -158,9 +158,9 @@ _algs = [
 
 _acc_names = [
     "acc",
+    "EC",
+    "ICS",
     "S3",
-    "IC",
-    "S3gt",
+    "jacc",
     "mnc",
-    "pmnc",
 ]

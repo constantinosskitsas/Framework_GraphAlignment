@@ -58,7 +58,8 @@ _GW_args = {
     # 'gamma': 0.01,
     # 'gamma': None,
     'gamma': 0.8,
-    'max_cpu': 4
+    'max_cpu': 20,
+    # 'max_cpu': 4
 }
 
 _CONE_args = {

@@ -29,21 +29,33 @@ def refill_e(edges, n, amount):
 
 
 @ ex.capture
-def remove_e(edges, noise, no_disc=True):
-    if no_disc:
-        bin_count = np.bincount(edges.flatten())
-        rows_to_delete = []
-        for i, edge in enumerate(edges):
-            if np.random.sample(1)[0] < noise:
-                e, f = edge
-                if bin_count[e] > 1 and bin_count[f] > 1:
-                    bin_count[e] -= 1
-                    bin_count[f] -= 1
-                    rows_to_delete.append(i)
-        edges = np.delete(edges, rows_to_delete, axis=0)
-    else:
-        edges = edges[np.random.sample(edges.shape[0]) >= noise]
-    return edges
+def remove_e(edges, noise, no_disc=True, until_connected=False):
+    ii = 0
+    while True:
+        ii += 1
+        print(f"##<{ii}>##")
+
+        if no_disc:
+            bin_count = np.bincount(edges.flatten())
+            rows_to_delete = []
+            for i, edge in enumerate(edges):
+                if np.random.sample(1)[0] < noise:
+                    e, f = edge
+                    if bin_count[e] > 1 and bin_count[f] > 1:
+                        bin_count[e] -= 1
+                        bin_count[f] -= 1
+                        rows_to_delete.append(i)
+            new_edges = np.delete(edges, rows_to_delete, axis=0)
+        else:
+            new_edges = edges[np.random.sample(edges.shape[0]) >= noise]
+
+        graph = nx.Graph(new_edges.tolist())
+        graph_cc = len(max(nx.connected_components(graph), key=len))
+        print(graph_cc, np.amax(edges)+1)
+        graph_connected = graph_cc == np.amax(edges) + 1
+        if graph_connected or not until_connected:
+            break
+    return new_edges
 
 
 def load_as_nx(path):

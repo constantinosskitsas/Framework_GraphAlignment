@@ -4,7 +4,7 @@ from .CONE import conealign
 from .NetAlign import netalign
 from .NSD import NSD
 from .KLAUS import klaus
-from .GWL import gwl
+from .GWL import gwl, sgwl
 from .isorank import isorank2
 # from .isorank import isorank
 from .GrASp import grasp, grasp2

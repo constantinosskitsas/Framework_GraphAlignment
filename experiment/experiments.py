@@ -139,10 +139,10 @@ def scaling():
 
     # graphs = aaa(tmp, dist_type=0)
     # xlabel = "kdist"
-    graphs = aaa(tmp, dist_type=1)
-    xlabel = "powerlaw"
-    # graphs = aaa(tmp, dist_type=2)
-    # xlabel = "normal"
+    # graphs = aaa(tmp, dist_type=1)
+    # xlabel = "powerlaw"
+    graphs = aaa(tmp, dist_type=2)
+    xlabel = "normal"
     # graphs = aaa(tmp, dist_type=3)
     # xlabel = "poisson"
 

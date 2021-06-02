@@ -78,7 +78,8 @@ def getmatching(sim, cost, mt, _log):
         if mt == 30:
             mat_to_min = -np.log(sim)
         else:
-            mat_to_min = -sim
+            mat_to_min = sim
+            mat_to_min *= -1
     else:
         if cost is None:
             raise Exception("Empty cost matrix")

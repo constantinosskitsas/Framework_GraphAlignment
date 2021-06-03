@@ -256,9 +256,9 @@ def tuning():
     ]
 
     graphs = [
-        # (gen.loadnx, ('data/arenas/source.txt',)),
-        (gen.loadnx, ('data/facebook/source.txt',)),
-        # (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
+        # (gen.loadnx, ('data/arenas.txt',)),
+        (gen.loadnx, ('data/facebook.txt',)),
+        # (gen.loadnx, ('data/CA-AstroPh.txt',)),
         # (nx.gnp_random_graph, (2**15, 0.0003)),
     ]
 
@@ -329,6 +329,12 @@ def real_noise():
     s_trans = (2, 1, 0, 3)
 
 
+def rgraphs(gnames):
+    return [
+        (gen.loadnx, (f"data/{name}.txt",)) for name in gnames
+    ]
+
+
 @ ex.named_config
 def real():
 
@@ -336,47 +342,47 @@ def real():
 
     iters = 5
 
-    graph_names = [
-        "arenas",
-        "facebook",
-        # "astro",
+    graph_names = [             # n     / e
+        "ca-netscience",        # 379   / 914
+        "bio-celegans",         # 453   / 2k
+        "arenas",               # 1.1k  / 5.4k
+        "inf-euroroad",         # 1.2K  / 1.4K
+        # "soc-hamsterster",      # 2.4K  / 16.6K
+        # "inf-power",            # 4.9K  / 6.6K
+        # "ca-GrQc",              # 4.2k  / 13.4K   - (5.2k  / 14.5K)?
+        # "ca-Erdos992",          # 6.1K  / 7.5K    - 1k disc ;v
+        # "bio-dmela",            # 7.4k  / 25.6k
 
-        "bio-celegans",
-        "bio-dmela",
-        "ca-Erdos992",
-        "ca-GrQc",
-        "ca-netscience",
-        "inf-euroroad",
-        "inf-power",
-        "soc-hamsterster",
-
-        "socfb-Bowdoin47",
-        "socfb-Hamilton46",
-        "socfb-Haverford76",
-        "socfb-Swarthmore42",
+        # "socfb-Bowdoin47",      # 2.3K  / 84.4K
+        # "socfb-Hamilton46",     # 2.3K  / 96.4K
+        # "socfb-Haverford76",    # 1.4K  / 59.6K
+        # "socfb-Swarthmore42",   # 1.7K  / 61.1K
+        # "facebook",             # 4k    / 87k
+        # "CA-AstroPh",           # 18k   / 195k
     ]
 
-    graphs = [
-        (gen.loadnx, ('data/arenas/source.txt',)),
-        # with real load=[2-,2-] / iters10 / 0-6
-        (gen.loadnx, ('data/facebook/source.txt',)),
-        # with real load=[3-,3-] / iters5 / 0 + 1-6
-        # (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
+    graphs = rgraphs(graph_names)
 
-        (gen.loadnx, ('data/bio-celegans.mtx',)),
-        (gen.loadnx, ('data/bio-dmela.mtx',)),
-        (gen.loadnx, ('data/ca-Erdos992.mtx',)),
-        (gen.loadnx, ('data/ca-GrQc.mtx',)),
-        (gen.loadnx, ('data/ca-netscience.mtx',)),
-        (gen.loadnx, ('data/inf-euroroad.edges',)),
-        (gen.loadnx, ('data/inf-power.mtx',)),
-        (gen.loadnx, ('data/soc-hamsterster.edges',)),
+    # graphs = [
+    #     (gen.loadnx, ('data/arenas.txt',)),
+    #     # with real load=[2-,2-] / iters10 / 0-6
+    #     (gen.loadnx, ('data/facebook.txt',)),
+    #     # with real load=[3-,3-] / iters5 / 0 + 1-6
+    #     # (gen.loadnx, ('data/CA-AstroPh.txt',)),
 
-        (gen.loadnx, ('data/socfb-Bowdoin47.mtx',)),
-        (gen.loadnx, ('data/socfb-Hamilton46.mtx',)),
-        (gen.loadnx, ('data/socfb-Haverford76.mtx',)),
-        (gen.loadnx, ('data/socfb-Swarthmore42.mtx',)),
-    ]
+    #     (gen.loadnx, ('data/bio-celegans.mtx',)),
+    #     (gen.loadnx, ('data/bio-dmela.mtx',)),
+    #     (gen.loadnx, ('data/ca-Erdos992.mtx',)),
+    #     (gen.loadnx, ('data/ca-GrQc.mtx',)),
+    #     (gen.loadnx, ('data/ca-netscience.mtx',)),
+    #     (gen.loadnx, ('data/inf-euroroad.edges',)),
+    #     (gen.loadnx, ('data/inf-power.mtx',)),
+    #     (gen.loadnx, ('data/soc-hamsterster.edges',)),
+    #     (gen.loadnx, ('data/socfb-Bowdoin47.mtx',)),
+    #     (gen.loadnx, ('data/socfb-Hamilton46.mtx',)),
+    #     (gen.loadnx, ('data/socfb-Haverford76.mtx',)),
+    #     (gen.loadnx, ('data/socfb-Swarthmore42.mtx',)),
+    # ]
 
     noises = [
         # 0.00,
@@ -386,7 +392,7 @@ def real():
         # 0.04,
         # 0.05,
 
-        # 0.00,
+        0.00,
         0.05,
         0.10,
         0.15,
@@ -414,7 +420,7 @@ def arenasish():
     graphs = [
         # with arenasish load=[1-,1-]
         # 91-
-        (gen.loadnx, ('data/arenas/source.txt',)),
+        (gen.loadnx, ('data/arenas.txt',)),
         (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
         # 92-0
         (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
@@ -454,7 +460,7 @@ def test():
     ]
 
     graphs = [
-        # (gen.loadnx, ('data/arenas/source.txt',)),
+        # (gen.loadnx, ('data/arenas.txt',)),
         (nx.gnp_random_graph, (50, 0.5)),
         (nx.barabasi_albert_graph, (50, 3)),
     ]

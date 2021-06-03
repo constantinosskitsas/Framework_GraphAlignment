@@ -141,26 +141,14 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        (loadnx, ('data/arenas/source.txt',)),
-        # (loadnx, ('data/facebook/source.txt',)),
-        # (loadnx, ('data/CA-AstroPh/source.txt',)),
+        (loadnx, ('data/arenas.txt',)),
+        # (loadnx, ('data/facebook.txt',)),
+        # (loadnx, ('data/CA-AstroPh.txt',)),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        # (lambda x: x, ('data/arenas/source.txt',)),
-        # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
-        # (lambda x: x, ('data/facebook/source.txt',)),
-
-        # (lambda x: x, ({'dataset': 'arenas_old',
-        #                 'edges': 1, 'noise_level': 5},)),
-
-        # (lambda x: x, ({'dataset': 'arenas',
-        #                 'edges': 1, 'noise_level': 5},)),
-
-        # (lambda x: x, ({'dataset': 'CA-AstroPh',
-        #                 'edges': 1, 'noise_level': 5},)),
-
-        # (lambda x: x, ({'dataset': 'facebook',
-        #                 'edges': 1, 'noise_level': 5},)),
+        # (lambda x: x, ('data/arenas.txt',)),
+        # (lambda x: x, ('data/CA-AstroPh.txt',)),
+        # (lambda x: x, ('data/facebook.txt',)),
     ]
 
     # no_disc = False

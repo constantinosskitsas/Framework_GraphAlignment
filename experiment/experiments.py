@@ -338,25 +338,60 @@ def real():
 
     graph_names = [
         "arenas",
-        # "facebook",
+        "facebook",
         # "astro",
+
+        "bio-celegans",
+        "bio-dmela",
+        "ca-Erdos992",
+        "ca-GrQc",
+        "ca-netscience",
+        "inf-euroroad",
+        "inf-power",
+        "soc-hamsterster",
+
+        "socfb-Bowdoin47",
+        "socfb-Hamilton46",
+        "socfb-Haverford76",
+        "socfb-Swarthmore42",
     ]
 
     graphs = [
         (gen.loadnx, ('data/arenas/source.txt',)),
         # with real load=[2-,2-] / iters10 / 0-6
-        # (gen.loadnx, ('data/facebook/source.txt',)),
+        (gen.loadnx, ('data/facebook/source.txt',)),
         # with real load=[3-,3-] / iters5 / 0 + 1-6
         # (gen.loadnx, ('data/CA-AstroPh/source.txt',)),
+
+        (gen.loadnx, ('data/bio-celegans.mtx',)),
+        (gen.loadnx, ('data/bio-dmela.mtx',)),
+        (gen.loadnx, ('data/ca-Erdos992.mtx',)),
+        (gen.loadnx, ('data/ca-GrQc.mtx',)),
+        (gen.loadnx, ('data/ca-netscience.mtx',)),
+        (gen.loadnx, ('data/inf-euroroad.edges',)),
+        (gen.loadnx, ('data/inf-power.mtx',)),
+        (gen.loadnx, ('data/soc-hamsterster.edges',)),
+
+        (gen.loadnx, ('data/socfb-Bowdoin47.mtx',)),
+        (gen.loadnx, ('data/socfb-Hamilton46.mtx',)),
+        (gen.loadnx, ('data/socfb-Haverford76.mtx',)),
+        (gen.loadnx, ('data/socfb-Swarthmore42.mtx',)),
     ]
 
     noises = [
-        0.00,
-        0.01,
-        0.02,
-        0.03,
-        0.04,
+        # 0.00,
+        # 0.01,
+        # 0.02,
+        # 0.03,
+        # 0.04,
+        # 0.05,
+
+        # 0.00,
         0.05,
+        0.10,
+        0.15,
+        0.20,
+        0.25,
     ]
 
 

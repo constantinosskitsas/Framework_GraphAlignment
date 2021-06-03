@@ -236,6 +236,14 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
     if len(plot) > 1 and plot[1]:
         plot_G(G)
 
+    # gg = np.array(G)
+
+    # print(gg.shape)
+
+    # G = gg[:, :, -1:, :].tolist()
+
+    # exit()
+
     randcheck = (randcheck1, randcheck2)
     _log.info("randcheck: %s", randcheck)
     open(f"{path}/_randcheck.txt", "w").write(str(randcheck))

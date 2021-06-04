@@ -14,8 +14,10 @@ from .. import bipartitewrapper as bmw
 # def main(A, B, iters, method, bmatch, default_params=True):
 def main(data, iters, method, bmatch, default_params=True):
 
-    Src = data['Src'].A
-    Tar = data['Tar'].A
+    # Src = data['Src'].A
+    # Tar = data['Tar'].A
+    Src = data['Src']
+    Tar = data['Tar']
 
     # D = 0
     s1, s2, s3 = find_parameters(Src, Tar)

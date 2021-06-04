@@ -54,8 +54,10 @@ def parse_args():
 
 def main(data, **args):
 
-    Src = data['Src'].A
-    Tar = data['Tar'].A
+    # Src = data['Src'].A
+    # Tar = data['Tar'].A
+    Src = data['Src']
+    Tar = data['Tar']
 
     if args['n_eig'] is None:
         args['n_eig'] = Src.shape[0] - 1

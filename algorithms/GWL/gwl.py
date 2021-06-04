@@ -11,8 +11,10 @@ def main(data, opt_dict, hyperpara_dict, lr, gamma, max_cpu=0):
     Src = data['Src']
     Tar = data['Tar']
 
-    Se = np.array(sps.find(Src)[:2]).T
-    Te = np.array(sps.find(Tar)[:2]).T
+    # Se = np.array(sps.find(Src)[:2]).T
+    # Te = np.array(sps.find(Tar)[:2]).T
+    Se = np.array(sps.find(sps.csr_matrix(Src))[:2]).T
+    Te = np.array(sps.find(sps.csr_matrix(Tar))[:2]).T
 
     data = {
         'src_index': {float(i): i for i in range(np.amax(Se) + 1)},

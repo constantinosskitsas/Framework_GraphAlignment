@@ -1,192 +1,256 @@
-from random import random
-import networkx as nx
+from . import ex
 import numpy as np
-import argparse
-import time
+import scipy.sparse as sps
 import os
-import sys
-import scipy.sparse as sp
-from sklearn.metrics import jaccard_score
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-from scipy.sparse import csr_matrix
 
 
-def check_with_identity(mb):
-    count = 0
-    for i in range(len(mb)):
-        if i == mb[i]-1:
-            count = count + 1
-    return count/len(mb)
+def EC(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
+
+    intersection = np.sum(comb == 2)
+
+    return intersection / np.sum(A == 1)
 
 
-def accuracy(gma, gmb, mb, ma):
-    nodes = len(gma)
-    count = 0
-    for i in range(nodes):
-        if ma[i] == gma[i]:
-            if (gmb[i]) == (mb[i]):
-                count = count + 1
-        else:
-            print("mistake", ma[i], gma[i])
-    print(count)
-    return count / nodes
+def ICS(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
+
+    intersection = np.sum(comb == 2)
+    induced = np.sum(adj2 == 1)
+
+    return intersection / induced
 
 
-def accuracydiff(gma, gmb, mb, ma):
-    nodes = len(ma) - 1
-    nodes1 = len(gma)
-    count = 0
-    j = 0
-    i = 0
-    while i < nodes:
-        if (ma[i] == gma[j]):
-            if (gmb[j]) == (mb[i]):
-                count = count + 1
-                j = j+1
-            i = i+1
-        else:
-            j = j+1
-            # print("mistake", ma[i], gma[i])
-    print(count)
-    return count / nodes, count/nodes1
+def S3(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
+
+    intersection = np.sum(comb == 2)
+    induced = np.sum(adj2 == 1)
+    denom = np.sum(A == 1) + induced - intersection
+
+    return intersection / denom
 
 
-def accuracy2(gmb, mb):
-    nodes = len(gmb)
-    count = 0
-    for i in range(nodes):
-        print(gmb[i], mb[i])
-        if (gmb[i]) == (mb[i]):
-            count = count + 1
-    print(count)
-    return count / nodes
+def jacc(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    comb = adj1 + adj2
+
+    intersection = np.sum(comb == 2)
+    union = np.sum(A == 1) + np.sum(B == 1) - intersection
+
+    return intersection / union
+
+# def S3(A, B, ma, mb):
+#     A1 = np.sum(A, 0)
+#     B1 = np.sum(B, 0)
+#     EdA1 = np.sum(A1)
+#     EdB1 = np.sum(B1)
+#     Ce = 0
+#     source = 0
+#     target = 0
+#     res = 0
+#     for ai, bi in zip(ma, mb):
+#         source = A1[ai]
+#         target = B1[bi]
+#         if source == target:  # equality goes in either of the cases below, different case for...
+#             Ce = Ce+source
+#         elif source < target:
+#             Ce = Ce+source
+#         elif source > target:
+#             Ce = Ce+target
+#     div = EdA1+EdB1-Ce
+#     # print(EdA1)
+#     # print(EdB1)
+#     # print(Ce)
+#     res = Ce/div
+#     return res
 
 
-def split(Matching):
-    Tempxx = (Matching[0])
-    dd = len(Tempxx)
+# def ICorS3GT(A, B, ma, mb, gmb, IC):
+#     A1 = np.sum(A, 0)
+#     B1 = np.sum(B, 0)
+#     EdA1 = np.sum(A1)
+#     EdB1 = np.sum(B1)
 
-    split1 = np.zeros(len(Tempxx), int)
-    split2 = np.zeros(len(Tempxx), int)
-    for i in range(dd):
-        tempMatching = Tempxx.pop()
-        split1[i] = int(tempMatching[0])
-        split2[i] = int(tempMatching[1])
-    return split1, split2
+#     Ce = 0
+#     source = 0
+#     target = 0
+#     res = 0
+#     for ai, bi in zip(ma, mb):
+#         if (gmb[ai] == bi):
+#             source = A1[ai]
+#             target = B1[bi]
+#             if source == target:  # equality goes in either of the cases below, different case for...
+#                 Ce = Ce+source
+#             elif source < target:
+#                 Ce = Ce+source
+#             elif source > target:
+#                 Ce = Ce+target
+#     if IC == True:
+#         res = Ce/EdA1
+#     else:
+#         div = EdA1+EdB1-Ce
+#         res = Ce/div
+#     return res
 
 
-def transformRAtoNormalALign(alignment_matrix):
+def score_MNC(adj1, adj2, countera, counterb):
+    try:
+        mnc = 0
+        # print(adj1.data.tolist())
+        # print(adj1.tolist())
+        # if sps.issparse(alignment_matrix):
+        #     alignment_matrix = alignment_matrix.toarray()
+        if sps.issparse(adj1):
+            adj1 = adj1.toarray()
+        if sps.issparse(adj2):
+            adj2 = adj2.toarray()
+        # counter_dict = get_counterpart(alignment_matrix)
+        # node_num = alignment_matrix.shape[0]
+        for cri, cbi in zip(countera, counterb):
+            a = np.array(adj1[cri, :])
+            # a = np.array(adj1[i, :])
+            one_hop_neighbor = np.flatnonzero(a)
+            b = np.array(adj2[cbi, :])
+            # neighbor of counterpart
+            new_one_hop_neighbor = np.flatnonzero(b)
 
-    n_nodes = alignment_matrix.shape[0]
-    sorted_indices = np.argsort(alignment_matrix)
+            one_hop_neighbor_counter = []
+            # print(one_hop_neighbor)
 
-    mb = np.zeros(n_nodes)
-    for node_index in range(n_nodes):
-        target_alignment = node_index
-        row, possible_alignments, possible_values = sp.find(
-            alignment_matrix[node_index])
-        node_sorted_indices = possible_alignments[possible_values.argsort()]
-        mb[node_index] = node_sorted_indices[-1:]
-    np.savetxt("results/matching.txt",
-               np.vstack((range(n_nodes), mb)).T, fmt="%i")
-    mar = range(0, len(mb))
-    return mar, mb
+            for count in one_hop_neighbor:
+                indx = np.where(count == countera)
+                try:
+                    one_hop_neighbor_counter.append(counterb[indx[0][0]])
+                except Exception:
+                    pass
+                # one_hop_neighbor_counter.append(counterb[count])
 
-#works
-def S3(A,B,mb):
-    A1=np.sum(A,0)
-    B1=np.sum(B,0)
-    EdA1=np.sum(A1)
-    EdB1=np.sum(B1)
-    Ce=0
-    source=0
-    target=0
-    res=0
-    for i in range(len(mb)):
-        source=A1[i]
-        target=B1[mb[i]]
-        if source==target:#equality goes in either of the cases below, different case for...
-            Ce=Ce+source
-        elif source<target:
-            Ce=Ce+source
-        elif source>target:
-            Ce=Ce+target
-    div=EdA1+EdB1-Ce
-    res=Ce/div
-    return res    
-#works
-def ICorS3GT(A,B,mb,gmb,IC):
-    A1=np.sum(A,0)
-    B1=np.sum(B,0)
-    EdA1=np.sum(A1)
-    EdB1=np.sum(B1)
-    Ce=0
-    source=0
-    target=0
-    res=0
-    for i in range(len(mb)):
-        if (gmb[i]==mb[i]):
-            source=A1[i]
-            target=B1[mb[i]]
-            if source==target: #equality goes in either of the cases below, different case for...
-                Ce=Ce+source
-            elif source<target:
-                Ce=Ce+source
-            elif source>target:
-                Ce=Ce+target
-    if IC==True:
-        res=Ce/EdA1
-    else:
-        div=EdA1+EdB1-Ce
-        res=Ce/div
-    return res  
+            num_stable_neighbor = np.intersect1d(
+                new_one_hop_neighbor, np.array(one_hop_neighbor_counter)).shape[0]
+            union_align = np.union1d(new_one_hop_neighbor, np.array(
+                one_hop_neighbor_counter)).shape[0]
 
-def permute(B,mb):
-    S=np.zeros(len(mb))
-    for i in range(len(mb)):
-        S[mb[i]]=i
-    print(S)
-    S.astype(int)
-    k=S[B]
-    print(k)
-    return k
-#needs correct perm
-def jacardSim(A,B1,mb):
-    B = mb[B1]
-    #B=permute(B1,mb)
-    print(B)
-    print(A)
-    #B.astype(int)
-    JI=0
-    for i in range(len(mb)):
-        #print(jaccard_score(A[i,:],B[mb[i],:]))
-        #JI=JI+jaccard_score(A[i,:],B[mb[i],:])
-        JI=JI+jaccard_score(A[:,i],B[:,i],average='macro')
-    return JI/len(mb)
+            sim = float(num_stable_neighbor) / union_align
+            mnc += sim
 
-#needs correct perm
-def jacardSimSepCm(A,B1,mb,gmb):
-    #B=permute(B1,mb)
-    B=mb[B1]
-    B.astype(int)
-    JIC=0
-    JIW=0
-    countercorr=0
-    counterwrong=0
-    for i in range(len(mb)):
-        if ( mb[i]==gmb[i]):
-            #JIC=JIC+jaccard_score(A[:,i],B[:,mb[i]])
-            JIC=JIC+jaccard_score(A[i,:],B[i,:],average='weighted')
-            countercorr=countercorr+1
-        else:
-            #JIW=JIW+jaccard_score(A[:,i],B[:,mb[i]])
-            JIW=JIW+jaccard_score(A[i,:],B[i,:],average='weighted')
-            counterwrong=counterwrong+1
-    if countercorr==0:
-        countercorr=1
-    if counterwrong==0:
-        counterwrong=1
-    return JIC/countercorr,JIW/counterwrong
+        return mnc / countera.size
+    except Exception:
+        return -1
+
+
+# def panos_MNC(adj1, adj2, ma, mb):
+#     # src_exp = adj1[ma][:, ma]
+#     src_exp = adj1
+#     src_act = adj2[mb][:, mb]
+
+#     good = 0
+#     total = 0
+
+#     for i in range(src_exp.shape[0]):
+#         for j in range(src_exp.shape[1]):
+#             if src_exp[i, j] == 1 or src_act[i, j] == 1:
+#                 if src_exp[i, j] == src_act[i, j]:
+#                     good += 1
+#                 total += 1
+#     # with np.printoptions(linewidth=1000, suppress=True, threshold=np.inf):
+#     #     print(adj2)
+#     #     print(adj1)
+#     #     print(mb)
+#     #     print(adj1[mb][:, mb])
+#     #     print(diff)
+#     #     print(np.mean(diff == 0))
+#     return good/total
+
+
+def eval_align(ma, mb, gmb):
+
+    try:
+        gmab = np.arange(gmb.size)
+        gmab[ma] = mb
+        gacc = np.mean(gmb == gmab)
+
+        mab = gmb[ma]
+        acc = np.mean(mb == mab)
+
+    except Exception:
+        mab = np.zeros(mb.size, int) - 1
+        gacc = acc = -1.0
+    alignment = np.array([ma, mb, mab]).T
+    alignment = alignment[alignment[:, 0].argsort()]
+    return gacc, acc, alignment
+
+
+# @profile
+@ex.capture
+def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, save=False, eval_type=0):
+
+    gmb, gmb1 = Gt
+    gmb = np.array(gmb, int)
+    gmb1 = np.array(gmb1, int)
+
+    ma = np.array(ma, int)
+    mb = np.array(mb, int)
+
+    assert ma.size == mb.size
+
+    _log.debug("matched %s out of %s", mb.size, gmb.size)
+
+    res = np.array([
+        eval_align(ma, mb, gmb),
+        eval_align(mb, ma, gmb),
+        eval_align(ma, mb, gmb1),
+        eval_align(mb, ma, gmb1),
+    ], dtype=object)
+
+    with np.printoptions(suppress=True, precision=4):
+        _log.debug("\n%s", res[:, :2].astype(float))
+
+    acc, accb, alignment = res[eval_type]
+
+    _accs = []
+
+    if 0 in accs:
+        _accs.append(acc)
+    if 1 in accs:
+        _accs.append(EC(Src, Tar, ma, mb))
+    if 2 in accs:
+        _accs.append(ICS(Src, Tar, ma, mb))
+    if 3 in accs:
+        _accs.append(S3(Src, Tar, ma, mb))
+    if 4 in accs:
+        _accs.append(jacc(Src, Tar, ma, mb))
+    if 5 in accs:
+        _accs.append(score_MNC(Src, Tar, ma, mb))
+    # if 2 in accs:
+    #     _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, True))
+    # if 3 in accs:
+    #     _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, False))
+    # if 4 in accs:
+    #     _accs.append(score_MNC(Src, Tar, ma, mb))
+    # if 5 in accs:
+    #     _accs.append(panos_MNC(Src, Tar, ma, mb))
+
+    if save:
+        output_path = f"runs/{_run._id}/alignments"
+
+        os.makedirs(output_path, exist_ok=True)
+
+        i = 0
+        while os.path.exists(f"{output_path}/{alg}_{i}.txt"):
+            i += 1
+
+        with open(f"{output_path}/{alg}_{i}.txt", 'w') as f:
+            np.savetxt(f, res[:, :2], fmt='%2.3f')
+            np.savetxt(f, [_accs], fmt='%2.3f')
+            np.savetxt(f, [["ma", "mb", "gmab"]], fmt='%5s')
+            np.savetxt(f, alignment, fmt='%5d')
+
+    return np.array(_accs)

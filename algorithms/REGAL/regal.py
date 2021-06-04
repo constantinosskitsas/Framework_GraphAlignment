@@ -49,10 +49,15 @@ from .alignments import get_embeddings, get_embedding_similarities
 #     return parser.parse_known_args()[0]
 
 def G_to_Adj(G1, G2):
-    adj1 = sps.kron([[1, 0], [0, 0]], G1)
-    adj2 = sps.kron([[0, 0], [0, 1]], G2)
+    # adj1 = sps.kron([[1, 0], [0, 0]], G1)
+    # adj2 = sps.kron([[0, 0], [0, 1]], G2)
+    adj1 = np.array([[1, 0], [0, 0]], dtype=np.int8)
+    adj1 = np.kron(adj1, G1)
+    adj2 = np.array([[0, 0], [0, 1]], dtype=np.int8)
+    adj2 = np.kron(adj2, G2)
     adj = adj1 + adj2
-    adj.data = adj.data.clip(0, 1)
+    # adj.data = adj.data.clip(0, 1)
+    adj = adj.clip(0, 1)
     return adj
 
 
@@ -62,6 +67,7 @@ def main(data, **args) -> object:
     Src = data['Src']
     Tar = data['Tar']
 
+    # adj = G_to_Adj(Src, Tar).A
     adj = G_to_Adj(Src, Tar)
 
     # global REGAL_args
@@ -71,7 +77,7 @@ def main(data, **args) -> object:
         # load vector of attributes in from file
         args['attributes'] = np.load(args['attributes'])
 
-    embed = learn_representations(adj.A, args)
+    embed = learn_representations(adj, args)
     emb1, emb2 = get_embeddings(embed)
     if args['numtop'] == 0:
         args['numtop'] = None

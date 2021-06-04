@@ -617,31 +617,31 @@ class GromovWassersteinLearning(object):
                         loss = 1e3 * loss_gw + 1e3 * loss_w + regularizer
                         loss.backward()
                         optimizer.step()
-                        if num % 10 == 0:
-                            print('inner {}/{}: loss={:.6f}.'.format(num,
-                                                                     sgd_iter, loss.data))
+                        # if num % 10 == 0:
+                        #     print('inner {}/{}: loss={:.6f}.'.format(num,
+                        #                                              sgd_iter, loss.data))
 
-                    nc1, ec1, nc2, ec2 = self.evaluation_matching(trans_np,
-                                                                  cost_s.cpu().data.numpy(),
-                                                                  cost_t.cpu().data.numpy(),
-                                                                  index_s, index_t,
-                                                                  mask_s.cpu().data.numpy(),
-                                                                  mask_t.cpu().data.numpy())
-                    self.NC1.append(nc1)
-                    self.NC2.append(nc2)
-                    self.EC1.append(ec1)
-                    self.EC2.append(ec2)
+            #         nc1, ec1, nc2, ec2 = self.evaluation_matching(trans_np,
+            #                                                       cost_s.cpu().data.numpy(),
+            #                                                       cost_t.cpu().data.numpy(),
+            #                                                       index_s, index_t,
+            #                                                       mask_s.cpu().data.numpy(),
+            #                                                       mask_t.cpu().data.numpy())
+            #         self.NC1.append(nc1)
+            #         self.NC2.append(nc2)
+            #         self.EC1.append(ec1)
+            #         self.EC2.append(ec2)
 
-                    logger.info('Train Epoch: {}'.format(epoch))
-                    logger.info(
-                        '- node correctness: {:.4f}%, {:.4f}%'.format(nc1, nc2))
-                    logger.info(
-                        '- edge correctness: {:.4f}%, {:.4f}%'.format(ec1, ec2))
-                if src_idx % 100 == 1:
-                    logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]'.format(
-                        epoch, src_idx * hyperpara_dict['batch_size'],
-                        len(src_loader.dataset), 100. * src_idx / len(src_loader)))
-            logger.info('- GW distance = {:.4f}.'.format(gw/len(src_loader)))
+            #         logger.info('Train Epoch: {}'.format(epoch))
+            #         logger.info(
+            #             '- node correctness: {:.4f}%, {:.4f}%'.format(nc1, nc2))
+            #         logger.info(
+            #             '- edge correctness: {:.4f}%, {:.4f}%'.format(ec1, ec2))
+            #     if src_idx % 100 == 1:
+            #         logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]'.format(
+            #             epoch, src_idx * hyperpara_dict['batch_size'],
+            #             len(src_loader.dataset), 100. * src_idx / len(src_loader)))
+            # logger.info('- GW distance = {:.4f}.'.format(gw/len(src_loader)))
 
             trans_tmp /= np.max(trans_tmp)
             self.trans = trans_tmp

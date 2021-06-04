@@ -1,12 +1,13 @@
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
+# from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank
 import algorithms
-from experiment import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
+# from experiment import ex, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args
+from experiment import ex, _algs, _acc_names
 from experiment.special_settings import *
 from experiment.experiments import *
-from experiment.commands import *
-from experiment.generate import init1, init2, loadnx
 from experiment.run import run_exp
-from experiment.save import plotS_G, plot_G, savexls, plotres
+from experiment.save import plotS_G, plot_G, save
+
+from generation.generate import init1, init2, loadnx
 
 import numpy as np
 import scipy.sparse as sps
@@ -20,68 +21,11 @@ import pickle
 @ex.config
 def global_config():
 
-    GW_args = _GW_args
-    CONE_args = _CONE_args
-    GRASP_args = _GRASP_args
-    REGAL_args = _REGAL_args
-    LREA_args = _LREA_args
-    NSD_args = _NSD_args
-
-    ISO_args = _ISO_args
-    NET_args = _NET_args
-    KLAU_args = _KLAU_args
-
-    GW_mtype = 4
-    CONE_mtype = -4
-    GRASP_mtype = -4
-    REGAL_mtype = -4
-    LREA_mtype = 4
-    NSD_mtype = 40
-
-    ISO_mtype = 2
-    NET_mtype = 3
-    KLAU_mtype = 3
-
-    algs = [
-        (gwl, GW_args, GW_mtype),
-        (conealign, CONE_args, CONE_mtype),
-        (grasp, GRASP_args, GRASP_mtype),
-        (regal, REGAL_args, REGAL_mtype),
-        (eigenalign, LREA_args, LREA_mtype),
-        (NSD, NSD_args, NSD_mtype),
-
-        (isorank, ISO_args, ISO_mtype),
-        (netalign, NET_args, NET_mtype),
-        (klaus, KLAU_args, KLAU_mtype)
-    ]
-
-    alg_names = [
-        "GW",
-        "CONE",
-        "GRASP",
-        "REGAL",
-        "LREA",
-        "NSD",
-
-        "ISO",
-        "NET",
-        "KLAU"
-    ]
-
-    acc_names = [
-        "acc",
-        "S3",
-        "IC",
-        "S3gt",
-        "mnc",
-    ]
-
     run = [
         0,      # gwl
         1,      # conealign
         2,      # grasp
         3,      # regal
-
         4,      # eigenalign
         5,      # NSD
 
@@ -90,49 +34,84 @@ def global_config():
         # 8,      # klaus
     ]
 
-    graphs = [
-        (lambda x: x, ('data/arenas/source.txt',)),
+    accs = [
+        0,      # acc
+        # 1,      # EC
+        # 2,      # ICS
+        # 3,      # S3
+        # 4,      # jacc
+        # 5,      # mnc
     ]
 
-    noises = [
-        0.05
-    ]
+    algs = [_algs[i] for i in run]
+
+    mall = False
+
+    if mall:
+        algs = [
+            (alg, args, [1, 2, 3, 30, -1, -2, -3, -30], algname) for alg, args, _, algname in algs
+        ]
+
+    acc_names = [_acc_names[i] for i in accs]
 
     tmp = []
+
+
+def configg():
+    tmp = [
+        # list(range(50)) for _ in range(6)
+        # list(range(100)) for _ in range(3)
+        # list(range(150)) for _ in range(2)
+        list(range(300)) for _ in range(1)
+    ]
+
+    tmp = np.array(tmp)
+
+    # tmp = tmp.T
+
+    tmp = tmp.flatten()
+
+    G = nx.generators.degree_seq.configuration_model(tmp.tolist(), nx.Graph)
+
+    G.remove_edges_from(nx.selfloop_edges(G))
+
+    return lambda x: x, (G,)
 
 
 @ex.named_config
 def playground():
 
-    # iters = 10
-
     graph_names = [
+        # "gnp",
         # "barabasi",
         # "powerlaw",
         "arenas",
         # "LFR_span",
         # "facebook",
+        # "astro",
+        # "yeast5"
+        # "k_normal"
     ]
 
-    # acc_names = [
-    #     5, 4, 3, 2, 1
-    # ]
-
-    # alg_names = [
-    #     "gw1",
-    #     "gw2",
-    #     "gw3",
-    #     "gw4",
-    #     "gw5",
-    #     "gw6",
-    # ]
+    # print(tmp)
 
     graphs = [
-        # (nx.newman_watts_strogatz_graph, (100, 3, 0.5)),
+        # configg(),
+        # (nx.newman_watts_strogatz_graph, (20, 3, 0.5)),
+        # (nx.newman_watts_strogatz_graph, (100, 3, 0.0)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
-        # (nx.gnp_random_graph, (50, 0.9)),
-        # (nx.barabasi_albert_graph, (100, 5)),
+        # (nx.gnp_random_graph, (35000, 0.0003)),
+        # (nx.gnp_random_graph, (1000, 0.01)),
+        # (nx.random_regular_graph, (1000, 0.01)),
+
+        # (nx.barabasi_albert_graph, (50, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
+
+        # (lambda x:x, [[
+        #     "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
+        #     "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_99.txt",
+        #     None
+        # ]])
 
         # (nx.relaxed_caveman_graph, (20, 5, 0.2)),
 
@@ -162,37 +141,27 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        (loadnx, ('data/arenas/source.txt',)),
-        # (loadnx, ('data/facebook/source.txt',)),
-        # (loadnx, ('data/CA-AstroPh/source.txt',)),
+        (loadnx, ('data/arenas.txt',)),
+        # (loadnx, ('data/facebook.txt',)),
+        # (loadnx, ('data/CA-AstroPh.txt',)),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
-        # (lambda x: x, ('data/arenas/source.txt',)),
-        # (lambda x: x, ('data/CA-AstroPh/source.txt',)),
-        # (lambda x: x, ('data/facebook/source.txt',)),
-
-        # (lambda x: x, ({'dataset': 'arenas_old',
-        #                 'edges': 1, 'noise_level': 5},)),
-
-        # (lambda x: x, ({'dataset': 'arenas',
-        #                 'edges': 1, 'noise_level': 5},)),
-
-        # (lambda x: x, ({'dataset': 'CA-AstroPh',
-        #                 'edges': 1, 'noise_level': 5},)),
-
-        # (lambda x: x, ({'dataset': 'facebook',
-        #                 'edges': 1, 'noise_level': 5},)),
+        # (lambda x: x, ('data/arenas.txt',)),
+        # (lambda x: x, ('data/CA-AstroPh.txt',)),
+        # (lambda x: x, ('data/facebook.txt',)),
     ]
 
     # no_disc = False
+
+    iters = 6
 
     noises = [
         # 0.00,
 
         # 0.01,
-        # 0.02,
+        # # 0.02,
         # 0.03,
-        # 0.04,
+        # # 0.04,
         0.05,
 
         # 0.06,
@@ -212,59 +181,79 @@ def playground():
 
 
 @ex.automain
-def main(_config, _run, _log, verbose=False, load=[], plot=[], nice=10):
+def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
 
     path = f"runs/{_run._id}"
 
+    def runid(_id):
+        return _id if _id > 0 else int(_run._id) + _id
+
     def load_path(_id):
-        _id = _id if _id > 0 else int(_run._id) + _id
-        return f"runs/{_id}"
+        return f"runs/{runid(_id)}"
+
+    # try:
+    if not verbose:
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+        algorithms.GWL.dev.util.logger.disabled = True
 
     try:
-        if not verbose:
-            sys.stdout = open(os.devnull, 'w')
-            sys.stderr = open(os.devnull, 'w')
-            algorithms.GWL.dev.util.logger.disabled = True
-
-        try:
-            os.nice(nice)
-        except Exception:
-            pass
-
-        if len(load) > 0:
-            S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
-            randcheck1 = load[0]
-        else:
-            S_G, randcheck1 = init1()
-
-        pickle.dump(S_G, open(f"{path}/_S_G.pickle", "wb"))
-        if len(plot) > 0 and plot[0]:
-            plotS_G(S_G)
-
-        if len(load) > 1:
-            G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
-            randcheck2 = load[1]
-        else:
-            G, randcheck2 = init2(S_G)
-
-        pickle.dump(G, open(f"{path}/_G.pickle", "wb"))
-        if len(plot) > 1 and plot[1]:
-            plot_G(G)
-
-        randcheck = (randcheck1, randcheck2)
-        _log.info("randcheck: %s", randcheck)
-        open(f"{path}/_randcheck.txt", "w").write(str(randcheck))
-
-        if len(load) > 2:
-            res5 = np.load(f"{load_path(load[2])}/_res5.npy")
-        else:
-            res5 = run_exp(G, path)
-
-        np.save(f"{path}/_res5", res5)
-
-        os.makedirs(f"{path}/res")
-        savexls(res5, f"{path}/res")
-        plotres(res5, f"{path}/res")
-
+        os.nice(nice)
     except Exception:
-        _log.exception("")
+        pass
+
+    if len(load) > 0:
+        S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
+        randcheck1 = runid(load[0])
+        # S_G, randcheck1 = init1(path=load_path(load[0]))
+    else:
+        S_G, randcheck1 = init1()
+
+    pickle.dump(S_G, open(f"{path}/_S_G.pickle", "wb"))
+    if len(plot) > 0 and plot[0]:
+        plotS_G(S_G)
+
+    if len(load) > 1:
+        G = pickle.load(open(f"{load_path(load[1])}/_G.pickle", "rb"))
+        randcheck2 = runid(load[1])
+        # G, randcheck2 = init2(S_G, path=load_path(load[1]))
+    else:
+        G, randcheck2 = init2(S_G)
+
+    pickle.dump(G, open(f"{path}/_G.pickle", "wb"))
+    if len(plot) > 1 and plot[1]:
+        plot_G(G)
+
+    # gg = np.array(G)
+
+    # print(gg.shape)
+
+    # G = gg[:, :, -1:, :].tolist()
+
+    # exit()
+
+    randcheck = (randcheck1, randcheck2)
+    _log.info("randcheck: %s", randcheck)
+    open(f"{path}/_randcheck.txt", "w").write(str(randcheck))
+
+    if len(load) > 2:
+        time5 = np.load(f"{load_path(load[2])}/_time5.npy")
+        res6 = np.load(f"{load_path(load[2])}/_res6.npy")
+        # time = np.load(f"{load_path(load[2])}/_time4.npy")
+        # time = np.expand_dims(time, axis=0)
+        # time6 = np.expand_dims(time, axis=0)
+        # res = np.load(f"{load_path(load[2])}/_res5.npy")
+        # res = np.expand_dims(res, axis=0)
+        # res6 = np.expand_dims(res, axis=0)
+    else:
+        time5, res6 = run_exp(G, path)
+
+    np.save(f"{path}/_time5", time5)
+    np.save(f"{path}/_res6", res6)
+
+    os.makedirs(f"{path}/res")
+    save(time5, res6, f"{path}/res")
+
+    # except Exception:
+    #     _log.exception("")
+    #     raise

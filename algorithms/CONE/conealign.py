@@ -5,7 +5,7 @@ import argparse
 import time
 from scipy.sparse import csr_matrix, coo_matrix
 from sklearn.neighbors import KDTree
-from data import ReadFile
+# from data import ReadFile
 from . import unsup_align, embedding
 
 

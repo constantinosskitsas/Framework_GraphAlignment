@@ -1,0 +1,34 @@
+_algs:
+- - !!python/module:algorithms.NSD.NSD ''
+  - alpha: 0.8
+    iters: 10
+  - 5
+_graphs:
+- - !!python/name:__main__.%3Clambda%3E ''
+  - - data/arenas_old/source.txt
+_noises:
+- 0.0
+- 0.01
+- 0.02
+- 0.03
+- 0.04
+- 0.05
+iters: 10
+lalpha: null
+mind: null
+mnc: true
+noise_level: 0.05
+noise_type: 1
+noise_types: !!python/name:__main__.noise_types ''
+output_path: results/pg_2021-04-25_20'55'28,223945
+plot: false
+prep: false
+randcheck: !!python/tuple
+- 0.9371974931448463
+- 0.14949874111238037
+run:
+- 5
+run_id: '7'
+save: false
+seed: 84493805
+verbose: false

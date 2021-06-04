@@ -1,0 +1,36 @@
+_algs:
+- - !!python/module:algorithms.LREA.eigenalign ''
+  - bmatch: 3
+    default_params: true
+    iters: 8
+    method: lowrank_svd_union
+  - 5
+_graphs:
+- - !!python/name:__main__.%3Clambda%3E ''
+  - - data/arenas_old/source.txt
+_noises:
+- 0.0
+- 0.01
+- 0.02
+- 0.03
+- 0.04
+- 0.05
+iters: 1
+lalpha: null
+mind: null
+mnc: true
+noise_level: 0.05
+noise_type: 1
+noise_types: !!python/name:__main__.noise_types ''
+output_path: results/pg_2021-04-25_21'42'10,314941
+plot: false
+prep: false
+randcheck: !!python/tuple
+- 0.9447029205574218
+- 0.949892574658152
+run:
+- 4
+run_id: '20'
+save: false
+seed: 982399652
+verbose: false

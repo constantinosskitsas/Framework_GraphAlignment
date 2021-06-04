@@ -1,0 +1,110 @@
+_algs:
+- - !!python/module:algorithms.GWL.gwl ''
+  - gamma: 0.8
+    hyperpara_dict:
+      cost_type: cosine
+      dimension: 90
+      loss_type: L2
+      ot_method: proximal
+    lr: 0.001
+    opt_dict:
+      batch_size: 1000000
+      beta: 0.1
+      display: false
+      epochs: 1
+      inner_iteration: 1
+      outer_iteration: 400
+      prefix: results
+      prior: false
+      sgd_iteration: 300
+      strategy: soft
+      use_cuda: false
+- - !!python/module:algorithms.CONE.conealign ''
+  - alignmethod: greedy
+    bsz: 10
+    dim: 128
+    embsim: euclidean
+    lr: 1.0
+    negative: 1.0
+    nepoch: 5
+    niter_align: 10
+    niter_init: 10
+    numtop: 10
+    reg_align: 0.05
+    reg_init: 1.0
+    window: 10
+- - !!python/module:algorithms.GrASp.grasp ''
+  - base_align: true
+    icp: false
+    icp_its: 3
+    k: 20
+    laa: 2
+    linsteps: true
+    lower_t: 1.0
+    n_eig: null
+    q: 100
+    upper_t: 50.0
+- - !!python/module:algorithms.REGAL.regal ''
+  - alpha: 0.01
+    attributes: null
+    attrvals: 2
+    buckets: 2
+    dimensions: 128
+    gammaattr: 1.0
+    gammastruc: 1.0
+    k: 10
+    numtop: 10
+    untillayer: 2
+- - !!python/module:algorithms.LREA.eigenalign ''
+  - bmatch: 3
+    default_params: true
+    iters: 8
+    method: lowrank_svd_union
+- - !!python/module:algorithms.NSD.NSD ''
+  - alpha: 0.8
+    iters: 10
+- - !!python/module:algorithms.isorank.isorank2 ''
+  - alpha: null
+    maxiter: 100
+    tol: 1.0e-12
+_graphs:
+- - !!python/name:__main__.%3Clambda%3E ''
+  - - data/arenas/source.txt
+_mtype:
+- 1
+- 2
+- 3
+- 0
+- 2
+- 1
+- 1
+_noises:
+- target_noise: 0.05
+- refill: true
+  target_noise: 0.05
+- source_noise: 0.05
+  target_noise: 0.05
+- refill: true
+  source_noise: 0.05
+  target_noise: 0.05
+iters: 10
+lalpha: null
+mind: null
+mnc: true
+n: 500
+noise_level: 0.05
+output_path: results/pg_2021-04-19_09;16;04,625727
+plot: true
+prep: false
+randcheck: 0.444419991500588
+run:
+- 0
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+save: true
+seed: 401279427
+verbose: true

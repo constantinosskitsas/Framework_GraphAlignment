@@ -1,0 +1,34 @@
+_algs:
+- - !!python/module:algorithms.REGAL.regal ''
+  - alpha: 0.01
+    attributes: null
+    attrvals: 2
+    buckets: 2
+    dimensions: 128
+    gammaattr: 1.0
+    gammastruc: 1.0
+    k: 10
+    numtop: 10
+    untillayer: 2
+_graphs:
+- - !!python/name:__main__.%3Clambda%3E ''
+  - - data/arenas/source.txt
+_mtype:
+- 2
+_noises:
+- target_noise: 0.05
+iters: 1
+lalpha: null
+mind: null
+mnc: false
+n: 500
+noise_level: 0.05
+output_path: results/pg_2021-04-20_18;35;17,040081
+plot: false
+prep: false
+randcheck: 0.7668353696279979
+run:
+- 3
+save: true
+seed: 346320638
+verbose: false

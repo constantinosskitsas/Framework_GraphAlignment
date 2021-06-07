@@ -328,6 +328,9 @@ def real_noise():
 
     s_trans = (2, 1, 0, 3)
 
+    # (g,alg,acc,n,i)
+    # s_trans = (3, 1, 2, 0, 4)
+
 
 def rgraphs(gnames):
     return [
@@ -346,19 +349,20 @@ def real():
         # "ca-netscience",        # 379   / 914
         # "bio-celegans",         # 453   / 2k
         # "arenas",               # 1.1k  / 5.4k
-        # "inf-euroroad",         # 1.2K  / 1.4K
-        # "soc-hamsterster",      # 2.4K  / 16.6K
+        # "inf-euroroad",         # 1.2K  / 1.4K      - 100 disc
         # "inf-power",            # 4.9K  / 6.6K
-        # "ca-GrQc",              # 4.2k  / 13.4K   - (5.2k  / 14.5K)?
-        # "ca-Erdos992",          # 6.1K  / 7.5K    - 1k disc ;v
+        # "ca-GrQc",              # 4.2k  / 13.4K     - (5.2k  / 14.5K)?
         # "bio-dmela",            # 7.4k  / 25.6k
 
-        "socfb-Bowdoin47",      # 2.3K  / 84.4K     - 2 disc
-        "socfb-Hamilton46",     # 2.3K  / 96.4K     - 2 disc
-        "socfb-Haverford76",    # 1.4K  / 59.6K
-        "socfb-Swarthmore42",   # 1.7K  / 61.1K
+        # "socfb-Bowdoin47",      # 2.3K  / 84.4K     - 2 disc
+        # "socfb-Hamilton46",     # 2.3K  / 96.4K     - 2 disc
+        # "socfb-Haverford76",    # 1.4K  / 59.6K
+        # "socfb-Swarthmore42",   # 1.7K  / 61.1K     - 2 disc
         # "facebook",             # 4k    / 87k
         # "CA-AstroPh",           # 18k   / 195k
+
+        # "soc-hamsterster",      # 2.4K  / 16.6K     - 400 disc
+        # "ca-Erdos992",          # 6.1K  / 7.5K      - 1k disc
     ]
 
     graphs = rgraphs(graph_names)

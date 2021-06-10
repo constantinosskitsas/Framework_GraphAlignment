@@ -51,6 +51,11 @@ def plotS_G(S_G, _log):
             except Exception:
                 pass
             try:
+                g_cc = len(max(nx.connected_components(g), key=len))
+                _log.debug([g_cc, len(g.nodes)])
+            except Exception:
+                pass
+            try:
                 plotG(g, 'Src')
             except Exception:
                 pass

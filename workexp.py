@@ -62,7 +62,7 @@ def configg():
         # list(range(50)) for _ in range(6)
         # list(range(100)) for _ in range(3)
         # list(range(150)) for _ in range(2)
-        list(range(300)) for _ in range(1)
+        list(range(50)) for _ in range(10)
     ]
 
     tmp = np.array(tmp)
@@ -85,18 +85,18 @@ def playground():
         # "gnp",
         # "barabasi",
         # "powerlaw",
-        "arenas",
+        # "arenas",
         # "LFR_span",
         # "facebook",
         # "astro",
         # "yeast5"
-        # "k_normal"
+        "k_normal"
     ]
 
     # print(tmp)
 
     graphs = [
-        # configg(),
+        configg(),
         # (nx.newman_watts_strogatz_graph, (20, 3, 0.5)),
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.0)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
@@ -141,7 +141,7 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        (loadnx, ('data/arenas.txt',)),
+        # (loadnx, ('data/arenas.txt',)),
         # (loadnx, ('data/facebook.txt',)),
         # (loadnx, ('data/CA-AstroPh.txt',)),
 
@@ -153,16 +153,16 @@ def playground():
 
     # no_disc = False
 
-    iters = 6
+    iters = 5
 
     noises = [
-        # 0.00,
+        0.00,
 
         # 0.01,
         # # 0.02,
         # 0.03,
         # # 0.04,
-        0.05,
+        # 0.05,
 
         # 0.06,
         # 0.07,

@@ -42,8 +42,8 @@ def plotG(G, name="", end=True, circular=False):
 
 
 @ex.capture
-def plotS_G(S_G, _log):
-    for gi in S_G:
+def plotS_G(S_G, _log, graph_names):
+    for i, gi in enumerate(S_G):
         for g in gi:
             try:
                 _log.debug([len(x)
@@ -56,7 +56,8 @@ def plotS_G(S_G, _log):
             except Exception:
                 pass
             try:
-                plotG(g, 'Src')
+                # plotG(g, 'Src')
+                plotG(g, graph_names[i])
             except Exception:
                 pass
 

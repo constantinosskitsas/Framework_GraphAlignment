@@ -9,6 +9,9 @@ from experiment.save import plotS_G, plot_G, save
 
 from generation.generate import init1, init2, loadnx
 
+import signal
+import subprocess
+
 import numpy as np
 import scipy.sparse as sps
 import networkx as nx
@@ -181,7 +184,7 @@ def playground():
 
 
 @ex.automain
-def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
+def main(_run, _log, verbose=False, load=[], plot=[], nice=10, mon=False):
 
     path = f"runs/{_run._id}"
 
@@ -201,6 +204,13 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
         os.nice(nice)
     except Exception:
         pass
+
+    if mon:
+        # p = Process(target=monitor.monitor, args=(f"{path}/res",))
+        # p.start()
+        os.makedirs(f"{path}/mon")
+        proc = subprocess.Popen(
+            ['python', 'monitor.py', f"{path}/mon"], shell=False)
 
     if len(load) > 0:
         S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
@@ -253,6 +263,13 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
 
     os.makedirs(f"{path}/res")
     save(time5, res6, f"{path}/res")
+
+    if mon:
+        proc.send_signal(signal.SIGINT)
+    # p.terminate()
+
+    # while True:
+    #     pass
 
     # except Exception:
     #     _log.exception("")

@@ -4,20 +4,20 @@ import sys
 import matplotlib.pyplot as plt
 
 
-def save(path, vals):
-    np.save(path, np.array(vals))
-    plt.plot(vals)
+def save(path, vals, dims, ylabel):
+    vals = np.array(vals)
+    np.savetxt(f"{path}.txt", vals)
 
-    # plt.xlabel(xlabel)
-    # plt.xticks(dim3)
-    # if plot_type == 1:
-    #     plt.ylabel("Accuracy")
-    #     plt.ylim([-0.1, 1.1])
-    # else:
-    #     plt.ylabel("Time[s]")
-    #     # plt.yscale('log')
+    vals = vals.reshape(vals.shape[0], -1)
 
-    # plt.legend()
+    plt.figure()
+    for val, dim in zip(vals.T, dims):
+        plt.plot(val, label=dim)
+
+    plt.ylabel(ylabel)
+    plt.xlabel("Time[s]")
+
+    plt.legend()
     plt.savefig(f"{path}.png")
 
 
@@ -35,9 +35,9 @@ def monitor(path, interval=1):
             mem.append(psutil.virtual_memory().used)
     # except KeyboardInterrupt:
     except:
-        save(f"{path}/cpu", np.array(cpu))
-        save(f"{path}/load", np.array(load))
-        save(f"{path}/mem", np.array(mem))
+        save(f"{path}/cpu", cpu, ["cpu"], "usage[%]")
+        save(f"{path}/load", load, ["avg1", "avg5", "avg15"], "load[cores]")
+        save(f"{path}/mem", mem, ["used"], "memory[kb]")
 
         # plt.plot(cpu)
         # plt.show()

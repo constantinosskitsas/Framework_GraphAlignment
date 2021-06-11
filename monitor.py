@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def save(path, vals, dims, ylabel):
     vals = np.array(vals)
-    np.savetxt(f"{path}.txt", vals)
+    np.savetxt(f"{path}.txt", vals, fmt="%.2f")
 
     vals = vals.reshape(vals.shape[0], -1)
 
@@ -32,12 +32,12 @@ def monitor(path, interval=1):
             # print(1)
             cpu.append(psutil.cpu_percent(interval=interval))
             load.append(psutil.getloadavg())
-            mem.append(psutil.virtual_memory().used)
+            mem.append(psutil.virtual_memory().used / (1024 * 1024)) # MiB
     # except KeyboardInterrupt:
     except:
         save(f"{path}/cpu", cpu, ["cpu"], "usage[%]")
         save(f"{path}/load", load, ["avg1", "avg5", "avg15"], "load[cores]")
-        save(f"{path}/mem", mem, ["used"], "memory[kb]")
+        save(f"{path}/mem", mem, ["used"], "memory[MiB]")
 
         # plt.plot(cpu)
         # plt.show()

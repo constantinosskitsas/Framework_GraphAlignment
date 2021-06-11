@@ -53,6 +53,7 @@ def scaling():
     _algs[5][2][0] = 2
     _algs[6][2][0] = 2
 
+    _GW_args["max_cpu"] = 40
     _CONE_args["dim"] = 256
     _GRASP_args["n_eig"] = 256
     _ISO_args["alpha"] = 0.9

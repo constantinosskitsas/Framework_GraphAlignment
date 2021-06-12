@@ -46,7 +46,7 @@ def alg_exe(alg, data, args):
 
 
 @ ex.capture
-def run_alg(_alg, _data, Gt, accs, _log, _run, mall, mon=False):
+def run_alg(_alg, _data, Gt, accs, _log, _run, mall, mon=False, pstart=5):
 
     # random.seed(_seed)
     # np.random.seed(_seed)
@@ -77,8 +77,11 @@ def run_alg(_alg, _data, Gt, accs, _log, _run, mall, mon=False):
             i += 1
         output_path = f"{output_path}/{algname}_{i}"
         os.makedirs(output_path, exist_ok=True)
+
+        time.sleep(pstart)
         proc = subprocess.Popen(
             ['python', 'monitor.py', output_path], shell=False)
+        time.sleep(2)
     start = time.time()
     res = alg_exe(alg, data, args)
     time1.append(time.time()-start)

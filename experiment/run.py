@@ -10,6 +10,9 @@ import time
 import gc
 # from memory_profiler import profile
 
+import signal
+import subprocess
+
 
 def format_output(res):
 
@@ -27,9 +30,11 @@ def format_output(res):
 
     if sps.issparse(sim):
         sim = sim.A
+        # res[0] = sim.A
 
     if sps.issparse(cost):
         cost = cost.A
+        # res[1] = cost.A
 
     return sim, cost
 
@@ -41,7 +46,7 @@ def alg_exe(alg, data, args):
 
 
 @ ex.capture
-def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
+def run_alg(_alg, _data, Gt, accs, _log, _run, mall, mon=False):
 
     # random.seed(_seed)
     # np.random.seed(_seed)
@@ -55,9 +60,30 @@ def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
     time1 = []
 
     # gc.disable()
+    if mon:
+        output_path = f"runs/{_run._id}/mon"
+        os.makedirs(output_path, exist_ok=True)
+
+        # i = 0
+        # while os.path.exists(f"{output_path}/{i}/{algname}"):
+        #     i += 1
+        # output_path = f"{output_path}/{i}"
+        # os.makedirs(output_path, exist_ok=True)
+        # output_path = f"{output_path}/{algname}"
+        # os.makedirs(output_path)
+
+        i = 0
+        while os.path.exists(f"{output_path}/{algname}_{i}"):
+            i += 1
+        output_path = f"{output_path}/{algname}_{i}"
+        os.makedirs(output_path, exist_ok=True)
+        proc = subprocess.Popen(
+            ['python', 'monitor.py', output_path], shell=False)
     start = time.time()
     res = alg_exe(alg, data, args)
     time1.append(time.time()-start)
+    if mon:
+        proc.send_signal(signal.SIGINT)
     # gc.enable()
     # gc.collect()
 

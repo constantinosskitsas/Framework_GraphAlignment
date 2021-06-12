@@ -88,18 +88,18 @@ def playground():
         # "gnp",
         # "barabasi",
         # "powerlaw",
-        # "arenas",
+        "arenas",
         # "LFR_span",
         # "facebook",
         # "astro",
         # "yeast5"
-        "k_normal"
+        # "k_normal"
     ]
 
     # print(tmp)
 
     graphs = [
-        configg(),
+        # configg(),
         # (nx.newman_watts_strogatz_graph, (20, 3, 0.5)),
         # (nx.newman_watts_strogatz_graph, (100, 3, 0.0)),
         # (nx.watts_strogatz_graph, (100, 10, 0.5)),
@@ -144,8 +144,8 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        # (loadnx, ('data/arenas.txt',)),
-        # (loadnx, ('data/facebook.txt',)),
+        (loadnx, ('data/in-arenas.txt',)),
+        # (loadnx, ('data/soc-facebook.txt',)),
         # (loadnx, ('data/CA-AstroPh.txt',)),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
@@ -205,12 +205,12 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10, mon=False):
     except Exception:
         pass
 
-    if mon:
-        # p = Process(target=monitor.monitor, args=(f"{path}/res",))
-        # p.start()
-        os.makedirs(f"{path}/mon")
-        proc = subprocess.Popen(
-            ['python', 'monitor.py', f"{path}/mon"], shell=False)
+    # if mon:
+    #     # p = Process(target=monitor.monitor, args=(f"{path}/res",))
+    #     # p.start()
+    #     os.makedirs(f"{path}/mon")
+    #     proc = subprocess.Popen(
+    #         ['python', 'monitor.py', f"{path}/mon"], shell=False)
 
     if len(load) > 0:
         S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
@@ -238,7 +238,7 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10, mon=False):
 
     # print(gg.shape)
 
-    # G = gg[:, :, -1:, :].tolist()
+    # G = gg[:1, :, :1, :].tolist()
 
     # exit()
 
@@ -264,8 +264,8 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10, mon=False):
     os.makedirs(f"{path}/res")
     save(time5, res6, f"{path}/res")
 
-    if mon:
-        proc.send_signal(signal.SIGINT)
+    # if mon:
+    #     proc.send_signal(signal.SIGINT)
     # p.terminate()
 
     # while True:

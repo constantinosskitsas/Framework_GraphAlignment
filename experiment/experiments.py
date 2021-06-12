@@ -75,10 +75,11 @@ def scaling():
     # xlabel = "kdist"
     # graphs = aaa(tmp, dist_type=1)
     # xlabel = "powerlaw"
-    graphs = aaa(tmp, dist_type=2)
+    # graphs = aaa(tmp, dist_type=2)
     xlabel = "normal"
     # graphs = aaa(tmp, dist_type=3)
     # xlabel = "poisson"
+    graphs = []
 
     graph_names = ggg(tmp)
 

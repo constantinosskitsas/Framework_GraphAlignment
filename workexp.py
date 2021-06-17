@@ -35,6 +35,7 @@ def global_config():
         # 6,      # isorank
         # 7,      # netalign
         # 8,      # klaus
+        # 9,      # SGWL
     ]
 
     accs = [
@@ -86,9 +87,11 @@ def playground():
 
     graph_names = [
         # "gnp",
-        # "barabasi",
+        "barabasi",
+        # "barabasi2",
+        # "barabasi3",
         # "powerlaw",
-        "arenas",
+        # "arenas",
         # "LFR_span",
         # "facebook",
         # "astro",
@@ -107,7 +110,9 @@ def playground():
         # (nx.gnp_random_graph, (1000, 0.01)),
         # (nx.random_regular_graph, (1000, 0.01)),
 
-        # (nx.barabasi_albert_graph, (50, 3)),
+        # (nx.barabasi_albert_graph, (500, 3)),
+        (nx.barabasi_albert_graph, (1133, 5)),
+        # (nx.barabasi_albert_graph, (2000, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (lambda x:x, [[
@@ -144,7 +149,7 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        (loadnx, ('data/in-arenas.txt',)),
+        # (loadnx, ('data/in-arenas.txt',)),
         # (loadnx, ('data/soc-facebook.txt',)),
         # (loadnx, ('data/CA-AstroPh.txt',)),
 
@@ -165,7 +170,7 @@ def playground():
         # # 0.02,
         # 0.03,
         # # 0.04,
-        # 0.05,
+        0.05,
 
         # 0.06,
         # 0.07,

@@ -202,6 +202,7 @@ def run_algs(g, algs, _log, _run, prep=False, circular=False):
     n = Gt[0].size
 
     # prefix = f"{output_path}/graphs/{graph_number+1:0>2d}_{noise_level+1:0>2d}_{i+1:0>2d}"
+    # prefix = f""
     # Gt_m = np.c_[np.arange(n), Gt[0]]
     # np.savetxt(f"{prefix}_Src.txt", Src_e, fmt='%d')
     # np.savetxt(f"{prefix}_Tar.txt", Tar_e, fmt='%d')

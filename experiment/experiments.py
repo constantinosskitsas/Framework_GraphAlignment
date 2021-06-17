@@ -22,7 +22,10 @@ def aaa(vals, dist_type=0):
             dist = np.random.normal(10, 1, val)
             # dist = np.random.normal(val, 1, 2**14)
         if dist_type == 3:
-            dist = np.random.poisson(lam=10, size=val)
+            dist = np.random.poisson(lam=1, size=val)
+            dist = np.array(dist)
+            dist += 1
+            dist = dist.tolist()
 
         dist = [round(num) for num in dist]
         usum = sum(dist)
@@ -54,6 +57,7 @@ def scaling():
     _algs[6][2][0] = 2
 
     _GW_args["max_cpu"] = 40
+    # _CONE_args["dim"] = 1000
     _CONE_args["dim"] = 256
     _GRASP_args["n_eig"] = 256
     _ISO_args["alpha"] = 0.9
@@ -84,7 +88,11 @@ def scaling():
     graph_names = ggg(tmp)
 
     noises = [
-        0.01
+        # 0.00,
+        0.01,
+        # 0.02,
+        # 0.03
+        # 0.04,
     ]
 
     s_trans = (2, 1, 0, 3)

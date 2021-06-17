@@ -1,7 +1,7 @@
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
 import logging
-from algorithms import gwl as gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus
+from algorithms import gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl
 
 ex = Experiment("ex")
 
@@ -62,29 +62,29 @@ _GW_args = {
     # 'max_cpu': 4
 }
 
-# _GW_args = {
-#     'ot_dict': {
-#         'loss_type': 'L2',  # the key hyperparameters of GW distance
-#         'ot_method': 'proximal',
-#         'beta': 0.2,
-#         # outer, inner iteration, error bound of optimal transport
-#         'outer_iteration': None,  # num od nodes
-#         'iter_bound': 1e-10,
-#         'inner_iteration': 2,
-#         'sk_bound': 1e-10,
-#         'node_prior': 10,
-#         'max_iter': 5,  # iteration and error bound for calcuating barycenter
-#         'cost_bound': 1e-16,
-#         'update_p': False,  # optional updates of source distribution
-#         'lr': 0,
-#         'alpha': 0
-#     },
-#     # "mn": 0,  # gwl
-#     "mn": 1,  # s-gwl-3
-#     # "mn": 2,  # s-gwl-2
-#     # "mn": 3,  # s-gwl-1
-#     'max_cpu': 20,
-# }
+_SGW_args = {
+    'ot_dict': {
+        'loss_type': 'L2',  # the key hyperparameters of GW distance
+        'ot_method': 'proximal',
+        'beta': 0.2,
+        # outer, inner iteration, error bound of optimal transport
+        'outer_iteration': None,  # num od nodes
+        'iter_bound': 1e-10,
+        'inner_iteration': 2,
+        'sk_bound': 1e-10,
+        'node_prior': 10,
+        'max_iter': 5,  # iteration and error bound for calcuating barycenter
+        'cost_bound': 1e-16,
+        'update_p': False,  # optional updates of source distribution
+        'lr': 0,
+        'alpha': 0
+    },
+    # "mn": 0,  # gwl
+    "mn": 1,  # s-gwl-3
+    # "mn": 2,  # s-gwl-2
+    # "mn": 3,  # s-gwl-1
+    'max_cpu': 20,
+}
 
 _CONE_args = {
     'dim': 128,  # clipped by Src[0] - 1
@@ -178,7 +178,8 @@ _algs = [
 
     (isorank, _ISO_args, [3], "ISO"),
     (netalign, _NET_args, [3], "NET"),
-    (klaus, _KLAU_args, [3], "KLAU")
+    (klaus, _KLAU_args, [3], "KLAU"),
+    (sgwl, _SGW_args, [3], "SGW")
 ]
 
 _acc_names = [

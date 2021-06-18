@@ -66,21 +66,21 @@ _SGW_args = {
     'ot_dict': {
         'loss_type': 'L2',  # the key hyperparameters of GW distance
         'ot_method': 'proximal',
-        'beta': 0.2,
+        'beta': 0.025,
         # outer, inner iteration, error bound of optimal transport
-        'outer_iteration': None,  # num od nodes
+        'outer_iteration': 2000,  # num od nodes
         'iter_bound': 1e-10,
         'inner_iteration': 2,
-        'sk_bound': 1e-10,
-        'node_prior': 10,
-        'max_iter': 5,  # iteration and error bound for calcuating barycenter
-        'cost_bound': 1e-16,
+        'sk_bound': 1e-30,
+        'node_prior': 1000,
+        'max_iter': 4,  # iteration and error bound for calcuating barycenter
+        'cost_bound': 1e-26,
         'update_p': False,  # optional updates of source distribution
         'lr': 0,
         'alpha': 0
     },
-    # "mn": 0,  # gwl
-    "mn": 1,  # s-gwl-3
+    "mn": 1,  # gwl
+    # "mn": 1,  # s-gwl-3
     # "mn": 2,  # s-gwl-2
     # "mn": 3,  # s-gwl-1
     'max_cpu': 20,

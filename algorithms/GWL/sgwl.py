@@ -40,24 +40,25 @@ def main(data, ot_dict, mn, max_cpu=0):
             cost_s, cost_t, p_s, p_t, idx2node_s, idx2node_t, ot_dict)
     else:
         pairs_idx, pairs_name, pairs_confidence, trans = GwGt.recursive_direct_graph_matching(
-            cost_s, cost_t, p_s, p_t, idx2node_s, idx2node_t, ot_dict,
-            weights=None, predefine_barycenter=False, cluster_num=cluster_num[mn - 1],
-            partition_level=partition_level[mn - 1], max_node_num=0)
+            0.5 * (cost_s + cost_s.T), 0.5 * (cost_t + cost_t.T), p_s, p_t,
+            idx2node_s, idx2node_t, ot_dict, weights=None, predefine_barycenter=False,
+            cluster_num=2, partition_level=3, max_node_num=0
+        )
 
     pairs = np.array(pairs_name)[::-1].T
 
     # print(pairs)
     # print(pairs_idx)
-    print(pairs.shape)
+    # print(pairs.shape)
 
-    res = sps.csr_matrix((np.ones(pairs.shape[1]), pairs)).A
-    # res[:, -1] = 0.01
-    # print(res)
-    print(trans.shape)
-    print(pairs_name)
+    # res = sps.csr_matrix((np.ones(pairs.shape[1]), pairs)).A
+    # # res[:, -1] = 0.01
+    # # print(res)
+    # print(trans.shape)
+    # print(pairs_name)
 
-    return res
-    # return trans
+    # return res
+    return trans
 
     # Src = data['Src']
     # Tar = data['Tar']

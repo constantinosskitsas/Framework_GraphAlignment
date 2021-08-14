@@ -7,7 +7,7 @@ import time
 import os
 import sys
 import scipy.sparse as sps
-
+#original code from https://github.com/GemsLab/REGAL
 try:
     import cPickle as pickle
 except ImportError:

@@ -2,7 +2,7 @@ import scipy.sparse as sps
 import numpy as np
 from ..maxrowmatchcpp import column_maxmatchsum
 from .. import bipartitewrapper as bmw
-
+#original code https://www.cs.purdue.edu/homes/dgleich/codes/netalign/
 
 def maxrowmatch(Q, li, lj, m, n):
 

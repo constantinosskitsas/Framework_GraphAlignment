@@ -7,7 +7,7 @@ from scipy.sparse import csr_matrix, coo_matrix
 from sklearn.neighbors import KDTree
 # from data import ReadFile
 from . import unsup_align, embedding
-
+#original code from https://github.com/GemsLab/CONE-Align
 
 # def parse_args():
 #     parser = argparse.ArgumentParser(description="Run CONE Align.")

@@ -1,7 +1,7 @@
 import scipy.sparse as sps
 import numpy as np
 from .. import bipartitewrapper as bmw
-
+#original code https://www.cs.purdue.edu/homes/dgleich/codes/netalign/
 
 def othermaxplus(dim, li, lj, lw, m, n):
 

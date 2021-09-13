@@ -142,8 +142,8 @@ def playground():
 
         # (loadnx, ('data/arenas_old/source.txt',)),
         (loadnx, ('data/arenas.txt',)),
-        # (loadnx, ('data/facebook.txt',)),
-        # (loadnx, ('data/CA-AstroPh.txt',)),
+        (loadnx, ('data/facebook.txt',)),
+        (loadnx, ('data/CA-AstroPh.txt',)),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas.txt',)),
@@ -156,12 +156,12 @@ def playground():
     iters = 6
 
     noises = [
-        # 0.00,
+        0.00,
 
-        # 0.01,
-        # # 0.02,
-        # 0.03,
-        # # 0.04,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
         0.05,
 
         # 0.06,

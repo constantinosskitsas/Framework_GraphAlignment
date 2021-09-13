@@ -53,6 +53,8 @@ def remove_e(edges, noise, no_disc=True, until_connected=False):
         graph_cc = len(max(nx.connected_components(graph), key=len))
         print(graph_cc, np.amax(edges)+1)
         graph_connected = graph_cc == np.amax(edges) + 1
+        # if not graph_connected:
+        #     break
         if graph_connected or not until_connected:
             break
     return new_edges

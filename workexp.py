@@ -9,6 +9,9 @@ from experiment.save import plotS_G, plot_G, save
 
 from generation.generate import init1, init2, loadnx
 
+import signal
+import subprocess
+
 import numpy as np
 import scipy.sparse as sps
 import networkx as nx
@@ -32,6 +35,7 @@ def global_config():
         # 6,      # isorank
         # 7,      # netalign
         # 8,      # klaus
+        # 9,      # SGWL
     ]
 
     accs = [
@@ -62,7 +66,7 @@ def configg():
         # list(range(50)) for _ in range(6)
         # list(range(100)) for _ in range(3)
         # list(range(150)) for _ in range(2)
-        list(range(300)) for _ in range(1)
+        list(range(50)) for _ in range(10)
     ]
 
     tmp = np.array(tmp)
@@ -83,9 +87,11 @@ def playground():
 
     graph_names = [
         # "gnp",
-        # "barabasi",
+        "barabasi",
+        # "barabasi2",
+        # "barabasi3",
         # "powerlaw",
-        "arenas",
+        # "arenas",
         # "LFR_span",
         # "facebook",
         # "astro",
@@ -104,7 +110,9 @@ def playground():
         # (nx.gnp_random_graph, (1000, 0.01)),
         # (nx.random_regular_graph, (1000, 0.01)),
 
-        # (nx.barabasi_albert_graph, (50, 3)),
+        # (nx.barabasi_albert_graph, (500, 3)),
+        (nx.barabasi_albert_graph, (1133, 5)),
+        # (nx.barabasi_albert_graph, (2000, 3)),
         # (nx.powerlaw_cluster_graph, (100, 2, 0.3)),
 
         # (lambda x:x, [[
@@ -141,9 +149,9 @@ def playground():
 
 
         # (loadnx, ('data/arenas_old/source.txt',)),
-        (loadnx, ('data/arenas.txt',)),
-        (loadnx, ('data/facebook.txt',)),
-        (loadnx, ('data/CA-AstroPh.txt',)),
+        # (loadnx, ('data/in-arenas.txt',)),
+        # (loadnx, ('data/soc-facebook.txt',)),
+        # (loadnx, ('data/CA-AstroPh.txt',)),
 
         # (lambda x: x, ('data/arenas_old/source.txt',)),
         # (lambda x: x, ('data/arenas.txt',)),
@@ -153,15 +161,15 @@ def playground():
 
     # no_disc = False
 
-    iters = 6
+    iters = 5
 
     noises = [
         0.00,
 
-        0.01,
-        0.02,
-        0.03,
-        0.04,
+        # 0.01,
+        # # 0.02,
+        # 0.03,
+        # # 0.04,
         0.05,
 
         # 0.06,
@@ -181,7 +189,7 @@ def playground():
 
 
 @ex.automain
-def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
+def main(_run, _log, verbose=False, load=[], plot=[], nice=10, mon=False):
 
     path = f"runs/{_run._id}"
 
@@ -201,6 +209,13 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
         os.nice(nice)
     except Exception:
         pass
+
+    # if mon:
+    #     # p = Process(target=monitor.monitor, args=(f"{path}/res",))
+    #     # p.start()
+    #     os.makedirs(f"{path}/mon")
+    #     proc = subprocess.Popen(
+    #         ['python', 'monitor.py', f"{path}/mon"], shell=False)
 
     if len(load) > 0:
         S_G = pickle.load(open(f"{load_path(load[0])}/_S_G.pickle", "rb"))
@@ -228,7 +243,7 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
 
     # print(gg.shape)
 
-    # G = gg[:, :, -1:, :].tolist()
+    # G = gg[:1, :, :1, :].tolist()
 
     # exit()
 
@@ -253,6 +268,13 @@ def main(_run, _log, verbose=False, load=[], plot=[], nice=10):
 
     os.makedirs(f"{path}/res")
     save(time5, res6, f"{path}/res")
+
+    # if mon:
+    #     proc.send_signal(signal.SIGINT)
+    # p.terminate()
+
+    # while True:
+    #     pass
 
     # except Exception:
     #     _log.exception("")

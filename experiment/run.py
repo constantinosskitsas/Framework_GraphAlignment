@@ -10,6 +10,9 @@ import time
 import gc
 # from memory_profiler import profile
 
+import signal
+import subprocess
+
 
 def format_output(res):
 
@@ -27,9 +30,11 @@ def format_output(res):
 
     if sps.issparse(sim):
         sim = sim.A
+        # res[0] = sim.A
 
     if sps.issparse(cost):
         cost = cost.A
+        # res[1] = cost.A
 
     return sim, cost
 
@@ -41,7 +46,7 @@ def alg_exe(alg, data, args):
 
 
 @ ex.capture
-def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
+def run_alg(_alg, _data, Gt, accs, _log, _run, mall, mon=False, pstart=5):
 
     # random.seed(_seed)
     # np.random.seed(_seed)
@@ -55,9 +60,33 @@ def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
     time1 = []
 
     # gc.disable()
+    if mon:
+        output_path = f"runs/{_run._id}/mon"
+        os.makedirs(output_path, exist_ok=True)
+
+        # i = 0
+        # while os.path.exists(f"{output_path}/{i}/{algname}"):
+        #     i += 1
+        # output_path = f"{output_path}/{i}"
+        # os.makedirs(output_path, exist_ok=True)
+        # output_path = f"{output_path}/{algname}"
+        # os.makedirs(output_path)
+
+        i = 0
+        while os.path.exists(f"{output_path}/{algname}_{i}"):
+            i += 1
+        output_path = f"{output_path}/{algname}_{i}"
+        os.makedirs(output_path, exist_ok=True)
+
+        time.sleep(pstart)
+        proc = subprocess.Popen(
+            ['python', 'monitor.py', output_path], shell=False)
+        time.sleep(2)
     start = time.time()
     res = alg_exe(alg, data, args)
     time1.append(time.time()-start)
+    if mon:
+        proc.send_signal(signal.SIGINT)
     # gc.enable()
     # gc.collect()
 
@@ -111,24 +140,24 @@ def run_alg(_alg, _data, Gt, accs, _log, _run, mall):
 
 # @profile
 @ ex.capture
-def preprocess(Src, Tar, gt, _run):
+def preprocess(Src, Tar, gt, _run, addgt=False):
     start = time.time()
     # L = similarities_preprocess.create_L(Tar, Src)
-    L = similarities_preprocess.create_L(Src, Tar)
+    L2 = similarities_preprocess.create_L(Src, Tar)
     # print(L.shape)
 
-    # gt1 = gt[0]
-    # gt0 = np.arange(gt[0].size)
+    gt1 = gt[0]
+    gt0 = np.arange(gt[0].size)
 
-    # L = sps.coo_matrix((np.ones(gt0.size).tolist(
-    # ), (gt0.tolist(), gt1.tolist())), shape=(gt0.size, gt0.size)).A
+    L = sps.coo_matrix((np.ones(gt0.size).tolist(
+    ), (gt0.tolist(), gt1.tolist())), shape=(gt0.size, gt0.size)).A
 
-    # n = 1000
-    # x = 20
+    # n = 500
+    # x = 30
 
     # for _ in range(x):
-    #     ii = np.random.permutation(1133)[:n]
-    #     jj = np.random.permutation(1133)[:n]
+    #     ii = np.random.permutation(n)
+    #     jj = np.random.randint(0, n, n)
 
     #     for i, j in zip(ii, jj):
     #         L[i, j] = 1
@@ -136,9 +165,20 @@ def preprocess(Src, Tar, gt, _run):
 
     # # L[1] = 1
 
-    # L = sps.csr_matrix(L, dtype=float)
+    L = sps.csr_matrix(L, dtype=float)
 
-    # print(L.size)
+    print(L.size)
+    print(L2.size)
+    print(np.sum(L + L2 > 1))
+
+    if addgt:
+        L = L2 + L
+    else:
+        L = L2
+
+    L[L > 1] = 1
+
+    print(L.size)
 
     # L, _ = regal.main({"Src": Src, "Tar": Tar}, **REGAL_args)
     # L, _ = conealign.main({"Src": Src, "Tar": Tar}, **CONE_args)
@@ -162,6 +202,7 @@ def run_algs(g, algs, _log, _run, prep=False, circular=False):
     n = Gt[0].size
 
     # prefix = f"{output_path}/graphs/{graph_number+1:0>2d}_{noise_level+1:0>2d}_{i+1:0>2d}"
+    # prefix = f""
     # Gt_m = np.c_[np.arange(n), Gt[0]]
     # np.savetxt(f"{prefix}_Src.txt", Src_e, fmt='%d')
     # np.savetxt(f"{prefix}_Tar.txt", Tar_e, fmt='%d')

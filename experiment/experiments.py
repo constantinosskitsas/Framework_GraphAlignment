@@ -7,71 +7,6 @@ import numpy as np
 # mprof run workexp.py with playground run=[1,2,3,4,5] iters=2 win
 
 
-def alggs(tmp):
-    alg, args, mtype, algname = _algs[tmp[0]]
-    return [
-        # (alg, {**args, **update}, mtype, f"{algname}{list(update.values())[0]}") for update in tmp[1]
-        (alg, {**args, **update}, mtype, str(list(update.values())[0])) for update in tmp[1]
-    ]
-
-
-# @ex.named_config
-# def scaling():
-
-#     # Greedied down
-#     _algs[0][2][0] = 2
-#     _CONE_args['window'] = 4
-#     _algs[1][2][0] = -2
-#     _algs[2][2][0] = -2
-#     _algs[3][2][0] = -2
-#     _algs[4][2][0] = 2
-#     _algs[5][2][0] = 2
-#     _algs[6][2][0] = 2
-
-#     run = [3, 4, 5]
-
-#     iters = 1
-
-#     graph_names = [
-#         # "100",
-#         # "1000",
-#         # "10000",
-#         # "100000",
-
-#         # '1024',
-#         # '2048',
-#         # '4096',
-#         # '8192',
-#         # '16384',  # 2 ** 14
-#         '32768',
-#         # '65536',
-#         # '131072',
-#     ]
-
-#     graphs = [
-#         # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
-
-#         # (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
-#         (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
-#         # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
-#     ]
-
-#     noises = [
-#         # 0.00,
-#         0.05,
-#     ]
-
-#     s_trans = (2, 1, 0, 3)
-#     xlabel = "powerlaw"
-
 def aaa(vals, dist_type=0):
     g = []
     for val in vals:
@@ -87,7 +22,10 @@ def aaa(vals, dist_type=0):
             dist = np.random.normal(10, 1, val)
             # dist = np.random.normal(val, 1, 2**14)
         if dist_type == 3:
-            dist = np.random.poisson(lam=10, size=val)
+            dist = np.random.poisson(lam=1, size=val)
+            dist = np.array(dist)
+            dist += 1
+            dist = dist.tolist()
 
         dist = [round(num) for num in dist]
         usum = sum(dist)
@@ -111,7 +49,6 @@ def scaling():
 
     # Greedied down
     _algs[0][2][0] = 2
-    # _CONE_args['window'] = 4
     _algs[1][2][0] = -2
     _algs[2][2][0] = -2
     _algs[3][2][0] = -2
@@ -119,12 +56,13 @@ def scaling():
     _algs[5][2][0] = 2
     _algs[6][2][0] = 2
 
+    _GW_args["max_cpu"] = 40
+    # _CONE_args["dim"] = 1000
     _CONE_args["dim"] = 256
     _GRASP_args["n_eig"] = 256
     _ISO_args["alpha"] = 0.9
     _ISO_args["lalpha"] = 100000  # full dim
 
-    # run = [3, 4, 5]
     run = [1, 2, 3, 4, 5, 6]
 
     iters = 5
@@ -132,7 +70,7 @@ def scaling():
     tmp = [
         # 2**i for i in range(10, 14)
         # 2 ** 15,
-        2 ** 16,
+        # 2 ** 16,
         # 2 ** 17,
         # 10, 100, 1000, 10000
     ]
@@ -141,53 +79,31 @@ def scaling():
     # xlabel = "kdist"
     # graphs = aaa(tmp, dist_type=1)
     # xlabel = "powerlaw"
-    graphs = aaa(tmp, dist_type=2)
+    # graphs = aaa(tmp, dist_type=2)
     xlabel = "normal"
     # graphs = aaa(tmp, dist_type=3)
     # xlabel = "poisson"
+    graphs = []
 
     graph_names = ggg(tmp)
 
-    # graph_names = [
-    #     # "100",
-    #     # "1000",
-    #     # "10000",
-    #     # "100000",
-
-    #     '1024',
-    #     '2048',
-    #     '4096',
-    #     '8192',
-    #     # '16384',  # 2 ** 14
-    #     # '32768',
-    #     # '65536',
-    #     # '131072',
-    # ]
-
-    # graphs = [
-    #     # (nx.powerlaw_cluster_graph, (100, 2, 0.5)),
-    #     # (nx.powerlaw_cluster_graph, (1000, 2, 0.5)),
-    #     # (nx.powerlaw_cluster_graph, (10000, 2, 0.5)),
-    #     # (nx.powerlaw_cluster_graph, (100000, 2, 0.5)),
-
-    #     (nx.powerlaw_cluster_graph, (1024, 2, 0.5)),
-    #     (nx.powerlaw_cluster_graph, (2048, 2, 0.5)),
-    #     (nx.powerlaw_cluster_graph, (4096, 2, 0.5)),
-    #     (nx.powerlaw_cluster_graph, (8192, 2, 0.5)),
-    #     # (nx.powerlaw_cluster_graph, (16384, 2, 0.5)),  # 2 ** 14
-    #     # (nx.powerlaw_cluster_graph, (32768, 2, 0.5)),
-    #     # (nx.gnp_random_graph, (32768, 0.0003)),
-    #     # (nx.powerlaw_cluster_graph, (65536, 2, 0.5)),
-    #     # (nx.powerlaw_cluster_graph, (131072, 2, 0.5)),
-    # ]
-
     noises = [
         # 0.00,
-        0.05,
+        0.01,
+        # 0.02,
+        # 0.03
+        # 0.04,
     ]
 
     s_trans = (2, 1, 0, 3)
-    # xlabel = "k_normal"
+
+
+def alggs(tmp):
+    alg, args, mtype, algname = _algs[tmp[0]]
+    return [
+        # (alg, {**args, **update}, mtype, f"{algname}{list(update.values())[0]}") for update in tmp[1]
+        (alg, {**args, **update}, mtype, str(list(update.values())[0])) for update in tmp[1]
+    ]
 
 
 @ex.named_config
@@ -328,6 +244,9 @@ def real_noise():
 
     s_trans = (2, 1, 0, 3)
 
+    # (g,alg,acc,n,i)
+    # s_trans = (3, 1, 2, 0, 4)
+
 
 def rgraphs(gnames):
     return [
@@ -343,46 +262,26 @@ def real():
     iters = 5
 
     graph_names = [             # n     / e
-        # "ca-netscience",        # 379   / 914
-        # "bio-celegans",         # 453   / 2k
-        # "arenas",               # 1.1k  / 5.4k
-        # "inf-euroroad",         # 1.2K  / 1.4K
-        # "soc-hamsterster",      # 2.4K  / 16.6K
-        # "inf-power",            # 4.9K  / 6.6K
-        # "ca-GrQc",              # 4.2k  / 13.4K   - (5.2k  / 14.5K)?
-        # "ca-Erdos992",          # 6.1K  / 7.5K    - 1k disc ;v
-        # "bio-dmela",            # 7.4k  / 25.6k
+        "ca-netscience",        # 379   / 914   / connected
+        "bio-celegans",         # 453   / 2k    / connected
+        "in-arenas",            # 1.1k  / 5.4k  / connected
+        "inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
+        "inf-power",            # 4.9K  / 6.6K  / connected
+        "ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
+        "bio-dmela",            # 7.4k  / 25.6k / connected
+        "CA-AstroPh",           # 18k   / 195k  / connected
 
-        "socfb-Bowdoin47",      # 2.3K  / 84.4K     - 2 disc
-        "socfb-Hamilton46",     # 2.3K  / 96.4K     - 2 disc
-        "socfb-Haverford76",    # 1.4K  / 59.6K
-        "socfb-Swarthmore42",   # 1.7K  / 61.1K
-        # "facebook",             # 4k    / 87k
-        # "CA-AstroPh",           # 18k   / 195k
+        "soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
+        "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
+        "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
+        "socfb-Haverford76",    # 1.4K  / 59.6K / connected
+        "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
+        "soc-facebook",         # 4k    / 87k   / connected
+
+        # "ca-Erdos992",          # 6.1K  / 7.5K  / disc - 100 + 1k disc nodes
     ]
 
     graphs = rgraphs(graph_names)
-
-    # graphs = [
-    #     (gen.loadnx, ('data/arenas.txt',)),
-    #     # with real load=[2-,2-] / iters10 / 0-6
-    #     (gen.loadnx, ('data/facebook.txt',)),
-    #     # with real load=[3-,3-] / iters5 / 0 + 1-6
-    #     # (gen.loadnx, ('data/CA-AstroPh.txt',)),
-
-    #     (gen.loadnx, ('data/bio-celegans.mtx',)),
-    #     (gen.loadnx, ('data/bio-dmela.mtx',)),
-    #     (gen.loadnx, ('data/ca-Erdos992.mtx',)),
-    #     (gen.loadnx, ('data/ca-GrQc.mtx',)),
-    #     (gen.loadnx, ('data/ca-netscience.mtx',)),
-    #     (gen.loadnx, ('data/inf-euroroad.edges',)),
-    #     (gen.loadnx, ('data/inf-power.mtx',)),
-    #     (gen.loadnx, ('data/soc-hamsterster.edges',)),
-    #     (gen.loadnx, ('data/socfb-Bowdoin47.mtx',)),
-    #     (gen.loadnx, ('data/socfb-Hamilton46.mtx',)),
-    #     (gen.loadnx, ('data/socfb-Haverford76.mtx',)),
-    #     (gen.loadnx, ('data/socfb-Swarthmore42.mtx',)),
-    # ]
 
     noises = [
         # 0.00,
@@ -443,8 +342,6 @@ def arenasish():
 @ ex.named_config
 def tuned():
     _CONE_args["dim"] = 512
-    # _CONE_args["dim"] = 256
-    # _GRASP_args["n_eig"] = 256
     _LREA_args["iters"] = 40
     _ISO_args["alpha"] = 0.9
     _ISO_args["lalpha"] = 100000  # full dim

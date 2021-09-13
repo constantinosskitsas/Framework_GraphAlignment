@@ -92,6 +92,7 @@ def reconstruct_pytorch(quadtree, arg):
 
 def superfast_binbin_torch(M):
     M = torch.from_numpy(M)
+    # torch.set_num_threads(35)
     n = M.shape[0]
 
     quadtree = build_quadtree(M)

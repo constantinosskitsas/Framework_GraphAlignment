@@ -1,7 +1,7 @@
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
 import logging
-from algorithms import gwl as gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus
+from algorithms import gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl
 
 ex = Experiment("ex")
 
@@ -62,32 +62,32 @@ _GW_args = {
     # 'max_cpu': 4
 }
 
-# _GW_args = {
-#     'ot_dict': {
-#         'loss_type': 'L2',  # the key hyperparameters of GW distance
-#         'ot_method': 'proximal',
-#         'beta': 0.2,
-#         # outer, inner iteration, error bound of optimal transport
-#         'outer_iteration': None,  # num od nodes
-#         'iter_bound': 1e-10,
-#         'inner_iteration': 2,
-#         'sk_bound': 1e-10,
-#         'node_prior': 10,
-#         'max_iter': 5,  # iteration and error bound for calcuating barycenter
-#         'cost_bound': 1e-16,
-#         'update_p': False,  # optional updates of source distribution
-#         'lr': 0,
-#         'alpha': 0
-#     },
-#     # "mn": 0,  # gwl
-#     "mn": 1,  # s-gwl-3
-#     # "mn": 2,  # s-gwl-2
-#     # "mn": 3,  # s-gwl-1
-#     'max_cpu': 20,
-# }
+_SGW_args = {
+    'ot_dict': {
+        'loss_type': 'L2',  # the key hyperparameters of GW distance
+        'ot_method': 'proximal',
+        'beta': 0.025,
+        # outer, inner iteration, error bound of optimal transport
+        'outer_iteration': 2000,  # num od nodes
+        'iter_bound': 1e-10,
+        'inner_iteration': 2,
+        'sk_bound': 1e-30,
+        'node_prior': 1000,
+        'max_iter': 4,  # iteration and error bound for calcuating barycenter
+        'cost_bound': 1e-26,
+        'update_p': False,  # optional updates of source distribution
+        'lr': 0,
+        'alpha': 0
+    },
+    "mn": 1,  # gwl
+    # "mn": 1,  # s-gwl-3
+    # "mn": 2,  # s-gwl-2
+    # "mn": 3,  # s-gwl-1
+    'max_cpu': 20,
+}
 
 _CONE_args = {
-    'dim': 128,  # clipped by Src[0] - 1
+    'dim': 512,  # clipped by Src[0] - 1
     'window': 10,
     'negative': 1.0,
     'niter_init': 10,
@@ -108,8 +108,8 @@ _GRASP_args = {
     'icp_its': 3,
     'q': 100,
     'k': 20,
-    # 'n_eig': None,  # Src.shape[0] - 1
-    'n_eig': 100,
+    'n_eig': Src.shape[0] - 1
+    # 'n_eig': 100,
     'lower_t': 1.0,
     'upper_t': 50.0,
     'linsteps': True,
@@ -130,7 +130,7 @@ _REGAL_args = {
 }
 
 _LREA_args = {
-    'iters': 8,
+    'iters': 40,
     'method': "lowrank_svd_union",
     'bmatch': 3,
     'default_params': True
@@ -142,7 +142,7 @@ _NSD_args = {
 }
 
 _ISO_args = {
-    'alpha': 0.6,
+    'alpha': 0.9,
     'tol': 1e-12,
     'maxiter': 100,
     'lalpha': None,
@@ -178,7 +178,8 @@ _algs = [
 
     (isorank, _ISO_args, [3], "ISO"),
     (netalign, _NET_args, [3], "NET"),
-    (klaus, _KLAU_args, [3], "KLAU")
+    (klaus, _KLAU_args, [3], "KLAU"),
+    (sgwl, _SGW_args, [3], "SGW")
 ]
 
 _acc_names = [

@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.sparse as sps
 from algorithms.isorank.isorank2 import create_L
-
+#original code from https://github.com/nassarhuda/NetworkAlignment.jl/blob/master/src/NSD.jl
 
 def normout_rowstochastic(P):
     n = P.shape[0]

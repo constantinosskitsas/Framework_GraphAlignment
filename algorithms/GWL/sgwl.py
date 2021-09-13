@@ -2,6 +2,7 @@
 # import torch.optim as optim
 # from torch.optim import lr_scheduler
 # import torch
+#original code https://github.com/HongtengXu/s-gwl
 import numpy as np
 import scipy.sparse as sps
 # import scipy.sparse as sps

@@ -87,7 +87,7 @@ _SGW_args = {
 }
 
 _CONE_args = {
-    'dim': 128,  # clipped by Src[0] - 1
+    'dim': 512,  # clipped by Src[0] - 1
     'window': 10,
     'negative': 1.0,
     'niter_init': 10,
@@ -108,7 +108,7 @@ _GRASP_args = {
     'icp_its': 3,
     'q': 100,
     'k': 20,
-    'n_eig': None,  # Src.shape[0] - 1
+    'n_eig': Src.shape[0] - 1
     # 'n_eig': 100,
     'lower_t': 1.0,
     'upper_t': 50.0,
@@ -130,7 +130,7 @@ _REGAL_args = {
 }
 
 _LREA_args = {
-    'iters': 8,
+    'iters': 40,
     'method': "lowrank_svd_union",
     'bmatch': 3,
     'default_params': True
@@ -142,7 +142,7 @@ _NSD_args = {
 }
 
 _ISO_args = {
-    'alpha': 0.6,
+    'alpha': 0.9,
     'tol': 1e-12,
     'maxiter': 100,
     'lalpha': None,

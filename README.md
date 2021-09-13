@@ -26,4 +26,4 @@ Load= [..] to load the graphs of a specific run id, from the previusly runned . 
 
 accs=[...] to specify the evaluation methods         0-acc,1-EC,2-ICS,3-S3,4-Jacc,5-MNC
 
-
+noise_type-[..] 1 for One-Way, 2 MultiModal ,3 Two-Way

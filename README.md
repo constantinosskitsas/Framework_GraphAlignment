@@ -3,6 +3,7 @@ Implementation of well-known graph aligment methods in Python.
 Work in progress.
 
 How to run experiments :
+-- Unzip data.zip
 1) python workexp with scaling : This will run the scalability experiment as in the paper/thesis
 2) python workexp with tuning : This will run the tunning experiment as in the paper/thesis
 3) python workexp with real_noise: This will run the real graphs experiments as in the paper/thesis :MultiMagna,HighSchool,Voles datasets

@@ -108,8 +108,8 @@ _GRASP_args = {
     'icp_its': 3,
     'q': 100,
     'k': 20,
-    'n_eig': Src.shape[0] - 1
-    # 'n_eig': 100,
+    #'n_eig': Src.shape[0] - 1
+     n_eig': 100,
     'lower_t': 1.0,
     'upper_t': 50.0,
     'linsteps': True,

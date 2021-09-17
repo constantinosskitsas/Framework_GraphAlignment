@@ -242,7 +242,7 @@ def real_noise():
         1.0,
     ]
 
-    s_trans = (2, 1, 0, 3)
+    #s_trans = (2, 1, 0, 3)
 
     # (g,alg,acc,n,i)
     # s_trans = (3, 1, 2, 0, 4)

@@ -16,7 +16,7 @@ we evaluate nine representative graph-alignement algorithms, and their papers an
 |  NSD       |    [TKDE'2019](https://ieeexplore.ieee.org/abstract/document/8681160)    | [Julia](https://github.com/nassarhuda/NetworkAlignment.jl/blob/master/src/NSD.jl) |
 |  Isorank     |    [NeurIPS'2019](http://harsha-simhadri.org/pubs/DiskANN19.pdf)    |         -        |
 |  Regal     |    [arXiv'2016](https://arxiv.org/abs/1609.07228)    | [C++/MATLAB](https://github.com/ZJULearning/ssg) |
-|  Net-Align        |    [IEEE T CYBERNETICS'2014](https://ieeexplore.ieee.org/abstract/document/6734715/)    |[Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/      |
+|  Net-Align        |    [IEEE T CYBERNETICS'2014](https://ieeexplore.ieee.org/abstract/document/6734715/)    |[Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/)      |
 |  Klau's        | [IS'2014](https://www.sciencedirect.com/science/article/abs/pii/S0306437913001300) | [Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/) |
 |  S-GWL        | [arXiv'2019](https://arxiv.org/pdf/1905.07645.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |
 

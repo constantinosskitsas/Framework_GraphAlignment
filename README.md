@@ -18,7 +18,7 @@ we evaluate nine representative graph-alignement algorithms, and their papers an
 |  Regal     |    [arXiv'2016](https://arxiv.org/abs/1609.07228)    | [C++/MATLAB](https://github.com/ZJULearning/ssg) |
 |  Net-Align        |    [IEEE T CYBERNETICS'2014](https://ieeexplore.ieee.org/abstract/document/6734715/)    |        -      |
 |  Klau's        | [IS'2014](https://www.sciencedirect.com/science/article/abs/pii/S0306437913001300) | [C++/Python](https://github.com/kakao/n2) |
-|  S-GWL        | [arXiv'2019](https://arxiv.org/pdf/1905.07645.pdf) | [Python] (https://github.com/HongtengXu/s-gwl) |
+|  S-GWL        | [arXiv'2019](https://arxiv.org/pdf/1905.07645.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |
 
 
 ## Datasets

@@ -9,15 +9,15 @@ we evaluate nine representative graph-alignement algorithms, and their papers an
 
 |   ALGORITHM   |     PAPER     |   CODE   |
 |:--------:|:------------:|:--------:|
-|  GWL  |  [WWW'2011](https://dl.acm.org/doi/abs/10.1145/1963405.1963487)  |  [C++/Python](https://github.com/aaalgo/kgraph)  |
-|  Cone-ALign   |  [CVPR'2016](https://www.cv-foundation.org/openaccess/content_cvpr_2016/html/Harwood_FANNG_Fast_Approximate_CVPR_2016_paper.html)  | [Python][https://github.com/GemsLab/CONE-Align] |
+|  GWL  |  [WWW'2011](https://dl.acm.org/doi/abs/10.1145/1963405.1963487)  |  [Python](https://github.com/HongtengXu/gwl)  |
+|  Cone-ALign   |  [CVPR'2016](https://www.cv-foundation.org/openaccess/content_cvpr_2016/html/Harwood_FANNG_Fast_Approximate_CVPR_2016_paper.html)  | [Python](https://github.com/GemsLab/CONE-Align) |
 |  Grasp        |    [APWeb-WAIM'2021](https://link.springer.com/chapter/10.1007/978-3-030-85896-4_4)    | [Python](https://github.com/juhuhu/GrASp)      |
-|  Low Rank Eigen AlignLREA)        |    [TPAMI'2021](https://ieeexplore.ieee.org/abstract/document/9383170)    |      [C++/Python](https://github.com/ZJULearning/ssg)      |
-|  NSD       |    [TKDE'2019](https://ieeexplore.ieee.org/abstract/document/8681160)    | [C++](https://github.com/DBWangGroupUNSW/nns_benchmark/tree/master/algorithms/DPG) |
+|  Low Rank Eigen AlignLREA)        |    [TPAMI'2021](https://ieeexplore.ieee.org/abstract/document/9383170)    |      [Julia](https://github.com/nassarhuda/lowrank_spectral)      |
+|  NSD       |    [TKDE'2019](https://ieeexplore.ieee.org/abstract/document/8681160)    | [Julia](https://github.com/nassarhuda/NetworkAlignment.jl/blob/master/src/NSD.jl) |
 |  Isorank     |    [NeurIPS'2019](http://harsha-simhadri.org/pubs/DiskANN19.pdf)    |         -        |
 |  Regal     |    [arXiv'2016](https://arxiv.org/abs/1609.07228)    | [C++/MATLAB](https://github.com/ZJULearning/ssg) |
-|  Net-Align        |    [IEEE T CYBERNETICS'2014](https://ieeexplore.ieee.org/abstract/document/6734715/)    |        -      |
-|  Klau's        | [IS'2014](https://www.sciencedirect.com/science/article/abs/pii/S0306437913001300) | [C++/Python](https://github.com/kakao/n2) |
+|  Net-Align        |    [IEEE T CYBERNETICS'2014](https://ieeexplore.ieee.org/abstract/document/6734715/)    |[Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/      |
+|  Klau's        | [IS'2014](https://www.sciencedirect.com/science/article/abs/pii/S0306437913001300) | [Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/) |
 |  S-GWL        | [arXiv'2019](https://arxiv.org/pdf/1905.07645.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |
 
 

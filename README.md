@@ -5,7 +5,7 @@ The graph alignment problem calls for finding a matching between the nodes of on
 
 ## Algorithms
 
-we evaluate nine representative graph-alignement algorithms, and their papers and the original codes are given in the following table.
+We evaluate nine representative graph-alignement algorithms, and their papers and the original codes are given in the following table.
 
 |   ALGORITHM   |     PAPER     |   CODE   |
 |:--------:|:------------:|:--------:|
@@ -23,13 +23,13 @@ we evaluate nine representative graph-alignement algorithms, and their papers an
 
 ## Datasets
 
-Our experiment involves eight [real-world datasets](https://github.com/Lsyhprum/WEAVESS/tree/dev/dataset) popularly deployed by existing works. All datasets are pre-split into base data and query data and come with groundtruth data in the form of the top 20 or 100 neighbors. Additional twelve [synthetic datasets](https://github.com/Lsyhprum/WEAVESS/tree/dev/dataset) are used to test the scalability of each algorithm to the performance of different datasets.
+Our experiment involves seventeen [real-world datasets](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/data.zip)
 
-Note that, all base data and query data are converted to `fvecs` format, and groundtruth data is converted to `ivecs` format. Please refer [here](http://yael.gforge.inria.fr/file_format.html) for the description of `fvecs` and `ivecs` format. All datasets in this format can be downloaded from [here](https://github.com/Lsyhprum/WEAVESS/tree/dev/dataset).
+Also it involves synthetic graphs generated using the networkx library [synthetic graphs](https://networkx.org/documentation/stable/reference/generators.html).
 
 ## Parameters
 
-For the optimal parameters of each algorithm on all experimental datasets, see the [parameters](https://github.com/Lsyhprum/WEAVESS/tree/dev/parameters) page.
+For the average optimal parameters of each algorithm on all experimental datasets, see the [parameters](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/experiment/__init__.py) page.
 
 ## Usage
 

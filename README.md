@@ -1,12 +1,37 @@
+#Experimental Analysis of Graph Alignment Algorithms.
+
 ## **Introduction**
 The graph alignment problem calls for finding a matching between he nodes of one graph and those of another graph, in a way that they correspond to each other by some fitness measure. Over the last years, several graph alignment algorithms have been proposed and evaluated on diverse datasets and quality measures. Typically, a newly proposed algorithm is compared to previously proposed ones on some specific datasets, types of noise, and quality measures where the new proposal achieves superiority over the previous ones. However, no systematic comparison of the proposed algorithms has been attempted on the same benchmarks. This paper fills this gap by conducting an extensive, thorough, and commensurable evaluation of state-of-the-art graph alignment algorithms. Our results indicate that certain overlooked solutions perform competitively, while there is no one-size-fits-all winner.
 
+## Algorithms
+
+we evaluate nine representative graph-alignement algorithms, and their papers and the original codes are given in the following table.
+
+|   ALGORITHM   |     PAPER     |   CODE   |
+|:--------:|:------------:|:--------:|
+|  GWL  |  [WWW'2011](https://dl.acm.org/doi/abs/10.1145/1963405.1963487)  |  [C++/Python](https://github.com/aaalgo/kgraph)  |
+|  Cone-ALign   |  [CVPR'2016](https://www.cv-foundation.org/openaccess/content_cvpr_2016/html/Harwood_FANNG_Fast_Approximate_CVPR_2016_paper.html)  |   -   |
+|  Grasp        |    [VLDB'2019](http://www.vldb.org/pvldb/vol12/p461-fu.pdf)    | [C++](https://github.com/ZJULearning/nsg)      |
+|  Low Rank Eigen AlignLREA)        |    [TPAMI'2021](https://ieeexplore.ieee.org/abstract/document/9383170)    |      [C++/Python](https://github.com/ZJULearning/ssg)      |
+|  NSD       |    [TKDE'2019](https://ieeexplore.ieee.org/abstract/document/8681160)    | [C++](https://github.com/DBWangGroupUNSW/nns_benchmark/tree/master/algorithms/DPG) |
+|  Isorank     |    [NeurIPS'2019](http://harsha-simhadri.org/pubs/DiskANN19.pdf)    |         -        |
+|  Regal     |    [arXiv'2016](https://arxiv.org/abs/1609.07228)    | [C++/MATLAB](https://github.com/ZJULearning/ssg) |
+|  Net-Align        |    [IEEE T CYBERNETICS'2014](https://ieeexplore.ieee.org/abstract/document/6734715/)    |        -      |
+|  Klau's        | [IS'2014](https://www.sciencedirect.com/science/article/abs/pii/S0306437913001300) | [C++/Python](https://github.com/kakao/n2) |
 
 
+## Datasets
 
-## Framework_GraphAlignment
-Implementation of well-known graph aligment methods in Python.
-Work in progress.
+Our experiment involves eight [real-world datasets](https://github.com/Lsyhprum/WEAVESS/tree/dev/dataset) popularly deployed by existing works. All datasets are pre-split into base data and query data and come with groundtruth data in the form of the top 20 or 100 neighbors. Additional twelve [synthetic datasets](https://github.com/Lsyhprum/WEAVESS/tree/dev/dataset) are used to test the scalability of each algorithm to the performance of different datasets.
+
+Note that, all base data and query data are converted to `fvecs` format, and groundtruth data is converted to `ivecs` format. Please refer [here](http://yael.gforge.inria.fr/file_format.html) for the description of `fvecs` and `ivecs` format. All datasets in this format can be downloaded from [here](https://github.com/Lsyhprum/WEAVESS/tree/dev/dataset).
+
+## Parameters
+
+For the optimal parameters of each algorithm on all experimental datasets, see the [parameters](https://github.com/Lsyhprum/WEAVESS/tree/dev/parameters) page.
+
+## Usage
+
 
 How to run experiments :
 1) python workexp with scaling : This will run the scalability experiment as in the paper/thesis

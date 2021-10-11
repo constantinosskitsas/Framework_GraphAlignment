@@ -145,7 +145,7 @@ _ISO_args = {
     'alpha': 0.9,
     'tol': 1e-12,
     'maxiter': 100,
-    'lalpha': None,
+    'lalpha': 10000,
     'weighted': True
 }
 

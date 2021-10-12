@@ -15,7 +15,7 @@ We evaluate nine representative graph-alignement algorithms, and their papers an
 |  LREA        |    [WWW '2018](https://dl.acm.org/doi/10.1145/3178876.3186128)    |      [Julia](https://github.com/nassarhuda/lowrank_spectral)      |
 |  NSD       |    [IEEE'2012](https://ieeexplore.ieee.org/document/5975146)    | [Julia](https://github.com/nassarhuda/NetworkAlignment.jl/blob/master/src/NSD.jl) |
 |  Isorank     |    [PNAS'2008](https://www.pnas.org/content/105/35/12763)    |         [-](http://cb.csail.mit.edu/cb/mna/)       |
-|  Regal     |    [CIKM '2018](https://dl.acm.org/doi/10.1145/3269206.3271788)    | [C++/MATLAB](https://github.com/ZJULearning/ssg) |
+|  Regal     |    [CIKM '2018](https://dl.acm.org/doi/10.1145/3269206.3271788)    | [Python](https://github.com/GemsLab/REGAL) |
 |  Net-Align        |    [ACM'2013](https://dl.acm.org/doi/10.1145/2435209.2435212)    |[Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/)      |
 |  Klau's        | [APBC '2009](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-S1-S59) | [Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/) |
 |  S-GWL        | [arXiv'2019](https://arxiv.org/pdf/1905.07645.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |

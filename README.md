@@ -55,7 +55,7 @@ scipy,numpy,networkx,pickle,psutil,matplotlib,sklearn,theano,pymanopt,torch,pand
 ## Usage
 
 
-##How to run experiments :
+### How to run experiments :
 ```shell
 1)  python workexp with scaling : This will run the scalability experiment as in the paper/thesis
 2)  python workexp with tuning : This will run the tunning experiment as in the paper/thesis
@@ -64,7 +64,7 @@ scipy,numpy,networkx,pickle,psutil,matplotlib,sklearn,theano,pymanopt,torch,pand
 5)  python workexp with arenasish:This will run the random graph experiment+ arenas dataset as in the paper/thesis
 6)  python workexp with playground: This will run the low noise experiment as in the paper/thesis
 ```
-###Keywords can be used to make the experiments more specific or add more functionalities :
+### Keywords can be used to make the experiments more specific or add more functionalities :
 ```shell
 seed=[***] will run the experiment with specific randomness, it can be used again to run exactly the same experiment
 

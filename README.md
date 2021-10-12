@@ -24,6 +24,26 @@ We evaluate nine representative graph-alignement algorithms, and their papers an
 ## Datasets
 
 Our experiment involves seventeen [real-world datasets](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/data.zip)
+We use fourteen real dataset, where we
+|   DATASET   |     TYPE     |
+|  ca-netscience  | [COLLABORATION NETWORKS](https://networkrepository.com/ca-netscience.php)  |
+|  bio-celegans   |     [BIOLOGICAL](https://networkrepository.com/bio-celegans.php) |
+|  in-arenas        |        [EMAIL](https://networkrepository.com/email-univ.php)      |
+|  inf-euroroad        |            [INFRASTRUCTURE ](https://networkrepository.com/inf-euroroad.php)      |
+|  inf-power       |         [INFRASTRUCTURE ](https://networkrepository.com/inf-power.php) |
+|  ca-GrQc     | [COLLABORATION ](https://networkrepository.com/ca-GrQc.php) |
+|  bio-dmela     |         [BIOLOGICAL](https://networkrepository.com/bio-dmela.php) |
+|  ca-AstroPh        | [COLLABORATION ](https://networkrepository.com/ca-AstroPh.php)      |
+| soc-hamsterster        |  [Social Networks](https://networkrepository.com/soc-hamsterster.php)
+| socfb-Bowdoin47        |             [Facebook ](https://networkrepository.com/socfb-Bowdoin47.php)      |
+|  socfb-Hamilton46       |         [Facebook ](https://networkrepository.com/socfb-Hamilton46.php) |
+|  socfb-Haverford76     |           [Facebook ](https://networkrepository.com/socfb-Haverford76.php)       |
+|  socfb-Swarthmore42       | [Facebook ](https://networkrepository.com/socfb-Swarthmore42.php) |
+|  soc-facebook       |    [Social Networks](http://snap.stanford.edu/data/ego-Facebook.html)      |
+|  high-school-2013     |           [-](-)       |
+|  mammalia-voles       | [-](-) |
+|  yeast_Y2H1       |    [-](-)      |
+
 
 Also it involves synthetic graphs generated using the networkx library [synthetic graphs](https://networkx.org/documentation/stable/reference/generators.html).
 

@@ -86,7 +86,7 @@ no_disc=True #nodes to be conected or not
 
 until_connected=False #network to be conected or not
 
-noise_type-[..] 1 for One-Way, 2 MultiModal ,3 Two-Way
+noise_type=[..] #1 for One-Way, 2 MultiModal ,3 Two-Way
 ```
 ## Reference
 

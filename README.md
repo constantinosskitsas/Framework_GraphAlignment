@@ -69,3 +69,10 @@ until_connected=False
 
 noise_type-[..] 1 for One-Way, 2 MultiModal ,3 Two-Way
 ```
+## Reference
+
+Please cite our work in your publications if it helps your research:
+
+```
+not yet
+```

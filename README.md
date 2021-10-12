@@ -58,33 +58,33 @@ scipy,numpy,networkx,pickle,psutil,matplotlib,sklearn,theano,pymanopt,torch,pand
 ### How to run experiments :
 ```shell
 1)  python workexp with scaling #: This will run the scalability experiment as in the paper/thesis
-2)  python workexp with tuning : This will run the tunning experiment as in the paper/thesis
-3)  python workexp with real_noise: This will run the real graphs experiments as in the paper/thesis :MultiMagna,HighSchool,Voles datasets
-4)  python workexp with real: This will run the high noise experiments as in the paper/thesis 
-5)  python workexp with arenasish:This will run the random graph experiment+ arenas dataset as in the paper/thesis
-6)  python workexp with playground: This will run the low noise experiment as in the paper/thesis
+2)  python workexp with tuning #: This will run the tunning experiment as in the paper/thesis
+3)  python workexp with real_noise #: This will run the real graphs experiments as in the paper/thesis :MultiMagna,HighSchool,Voles datasets
+4)  python workexp with real #: This will run the high noise experiments as in the paper/thesis 
+5)  python workexp with arenasish #:This will run the random graph experiment+ arenas dataset as in the paper/thesis
+6)  python workexp with playground #: This will run the low noise experiment as in the paper/thesis
 ```
 ### Keywords can be used to make the experiments more specific or add more functionalities :
 ```shell
-seed=[***] will run the experiment with specific randomness, it can be used again to run exactly the same experiment
+seed=[***] # will run the experiment with specific randomness, it can be used again to run exactly the same experiment
 
-mall - will run all the possible extraction methods for all the selected aglorithms - JonkerVolgenant,Neirest Neigboor,SortGreedy on cost and/or similarity
+mall #- will run all the possible extraction methods for all the selected aglorithms - JonkerVolgenant,Neirest Neigboor,SortGreedy on cost and/or similarity
 
-run=[...] to choose only specific algorithms to run
+run=[...] #to choose only specific algorithms to run
 
-iters=[..] to speficy the number of iterations
+iters=[..] #to speficy the number of iterations
 
-mon=[True] to return results also for memory and Cpu usage
+mon=[True] #to return results also for memory and Cpu usage
 
-Load= [..] to load the graphs of a specific run id, from the previusly runned . Every experiment creates a unique id.
+Load= [..] #to load the graphs of a specific run id, from the previusly runned . Every experiment creates a unique id.
 
-accs=[...] to specify the evaluation methods         0-acc,1-EC,2-ICS,3-S3,4-Jacc,5-MNC
+accs=[...] #to specify the evaluation methods         0-acc,1-EC,2-ICS,3-S3,4-Jacc,5-MNC
 
-plot=[..]
+plot=[..] #create a plot
 
-no_disc=True
+no_disc=True #nodes to be conected or not
 
-until_connected=False
+until_connected=False #network to be conected or not
 
 noise_type-[..] 1 for One-Way, 2 MultiModal ,3 Two-Way
 ```

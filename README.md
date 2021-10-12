@@ -49,8 +49,7 @@ Also it involves synthetic graphs generated using the networkx library [syntheti
 
 ## Parameters
 
-For the optimal parameters in terms of accuraccy and running time of each algorithm on all experimental datasets, see the [parameters]
-(https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/experiment/__init__.py) page. If running time is not an issue higher embeding dimensionality and more iterations yields better accuracy results.
+For the optimal parameters in terms of accuraccy and running time of each algorithm on all experimental datasets, see the [parameters](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/experiment/__init__.py) page. If running time is not an issue higher embeding dimensionality and more iterations yields better accuracy results.
 ## Required Libraries
 scipy,numpy,networkx,pickle,psutil,matplotlib,sklearn,theano,pymanopt,torch,pandas,pot,lapjv(Linux)
 ## Usage

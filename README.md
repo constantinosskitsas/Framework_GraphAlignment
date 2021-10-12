@@ -24,8 +24,8 @@ We evaluate nine representative graph-alignement algorithms, and their papers an
 ## Datasets
 
 Our experiment involves seventeen [real-world datasets](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/data.zip)
-We use fourteen real dataset, where we
 |   DATASET   |     TYPE     |
+|:--------:|:------------:|
 |  ca-netscience  | [COLLABORATION NETWORKS](https://networkrepository.com/ca-netscience.php)  |
 |  bio-celegans   |     [BIOLOGICAL](https://networkrepository.com/bio-celegans.php) |
 |  in-arenas        |        [EMAIL](https://networkrepository.com/email-univ.php)      |

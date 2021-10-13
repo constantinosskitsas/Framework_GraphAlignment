@@ -7,7 +7,7 @@ The graph alignment problem calls for finding a matching between the nodes of on
 
 We evaluate nine representative graph-alignement algorithms, and their papers and the original codes are given in the following table.
 
-|   ALGORITHM   |     PAPER     |   CODE   |
+|   Algorithm   |     Paper     |   Code   |
 |:--------:|:------------:|:--------:|
 |  GWL  |  [arXiv'2019](https://arxiv.org/abs/1901.06003)  |  [Python](https://github.com/HongtengXu/gwl)  |
 |  CΟΝΕ-ALign   |  [CIKM '20](https://dl.acm.org/doi/10.1145/3340531.3412136)  | [Python](https://github.com/GemsLab/CONE-Align) |
@@ -24,7 +24,7 @@ We evaluate nine representative graph-alignement algorithms, and their papers an
 ## Datasets
 
 Our experiment involves seventeen [real-world datasets](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/data.zip)
-|   DATASET   |     TYPE     |
+|   Dataset   |     Type     |
 |:--------:|:------------:|
 |  ca-netscience  | [COLLABORATION NETWORKS](https://networkrepository.com/ca-netscience.php)  |
 |  bio-celegans   |     [BIOLOGICAL](https://networkrepository.com/bio-celegans.php) |
@@ -49,20 +49,22 @@ Also it involves synthetic graphs generated using the networkx library [syntheti
 
 ## Parameters
 
-For the optimal parameters in terms of accuraccy and running time of each algorithm on all experimental datasets, see the [parameters](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/experiment/__init__.py) page. If running time is not an issue higher embeding dimensionality and more iterations yields better accuracy results.
+For the optimal parameters in terms of accuraccy and running time of each algorithm on all experimental datasets, see the [parameters](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/experiment/__init__.py) page. If running time is not an issue higher embeding dimensionality and more iterations yield better accuracy results.
+
 ## Required Libraries
 scipy,numpy,networkx,pickle,psutil,matplotlib,sklearn,theano,pymanopt,torch,pandas,pot,lapjv(Linux)
 ## Usage
 
 
 ### How to run experiments :
+The following commands generate the relevant figures in our evaluation paper: 
 ```shell
-1)  python workexp with scaling #: This will run the scalability experiment as in the paper/thesis
-2)  python workexp with tuning #: This will run the tunning experiment as in the paper/thesis
-3)  python workexp with real_noise #: This will run the real graphs experiments as in the paper/thesis :MultiMagna,HighSchool,Voles datasets
-4)  python workexp with real #: This will run the high noise experiments as in the paper/thesis 
-5)  python workexp with arenasish #:This will run the random graph experiment+ arenas dataset as in the paper/thesis
-6)  python workexp with playground #: This will run the low noise experiment as in the paper/thesis
+1)  python workexp with scaling #: This will run the scalability experiment as in the paper
+2)  python workexp with tuning #: This will run the tunning experiment as in the paper
+3)  python workexp with real_noise #: This will run the real graphs experiments as in the paper :MultiMagna,HighSchool,Voles datasets
+4)  python workexp with real #: This will run the high noise experiments as in the paper 
+5)  python workexp with arenasish #:This will run the random graph experiment+ arenas dataset as in the paper
+6)  python workexp with playground #: This will run the low noise experiment as in the paper
 ```
 ### Keywords can be used to make the experiments more specific or add more functionalities :
 ```shell
@@ -93,5 +95,5 @@ noise_type=[..] #1 for One-Way, 2 MultiModal ,3 Two-Way
 Please cite our work in your publications if it helps your research:
 
 ```
-not yet
+The paper is under submission. 
 ```

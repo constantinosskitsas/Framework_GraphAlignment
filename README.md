@@ -40,7 +40,7 @@ Our experiment involves seventeen [real-world datasets](https://github.com/const
 |  socfb-Haverford76     |           [Facebook ](https://networkrepository.com/socfb-Haverford76.php)       |
 |  socfb-Swarthmore42       | [Facebook ](https://networkrepository.com/socfb-Swarthmore42.php) |
 |  soc-facebook       |    [Social Networks](http://snap.stanford.edu/data/ego-Facebook.html)      |
-|  high-school-2013     |           [-](-)       |
+|  high-school-2013     |           [Social Networks](http://www.sociopatterns.org/datasets/high-school-dynamic-contact-networks/)       |
 |  mammalia-voles       | [BIOLOGICAL](https://royalsocietypublishing.org/doi/suppl/10.1098/rsif.2014.1004) |
 |  MultiMagna       |    [BIOLOGICAL](https://www3.nd.edu/~cone/multiMAGNA++/)      |
 

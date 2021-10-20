@@ -42,7 +42,7 @@ Our experiment involves seventeen [real-world datasets](https://github.com/const
 |  soc-facebook       |    [Social Networks](http://snap.stanford.edu/data/ego-Facebook.html)      |
 |  high-school-2013     |           [-](-)       |
 |  mammalia-voles       | [-](-) |
-|  yeast_Y2H1       |    [-](-)      |
+|  MultiMagna       |    [BIOLOGICAL](https://www3.nd.edu/~cone/multiMAGNA++/)      |
 
 
 Also it involves synthetic graphs generated using the networkx library [synthetic graphs](https://networkx.org/documentation/stable/reference/generators.html).

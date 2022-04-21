@@ -66,7 +66,7 @@ _SGW_args = {
     'ot_dict': {
         'loss_type': 'L2',  # the key hyperparameters of GW distance
         'ot_method': 'proximal',
-        'beta': 0.025,
+        'beta': 0.025,# 0.025-0.1 depends on degree
         # outer, inner iteration, error bound of optimal transport
         'outer_iteration': 2000,  # num od nodes
         'iter_bound': 1e-10,

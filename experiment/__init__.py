@@ -66,6 +66,9 @@ _SGW_args = {
     'ot_dict': {
         'loss_type': 'L2',  # the key hyperparameters of GW distance
         'ot_method': 'proximal',
+         #'beta': 0.025,#euroroad
+         #'beta': 0.025,#netscience,eurorad,arenas
+        #'beta': 0.1,#dense ex fb, socfb datasets
         'beta': 0.025,# 0.025-0.1 depends on degree
         # outer, inner iteration, error bound of optimal transport
         'outer_iteration': 2000,  # num od nodes

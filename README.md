@@ -19,6 +19,7 @@ We evaluate nine representative graph-alignement algorithms, and their papers an
 |  Net-Align        |    [ACM'2013](https://dl.acm.org/doi/10.1145/2435209.2435212)    |[Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/)      |
 |  Klau's        | [APBC '2009](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-S1-S59) | [Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/) |
 |  S-GWL        | [arXiv'2019](https://arxiv.org/pdf/1905.07645.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |
+| Graal        | [arXiv'2019](https://royalsocietypublishing.org/doi/10.1098/rsif.2010.0063) | [C](http://www0.cs.ucl.ac.uk/staff/natasa/GRAAL/) |
 
 
 ## Datasets

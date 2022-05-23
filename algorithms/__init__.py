@@ -8,3 +8,4 @@ from .GWL import gwl, sgwl
 from .isorank import isorank2
 # from .isorank import isorank
 from .GrASp import grasp, grasp2
+from .Grampa import Grampa

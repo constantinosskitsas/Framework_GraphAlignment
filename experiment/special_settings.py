@@ -26,7 +26,7 @@ def prep():
 @ex.named_config
 def rall():
 
-    run = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    run = [0, 1, 2, 3, 4, 5, 6, 7, 8,9,10]
 
 
 @ex.named_config

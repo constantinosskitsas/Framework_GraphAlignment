@@ -32,10 +32,11 @@ def global_config():
         4,      # eigenalign
         5,      # NSD
 
-        # 6,      # isorank
+         6,      # isorank
         # 7,      # netalign
         # 8,      # klaus
-        # 9,      # SGWL
+         9,       #SGWL
+        10, #Grampa
     ]
 
     accs = [

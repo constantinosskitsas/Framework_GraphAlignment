@@ -115,17 +115,13 @@ def functional_maps_gen(A1, A2, q, k, n_eig, laa, icp, icp_its, lower_t, upper_t
     n = A1.shape[0]
 
     # decompose graph laplacians
-    print("aa1")
     D1, V1 = decompose_laplacian(A1, True, n_eig)
-
-    print("aa2")
     D2, V2 = decompose_laplacian(A2, True, n_eig)
 
     # calculate corresponding functions
     Cor1 = calc_corresponding_functions(n, q, t, D1, V1)
-    print("aac1")
     Cor2 = calc_corresponding_functions(n, q, t, D2, V2)
-    print("aac2")
+
 
     # calculate base alignment matrix
     if base_align:

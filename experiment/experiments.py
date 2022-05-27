@@ -1,6 +1,6 @@
 from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args,_Grampa_args
 from generation import generate as gen
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank,Grampa
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank,Grampa,GraspB
 import networkx as nx
 import numpy as np
 
@@ -190,7 +190,8 @@ def tuning():
 
 def namess(tmp):
     return [name[-15:] for name in tmp[1]]
-
+def namessgt(tmp):
+    return [name[-15:] for name in tmp[2]]
 
 def graphss(tmp):
     return [
@@ -201,18 +202,64 @@ def graphss(tmp):
         ]]) for target in tmp[1]
     ]
 
+def graphss1(tmp):
+    x=len(tmp[2])
+    return [
+        (lambda x:x, [[
+            tmp[0],
+            tmp[1][i],
+            tmp[2][i]
+        ]]) for i in range(x)
+            
+    ]
+
+@ex.named_config
+def real_noisetest():
+
+   
+    tmp = [
+        "data/real world/arenas/arenas_orig.txt",
+        [
+            f"data/real world/arenas/noise_level_10/edges_{i}.txt" for i in [
+                 1]
+        ],
+        [
+            f"data/real world/arenas/noise_level_10/gt_{i}.txt" for i in [
+               1]
+        ]
+
+    ]
+    #xlabel = "CA-AstroPh"
+    xlabel = "arenas"
+    graph_names = namess(tmp)
+    graphs = graphss1(tmp)
+    print(graphs)
+    run=[11]
+    iters = 1
+
+    noises = [
+        1.0
+    ]
+
+    s_trans = (2, 1, 0, 3)
+
+    # (g,alg,acc,n,i)
+    # s_trans = (3, 1, 2, 0, 4)
+
+
+
 
 @ex.named_config
 def real_noise():
 
-    tmp = [
-        "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
-        [
-            f"data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_{i}.txt" for i in [
-                99, 95, 90, 80]
-        ]
-    ]
-    xlabel = "high-school-2013"
+    #tmp = [
+    #    "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
+    #    [
+    #        f"data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_{i}.txt" for i in [
+    #            99, 95, 90, 80]
+    #    ]
+    #]
+    #xlabel = "high-school-2013"
 
     # tmp = [
     #     "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
@@ -223,23 +270,37 @@ def real_noise():
     # ]
     # xlabel = "mammalia-voles"
 
-    # tmp = [
-    #     "data/real world/MultiMagna/yeast0_Y2H1.txt",
-    #     [
-    #         f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
-    #             5, 10, 15, 20, 25]
-    #     ]
-    # ]
-    # xlabel = "yeast_Y2H1"
+    tmp = [
+        "data/real world/MultiMagna/yeast0_Y2H1.txt",
+        [
+             f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
+                 5, 10, 15, 20, 25]
+        ]
+    ]
+    xlabel = "yeast_Y2H1"
+    #tmp = [
+    #    "data/real world/arenas/arenas_orig.txt",
+    #    [
+    #        f"data/real world/arenas/noise_level_0/edges_{i}.txt" for i in [
+    #            1, 2, 3, 4,5]
+    #    ],
+    #    [
+    #        f"data/real world/arenas/noise_level_0/gt_{i}.txt" for i in [
+    #            1, 2, 3, 4,5]
+    #    ]
+
+    #]
+    #xlabel = "yeast_Y2H1"
 
     graph_names = namess(tmp)
-
+    #graphs = graphss1(tmp)
     graphs = graphss(tmp)
-
-    iters = 2
+    print(graphs)
+    run=[10]
+    iters = 1
 
     noises = [
-        1.0,
+        1.0
     ]
 
     #s_trans = (2, 1, 0, 3)
@@ -257,41 +318,42 @@ def rgraphs(gnames):
 @ ex.named_config
 def real():
 
-    run = [1, 2, 3, 4, 5, 6]
-
-    iters = 5
+    #run = [1, 2, 3, 4, 5, 6]
+    #run = [0,2,3,4,5,6,9,10]
+    run = [10,11]
+    iters = 3
 
     graph_names = [             # n     / e
         "ca-netscience",        # 379   / 914   / connected
         "bio-celegans",         # 453   / 2k    / connected
         "in-arenas",            # 1.1k  / 5.4k  / connected
         "inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
-        "inf-power",            # 4.9K  / 6.6K  / connected
-        "ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
-        "bio-dmela",            # 7.4k  / 25.6k / connected
-        "CA-AstroPh",           # 18k   / 195k  / connected
+        # "inf-power",            # 4.9K  / 6.6K  / connected
+        # "ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
+        # "bio-dmela",            # 7.4k  / 25.6k / connected
+        #"CA-AstroPh",           # 18k   / 195k  / connected
 
-        "soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
-        "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
-        "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
+        # "soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
+        # "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
+        # "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
         "socfb-Haverford76",    # 1.4K  / 59.6K / connected
-        "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
-        "soc-facebook",         # 4k    / 87k   / connected
-
+        # "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
+        # "soc-facebook",         # 4k    / 87k   / connected
+         #"crime"
         # "ca-Erdos992",          # 6.1K  / 7.5K  / disc - 100 + 1k disc nodes
     ]
 
     graphs = rgraphs(graph_names)
 
     noises = [
-        # 0.00,
-        # 0.01,
-        # 0.02,
+        #0.00,
+        #0.01,
+        #0.02,
         # 0.03,
         # 0.04,
         # 0.05,
 
-        0.00,
+       # 0.00,
         0.05,
         0.10,
         0.15,
@@ -305,8 +367,8 @@ def arenasish():
 
     # use with 'mall'
 
-    iters = 10
-
+    iters = 2
+    run = [4,10,11]
     graph_names = [
         "arenas",
         "powerlaw",
@@ -319,23 +381,32 @@ def arenasish():
     graphs = [
         # with arenasish load=[1-,1-]
         # 91-
-        (gen.loadnx, ('data/arenas.txt',)),
-        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+        #(gen.loadnx, ('data/arenas.txt',)),
+        #(nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
         # 92-0
-        (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
-        (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        #(nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+        #(nx.watts_strogatz_graph, (1133, 10, 0.5)),
         # 92-1
-        (nx.gnp_random_graph, (1133, 0.009)),
-        (nx.barabasi_albert_graph, (1133, 5)),
+        #(nx.gnp_random_graph, (1133, 0.009)),
+        #(nx.barabasi_albert_graph, (1133, 5)),
+        (nx.algorithms.bipartite.random_graph,(800,100,0.02)),
+        (nx.algorithms.bipartite.random_graph,(700,200,0.03)),
+        #(nx.algorithms.bipartite.random_graph,(200,100,0.3)),
+        (nx.algorithms.bipartite.random_graph,(600,300,0.04)),
+        (nx.algorithms.bipartite.random_graph,(500,400,0.05)),
+        (nx.algorithms.bipartite.random_graph,(450,450,0.06)),
+        (nx.algorithms.bipartite.random_graph,(200,700,0.09)),
+        #(nx.algorithms.bipartite.random_graph,(800,600,0.05))
     ]
 
     noises = [
-        0.00,
-        0.01,
-        0.02,
-        0.03,
-        0.04,
+        #0.00,
+        #0.01,
+        #0.02,
+        #0.04,
         0.05,
+       # 0.1,
+        #0.15
     ]
 
 

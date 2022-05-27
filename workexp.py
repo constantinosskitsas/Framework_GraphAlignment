@@ -37,6 +37,7 @@ def global_config():
         # 8,      # klaus
          9,       #SGWL
         10, #Grampa
+        11, #Grasp-B
     ]
 
     accs = [

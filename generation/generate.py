@@ -1,7 +1,7 @@
 from . import ex
 import numpy as np
 import networkx as nx
-
+import scipy.sparse as sps
 
 def refill_e(edges, n, amount):
     if amount == 0:
@@ -63,6 +63,7 @@ def remove_e(edges, noise, no_disc=True, until_connected=False):
 def load_as_nx(path):
     G_e = np.loadtxt(path, int)
     G = nx.Graph(G_e.tolist())
+    print("Just checking",nx.is_directed(G))
     return np.array(G.edges)
 
 
@@ -133,7 +134,8 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
         Src_e = np.array(G.edges)
     else:
         return sps.csr_matrix([]), sps.csr_matrix([]), (np.empty(1), np.empty(1))
-
+    if (np.amin(Src_e)!=0):
+        Src_e=Src_e-np.amin(Src_e)
     n = np.amax(Src_e) + 1
     nedges = Src_e.shape[0]
 

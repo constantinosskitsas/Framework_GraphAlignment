@@ -7,7 +7,7 @@ The graph alignment problem calls for finding a matching between the nodes of on
 
 We evaluate nine representative graph-alignement algorithms, and their papers and the original codes are given in the following table.
 
-|   Algorithm   |     Paper     |   Code   |
+|   Algorithm   |     Paper     |   Original Code   |
 |:--------:|:------------:|:--------:|
 |  GWL  |  [arXiv'2019](https://arxiv.org/abs/1901.06003)  |  [Python](https://github.com/HongtengXu/gwl)  |
 |  CΟΝΕ-ALign   |  [CIKM '20](https://dl.acm.org/doi/10.1145/3340531.3412136)  | [Python](https://github.com/GemsLab/CONE-Align) |

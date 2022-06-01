@@ -12,16 +12,17 @@ We evaluate nine representative graph-alignement algorithms, and their papers an
 |  GWL  |  [arXiv'2019](https://arxiv.org/abs/1901.06003)  |  [Python](https://github.com/HongtengXu/gwl)  |
 |  CΟΝΕ-ALign   |  [CIKM '20](https://dl.acm.org/doi/10.1145/3340531.3412136)  | [Python](https://github.com/GemsLab/CONE-Align) |
 |  Grasp        |    [APWeb-WAIM'2021](https://link.springer.com/chapter/10.1007/978-3-030-85896-4_4)    | [Python](https://github.com/juhuhu/GrASp)      |
+|  Regal     |    [CIKM '2018](https://dl.acm.org/doi/10.1145/3269206.3271788)    | [Python](https://github.com/GemsLab/REGAL) |
 |  LREA        |    [WWW '2018](https://dl.acm.org/doi/10.1145/3178876.3186128)    |      [Julia](https://github.com/nassarhuda/lowrank_spectral)      |
 |  NSD       |    [IEEE'2012](https://ieeexplore.ieee.org/document/5975146)    | [Julia](https://github.com/nassarhuda/NetworkAlignment.jl/blob/master/src/NSD.jl) |
 |  Isorank     |    [PNAS'2008](https://www.pnas.org/content/105/35/12763)    |         [-](http://cb.csail.mit.edu/cb/mna/)       |
-|  Regal     |    [CIKM '2018](https://dl.acm.org/doi/10.1145/3269206.3271788)    | [Python](https://github.com/GemsLab/REGAL) |
 |  Net-Align        |    [ACM'2013](https://dl.acm.org/doi/10.1145/2435209.2435212)    |[Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/)      |
 |  Klau's        | [APBC '2009](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-S1-S59) | [Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/) |
 |  S-GWL        | [NeurIPS'2019](https://proceedings.neurips.cc/paper/2019/file/6e62a992c676f611616097dbea8ea030-Paper.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |
 | Graal        | [JRSICU'2010](https://royalsocietypublishing.org/doi/10.1098/rsif.2010.0063) | [C](http://www0.cs.ucl.ac.uk/staff/natasa/GRAAL/) |
-| B-Grasp        | [-](-) |[-](-) |
 | Grampa        | [ICML'2020](https://dl.acm.org/doi/abs/10.5555/3524938.3525218) | [-](-) |
+| B-Grasp        | [-](-) |[-](-) |
+
 
 
 ## Datasets

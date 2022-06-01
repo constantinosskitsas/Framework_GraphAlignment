@@ -20,6 +20,8 @@ We evaluate nine representative graph-alignement algorithms, and their papers an
 |  Klau's        | [APBC '2009](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-S1-S59) | [Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/) |
 |  S-GWL        | [NeurIPS'2019](https://proceedings.neurips.cc/paper/2019/file/6e62a992c676f611616097dbea8ea030-Paper.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |
 | Graal        | [JRSICU'2010](https://royalsocietypublishing.org/doi/10.1098/rsif.2010.0063) | [C](http://www0.cs.ucl.ac.uk/staff/natasa/GRAAL/) |
+| B-Grasp        | [-](-) |[-](-) |
+| Grampa        | [-](-) | [-](-) |
 
 
 ## Datasets

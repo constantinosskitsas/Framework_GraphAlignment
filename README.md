@@ -75,7 +75,7 @@ seed=[***] # will run the experiment with specific randomness, it can be used ag
 
 mall #- will run all the possible extraction methods for all the selected aglorithms - JonkerVolgenant,Neirest Neigboor,SortGreedy on cost and/or similarity
 
-run=[...] #to choose only specific algorithms to run
+run=[...] #to choose only specific algorithms to run 0=GWL,1=Cone etc based on the Algorithms table order
 
 iters=[..] #to speficy the number of iterations
 

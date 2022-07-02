@@ -5,7 +5,7 @@ The graph alignment problem calls for finding a matching between the nodes of on
 
 ## Algorithms
 
-We evaluate nine representative graph-alignement algorithms, and their papers and the original codes are given in the following table.
+We evaluate nine representative graph-alignment algorithms, and their papers and the original codes are given in the following table.
 
 |   Algorithm   |     Paper     |   Original Code   |
 |:--------:|:------------:|:--------:|
@@ -93,6 +93,8 @@ no_disc=True #nodes to be conected or not
 until_connected=False #network to be conected or not
 
 noise_type=[..] #1 for One-Way, 2 MultiModal ,3 Two-Way
+
+save=true #Store alignment information
 ```
 ## Reference
 

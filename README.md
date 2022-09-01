@@ -101,5 +101,27 @@ save=true #Store alignment information
 Please cite our work in your publications if it helps your research:
 
 ```
-The paper is under submission. 
+@inproceedings{DBLP:conf/edbt/SkitsasOHMK23,
+  author    = {Konstantinos Skitsas and
+               Karol Orlowski and
+               Judith Hermanns and
+               Davide Mottin and
+               Panagiotis Karras},
+  editor    = {Julia Stoyanovich and
+               Jens Teubner and
+               Nikos Mamoulis and
+               Evaggelia Pitoura and
+               Jan M{\"{u}}hlig},
+  title     = {Comprehensive Evaluation of Algorithms for Unrestricted Graph Alignment},
+  booktitle = {Proceedings 26th International Conference on Extending Database Technology,
+               {EDBT} 2023, Ioannina, Greece, March 28-31, 2023},
+  pages     = {260--272},
+  publisher = {OpenProceedings.org},
+  year      = {2023},
+  url       = {https://doi.org/10.48786/edbt.2023.21},
+  doi       = {10.48786/edbt.2023.21},
+  timestamp = {Mon, 08 Aug 2022 09:41:38 +0200},
+  biburl    = {https://dblp.org/rec/conf/edbt/SkitsasOHMK23.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
 ```

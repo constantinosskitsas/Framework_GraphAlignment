@@ -370,7 +370,7 @@ def arenasish():
     iters = 2
     run = [4,10,11]
     graph_names = [
-        "arenas",
+        #"arenas",
         "powerlaw",
         "nw_str",
         "watts_str",
@@ -382,28 +382,29 @@ def arenasish():
         # with arenasish load=[1-,1-]
         # 91-
         #(gen.loadnx, ('data/arenas.txt',)),
-        #(nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
         # 92-0
-        #(nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
-        #(nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+        (nx.watts_strogatz_graph, (1133, 10, 0.5)),
         # 92-1
-        #(nx.gnp_random_graph, (1133, 0.009)),
-        #(nx.barabasi_albert_graph, (1133, 5)),
-        (nx.algorithms.bipartite.random_graph,(800,100,0.02)),
-        (nx.algorithms.bipartite.random_graph,(700,200,0.03)),
+        (nx.gnp_random_graph, (1133, 0.009)),
+        (nx.barabasi_albert_graph, (1133, 5)),
+        #(nx.algorithms.bipartite.random_graph,(800,100,0.02)),
+        #(nx.algorithms.bipartite.random_graph,(700,200,0.03)),
         #(nx.algorithms.bipartite.random_graph,(200,100,0.3)),
-        (nx.algorithms.bipartite.random_graph,(600,300,0.04)),
-        (nx.algorithms.bipartite.random_graph,(500,400,0.05)),
-        (nx.algorithms.bipartite.random_graph,(450,450,0.06)),
-        (nx.algorithms.bipartite.random_graph,(200,700,0.09)),
+        #(nx.algorithms.bipartite.random_graph,(600,300,0.04)),
+        #(nx.algorithms.bipartite.random_graph,(500,400,0.05)),
+        #(nx.algorithms.bipartite.random_graph,(450,450,0.06)),
+        #(nx.algorithms.bipartite.random_graph,(200,700,0.09)),
         #(nx.algorithms.bipartite.random_graph,(800,600,0.05))
     ]
 
     noises = [
-        #0.00,
-        #0.01,
-        #0.02,
-        #0.04,
+        0.00,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
         0.05,
        # 0.1,
         #0.15

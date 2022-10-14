@@ -63,12 +63,12 @@ scipy,numpy,networkx,pickle,psutil,matplotlib,sklearn,theano,pymanopt,pandas,pot
 ### How to run experiments :
 The following commands generate the relevant figures in our evaluation paper: 
 ```shell
-1)  python workexp with scaling #: This will run the scalability experiment as in the paper
-2)  python workexp with tuning #: This will run the tunning experiment as in the paper
-3)  python workexp with real_noise #: This will run the real graphs experiments as in the paper :MultiMagna,HighSchool,Voles datasets
-4)  python workexp with real #: This will run the high noise experiments as in the paper 
-5)  python workexp with arenasish #:This will run the random graph experiment+ arenas dataset as in the paper
-6)  python workexp with playground #: This will run the low noise experiment as in the paper
+1)  python workexp.py with scaling #: This will run the scalability experiment as in the paper
+2)  python workexp.py with tuning #: This will run the tunning experiment as in the paper
+3)  python workexp.py with real_noise #: This will run the real graphs experiments as in the paper :MultiMagna,HighSchool,Voles datasets
+4)  python workexp.py with real #: This will run the high noise experiments as in the paper 
+5)  python workexp.py with arenasish #:This will run the random graph experiment+ arenas dataset as in the paper
+6)  python workexp.py with playground #: This will run the low noise experiment as in the paper
 ```
 ### Keywords can be used to make the experiments more specific or add more functionalities :
 ```shell

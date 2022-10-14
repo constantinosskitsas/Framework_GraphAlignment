@@ -319,8 +319,8 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    #run = [0,2,3,4,5,6,9,10]
-    run = [10,11]
+    run = [0,2,3,4,5,6,9,10]
+   # run = [10,11]
     iters = 3
 
     graph_names = [             # n     / e

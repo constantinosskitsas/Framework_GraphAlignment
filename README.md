@@ -63,6 +63,7 @@ pickle,
 psutil,
 matplotlib(3.3.2)
 scikit-learn(0.24),
+sacred(0.8.2)
 theano (1.0.5)
 pymanopt(0.2.5)
 pandas(1.1.3)

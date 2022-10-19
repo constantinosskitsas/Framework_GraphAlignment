@@ -61,6 +61,7 @@ scipy,numpy,networkx,pickle,psutil,matplotlib,sklearn,theano,pymanopt,pandas,pot
 
 
 ### How to run experiments :
+Extract data.zip
 The following commands generate the relevant figures in our evaluation paper: 
 ```shell
 1)  python workexp.py with scaling #: This will run the scalability experiment as in the paper

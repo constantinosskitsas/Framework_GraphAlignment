@@ -319,15 +319,18 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [0,2,3,4,5,6,9,10]
+    run = [  10]
    # run = [10,11]
     iters = 3
 
     graph_names = [             # n     / e
-        "ca-netscience",        # 379   / 914   / connected
-        "bio-celegans",         # 453   / 2k    / connected
-        "in-arenas",            # 1.1k  / 5.4k  / connected
-        "inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
+        #"ca-netscience"       # 379   / 914   / connected
+        "voles",
+        "high-school",
+        "yeast"
+        #"bio-celegans",         # 453   / 2k    / connected
+        #"in-arenas",            # 1.1k  / 5.4k  / connected
+        #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
         # "inf-power",            # 4.9K  / 6.6K  / connected
         # "ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
         # "bio-dmela",            # 7.4k  / 25.6k / connected
@@ -336,7 +339,7 @@ def real():
         # "soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
         # "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
         # "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
-        "socfb-Haverford76",    # 1.4K  / 59.6K / connected
+       # "socfb-Haverford76",    # 1.4K  / 59.6K / connected
         # "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
         # "soc-facebook",         # 4k    / 87k   / connected
          #"crime"
@@ -353,12 +356,12 @@ def real():
         # 0.04,
         # 0.05,
 
-       # 0.00,
-        0.05,
-        0.10,
-        0.15,
-        0.20,
-        0.25,
+        0.00,
+        #0.05,
+        #0.10,
+        #0.15,
+        #0.20,
+        #0.25,
     ]
 
 

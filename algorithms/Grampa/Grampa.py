@@ -4,9 +4,28 @@ from numpy.linalg import inv
 from numpy.linalg import eigh,eig
 import networkx as nx 
 import random
+
+#from lapsolver import solve_dense
+import scipy as sci
 #from lapsolver import solve_dense
 
+def decompose_laplacian(A):
 
+    #  adjacency matrix
+
+    Deg = np.diag((np.sum(A, axis=1)))
+
+    n = np.shape(Deg)[0]
+
+    Deg = sci.linalg.fractional_matrix_power(Deg, -0.5)
+
+    L = np.identity(n) - Deg @ A @ Deg
+   # print((sci.fractional_matrix_power(Deg, -0.5) * A * sci.fractional_matrix_power(Deg, -0.5)))
+    # '[V1, D1] = eig(L1);
+
+    D, V = np.linalg.eigh(L)
+
+    return [D, V]
 
 def seigh(A):
   """
@@ -24,6 +43,8 @@ def main(data, eta):
   n = Src.shape[0]
   l,U =eigh(Src)
   mu,V = eigh(Tar)
+  #l, U = decompose_laplacian(Src)
+  #mu, V = decompose_laplacian(Tar)
   l = np.array([l])
   mu = np.array([mu])
 

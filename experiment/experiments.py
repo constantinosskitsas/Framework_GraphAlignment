@@ -1,6 +1,6 @@
-from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args,_Grampa_args
+from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args,_Grampa_args,_GrampaS_args
 from generation import generate as gen
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank,Grampa,GraspB
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank,Grampa,GraspB,GrampaS
 import networkx as nx
 import numpy as np
 
@@ -319,7 +319,7 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [  10]
+    run = [  10,12]
    # run = [10,11]
     iters = 3
 

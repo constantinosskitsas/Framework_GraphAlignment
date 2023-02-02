@@ -9,4 +9,5 @@ from .isorank import isorank2
 # from .isorank import isorank
 from .GrASp import grasp, grasp2,GraspB
 from .Grampa import Grampa
+from .GrampaS import GrampaS
 

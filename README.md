@@ -100,7 +100,7 @@ iters=[..] #to speficy the number of iterations
 
 mon=[True] #to return results also for memory and Cpu usage
 
-Load= [..] #to load the graphs of a specific run id, from the previusly runned . Every experiment creates a unique id.
+load= [..] #to load the graphs of a specific run id, from the previusly runned . Every experiment creates a unique id.
 
 accs=[...] #to specify the evaluation methods         0-acc,1-EC,2-ICS,3-S3,4-Jacc,5-MNC
 

@@ -366,7 +366,7 @@ def real():
 
 
 @ ex.named_config
-def arenasish():
+def synthetic():
 
     # use with 'mall'
 

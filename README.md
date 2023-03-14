@@ -21,7 +21,7 @@ We evaluate nine representative graph-alignment algorithms, and their papers and
 |  S-GWL        | [NeurIPS'2019](https://proceedings.neurips.cc/paper/2019/file/6e62a992c676f611616097dbea8ea030-Paper.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |
 | Graal        | [JRSICU'2010](https://royalsocietypublishing.org/doi/10.1098/rsif.2010.0063) | [C](http://www0.cs.ucl.ac.uk/staff/natasa/GRAAL/) |
 | Grampa        | [ICML'2020](https://dl.acm.org/doi/abs/10.5555/3524938.3525218) | [-](-) |
-| B-Grasp        | [-](-) |[-](-) |
+| B-Grasp        | [TKDD'23](https://dl.acm.org/doi/full/10.1145/3561058) |[-](-) |
 
 
 
@@ -53,7 +53,7 @@ Also it involves synthetic graphs generated using the networkx library [syntheti
 
 ## Parameters
 
-For the optimal parameters in terms of accuraccy and running time of each algorithm on all experimental datasets, see the [parameters](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/experiment/__init__.py) page. If running time is not an issue higher embeding dimensionality and more iterations yield better accuracy results.
+For the optimal parameters in terms of accuracy and running time of each algorithm on all experimental datasets, see the [parameters](https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/experiment/__init__.py) page. If running time is not an issue higher embeding dimensionality and more iterations yield better accuracy results.
 
 ## Required Libraries
 numpy(1.20.3)
@@ -85,7 +85,7 @@ The following commands generate the relevant figures in our evaluation paper:
 2)  python workexp.py with tuning #: This will run the tunning experiment as in the paper
 3)  python workexp.py with real_noise #: This will run the real graphs experiments as in the paper :MultiMagna,HighSchool,Voles datasets
 4)  python workexp.py with real #: This will run the high noise experiments as in the paper 
-5)  python workexp.py with arenasish #:This will run the random graph experiment+ arenas dataset as in the paper
+5)  python workexp.py with synthetic #:This will run the random graph experiment+ arenas dataset as in the paper
 6)  python workexp.py with playground #: This will run the low noise experiment as in the paper
 ```
 ### Keywords can be used to make the experiments more specific or add more functionalities :
@@ -100,7 +100,7 @@ iters=[..] #to speficy the number of iterations
 
 mon=[True] #to return results also for memory and Cpu usage
 
-Load= [..] #to load the graphs of a specific run id, from the previusly runned . Every experiment creates a unique id.
+load= [..] #to load the graphs of a specific run id, from the previusly runned . Every experiment creates a unique id.
 
 accs=[...] #to specify the evaluation methods         0-acc,1-EC,2-ICS,3-S3,4-Jacc,5-MNC
 
@@ -143,3 +143,8 @@ Please cite our work in your publications if it helps your research:
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 ```
+##Known problems. If you use
+$conda create --name <env> --file enviroment.yml ,cone align will no work with this configuration.
+## Contact
+For any problems or if you wan to add your algorithms to the framework contact au647909@uni.au.dk
+

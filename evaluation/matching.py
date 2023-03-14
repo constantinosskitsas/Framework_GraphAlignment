@@ -220,10 +220,12 @@ def getmatching(sim, cost, mt, _log):
 
 
     if mt > 0:
-
+        
         if sim is None:
 
             raise Exception("Empty sim matrix")
+        if mt==4:
+            return sim
 
         if mt == 30:
 
@@ -304,6 +306,7 @@ def getmatching(sim, cost, mt, _log):
         return sort_greedy_voting(mat_to_min)
     elif mt==96:
         return jv1(mat_to_min)
+    
 
 
 

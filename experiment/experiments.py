@@ -319,31 +319,30 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [  10,12]
+    run = [ 10,12]
    # run = [10,11]
-    iters = 3
+    iters = 5
 
     graph_names = [             # n     / e
-        #"ca-netscience"       # 379   / 914   / connected
-        "voles",
-        "high-school",
-        "yeast"
-        #"bio-celegans",         # 453   / 2k    / connected
-        #"in-arenas",            # 1.1k  / 5.4k  / connected
-        #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
-        # "inf-power",            # 4.9K  / 6.6K  / connected
-        # "ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
-        # "bio-dmela",            # 7.4k  / 25.6k / connected
+        "ca-netscience",       # 379   / 914   / connected
+        #"voles",
+       # "high-school",
+       #"yeast",
+       # "bio-celegans",         # 453   / 2k    / connected
+       # "in-arenas",            # 1.1k  / 5.4k  / connected
+       # "inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
+        #"inf-power",            # 4.9K  / 6.6K  / connected
+       # "ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
+       # "bio-dmela",            # 7.4k  / 25.6k / connected
         #"CA-AstroPh",           # 18k   / 195k  / connected
 
-        # "soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
-        # "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
-        # "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
+       #"soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
+       # "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
+       # "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
        # "socfb-Haverford76",    # 1.4K  / 59.6K / connected
-        # "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
-        # "soc-facebook",         # 4k    / 87k   / connected
-         #"crime"
-        # "ca-Erdos992",          # 6.1K  / 7.5K  / disc - 100 + 1k disc nodes
+       # "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
+        #"soc-facebook",         # 4k    / 87k   / connected
+        #"ca-Erdos992",          # 6.1K  / 7.5K  / disc - 100 + 1k disc nodes
     ]
 
     graphs = rgraphs(graph_names)
@@ -356,22 +355,22 @@ def real():
         # 0.04,
         # 0.05,
 
-        0.00,
-        #0.05,
-        #0.10,
-        #0.15,
+       # 0.00,
+       # 0.05,
+        0.10,
+        0.15,
         #0.20,
         #0.25,
     ]
 
 
 @ ex.named_config
-def arenasish():
+def synthetic():
 
     # use with 'mall'
 
-    iters = 2
-    run = [4,10,11]
+    iters = 10
+    run = [10,12]
     graph_names = [
         #"arenas",
         "powerlaw",
@@ -385,13 +384,14 @@ def arenasish():
         # with arenasish load=[1-,1-]
         # 91-
         #(gen.loadnx, ('data/arenas.txt',)),
-        (nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
+        #(nx.powerlaw_cluster_graph, (1133, 5, 0.5)),
         # 92-0
-        (nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
-        (nx.watts_strogatz_graph, (1133, 10, 0.5)),
+        #(nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
+        #(nx.watts_strogatz_graph, (1133, 10, 0.5)),
         # 92-1
-        (nx.gnp_random_graph, (1133, 0.009)),
-        (nx.barabasi_albert_graph, (1133, 5)),
+        (nx.gnp_random_graph, (100, 0.5)),
+        #(nx.gnp_random_graph, (1133, 0.009)),
+        #(nx.barabasi_albert_graph, (1133, 5)),
         #(nx.algorithms.bipartite.random_graph,(800,100,0.02)),
         #(nx.algorithms.bipartite.random_graph,(700,200,0.03)),
         #(nx.algorithms.bipartite.random_graph,(200,100,0.3)),
@@ -404,11 +404,20 @@ def arenasish():
 
     noises = [
         0.00,
-        0.01,
-        0.02,
-        0.03,
-        0.04,
-        0.05,
+        #0.01,
+        #0.02,
+        #0.03,
+        #0.04,
+        #0.05,
+        #0.06,
+        #0.07,
+        #0.08,
+        #0.09,
+        0.10
+
+        #0.1,
+        #0.15,
+        #0.3
        # 0.1,
         #0.15
     ]

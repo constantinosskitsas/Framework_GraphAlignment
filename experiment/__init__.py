@@ -171,10 +171,13 @@ _KLAU_args = {
     'verbose': True
 }
 _Grampa_args = {
-    'eta': 0.2
+   # 'eta': 0.2
+   'eta': 0.2,
+   'lalpha':10000
 }
 _GrampaS_args = {
-    'eta': 0.2
+    'eta': 0.2,
+    'lalpha':10000
 }
 _GRASPB_args = {
     'laa': 3,
@@ -208,7 +211,7 @@ _algs = [
     (sgwl, _SGW_args, [3], "SGW"),
     (Grampa, _Grampa_args, [3], "GRAMPA"),
     (GraspB, _GRASPB_args, [-96], "GRASPB"),
-    (GrampaS, _GrampaS_args, [3], "GRAMPA"),
+    (GrampaS, _GrampaS_args, [4], "GRAMPAS"),
 ]   
 
 _acc_names = [

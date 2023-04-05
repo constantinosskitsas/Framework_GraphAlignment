@@ -319,7 +319,7 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [ 10,12]
+    run = [ 1,9,10,12]
    # run = [10,11]
     iters = 5
 
@@ -327,7 +327,7 @@ def real():
         #"ca-netscience"       # 379   / 914   / connected
         "voles",
         "high-school",
-        "yeast"
+        #"yeast"
         #"bio-celegans",         # 453   / 2k    / connected
         #"in-arenas",            # 1.1k  / 5.4k  / connected
         #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200

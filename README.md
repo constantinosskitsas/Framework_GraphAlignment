@@ -88,6 +88,16 @@ The following commands generate the relevant figures in our evaluation paper:
 5)  python workexp.py with synthetic #:This will run the random graph experiment+ arenas dataset as in the paper
 6)  python workexp.py with playground #: This will run the low noise experiment as in the paper
 ```
+
+### Example of Small changes in code to edit Experiments :
+ If we want to edit experiment "3)real":
+ ```shell
+ 1)We can find the real() in code in Framework_GraphAlignment/experiment/experiment.py ->real().
+ 2) The function run = [a,b,c,d] we add the algorithm ID we want to evaluate and iter= N the number of repetitions for the experiment
+ 3) graph_names = [ ] are all the available graphs , many of them are commented , so you can comment/uncomment to keep only the graphs you need to run expeirments
+ 4) noise_type=1 and noises=[0,0.01,0.02,xxx] we can change also the noise type of the available ones and the noise level for the algorithms.
+ 5)All these can be changes also by adding keywords when running the experiment ex.  python workexp.py with real noise_type=2
+```
 ### Keywords can be used to make the experiments more specific or add more functionalities :
 ```shell
 seed=[***] # will run the experiment with specific randomness, it can be used again to run exactly the same experiment

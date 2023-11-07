@@ -171,7 +171,6 @@ _KLAU_args = {
     'verbose': True
 }
 _Grampa_args = {
-   # 'eta': 0.2
    'eta': 0.2,
    'lalpha':10000,
    'initSim':0,

@@ -71,10 +71,6 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
                 # lw.append(0.0 if d <= 0 else d)
                 # lw.append(d)
 
-                # print(len(li))
-                # print(len(lj))
-                # print(len(lj))
-
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
 
 def decompose_Tlaplacian(A,rA):
@@ -132,14 +128,16 @@ def decomposeN_laplacian(A):
 def random_walk_laplacian(A):
     # Calculate the degree matrix D
     D = np.diag(np.sum(A, axis=1))
-    
+    #epsilon = 1e-6  # Small constant
+    #D_inv = np.linalg.inv(D + epsilon * np.identity(D.shape[0]))
     # Compute the inverse of D
     D_inv = np.linalg.inv(D)
-    
+    print("jho")
     # Calculate the Random Walk Laplacian L_rw
     L_rw = np.identity(len(A)) - np.dot(D_inv, A)
-    
-    return L_rw
+    D, V = np.linalg.eigh(L_rw)
+    return [D, V]
+    #return L_rw
 def Signless_Laplacian(A):
         # Compute the degree matrix
     D = np.diag(np.sum(A, axis=1))
@@ -159,52 +157,52 @@ def seigh(A):
   l = l[idx]
   u = u[:,idx]
   return l, u
-
 def main(data, eta,lalpha,initSim,Eigtype):
-  Src = data['Src']
-  Tar = data['Tar']
-  n = Src.shape[0]
+    Src = data['Src']
+    Tar = data['Tar']
+    n = Src.shape[0]
+    print("test")
         #Adjancency
-  if(Eigtype==0){ 
-    l,U =eigh(Src)
-    mu,V = eigh(Tar)
-  }
-    elif(Eigtype==1){#Laplacian
-    l, U = decompose_laplacian(Src)
-    mu, V = decompose_laplacian(Tar)
-  }
-  elif(Eigtype==2){#RandomWalk Laplacian
-    l, U = random_walk_laplacian(Src)
-    mu, V = random_walk_laplacian(Tar)
-  }elif(Eigtype==3){#RandomWalk Laplacian
-    l, U = Signless_Laplacian(Src)
-    mu, V = Signless_Laplacian(Tar)
-  }
-   else{#Normalized Laplacian
-    l, U = decomposeN_laplacian(Src)
-    mu, V = decomposeN_laplacian(Tar)
-  }
-  l = np.array([l])
-  mu = np.array([mu])
-  dtype = np.float32
+    if Eigtype==0:
+        l,U =eigh(Src)
+        mu,V = eigh(Tar)
+  
+    elif Eigtype==1:#Laplacian
+        l, U = decompose_laplacian(Src)
+        mu, V = decompose_laplacian(Tar)
+  
+    elif Eigtype==2:#RandomWalk Laplacian
+        l, U = random_walk_laplacian(Src)
+        mu, V = random_walk_laplacian(Tar)
+    elif Eigtype==3:#Sinless Laplacian
+        l, U = Signless_Laplacian(Src)
+        mu, V = Signless_Laplacian(Tar)
+  
+    else: #Normalized Laplacian
+        l, U = decomposeN_laplacian(Src)
+        mu, V = decomposeN_laplacian(Tar)
+  
+    l = np.array([l])
+    mu = np.array([mu])
+    dtype = np.float32
   #Eq.4
-  coeff = 1.0/((l.T - mu)**2 + eta**2)
+    coeff = 1.0/((l.T - mu)**2 + eta**2)
   #Eq. 3
-  if(initSim==1){
-    alpha=0
-    L = create_L(Src, Tar, lalpha,
+    if initSim==1:
+        alpha=0
+        L = create_L(Src, Tar, lalpha,
                      True).A.astype(dtype)
-    K = ((1-alpha) * L).astype(dtype)*1
-    coeff = coeff * (U.T @ K @ V)
-  }
-  else{
-    coeff = coeff * (U.T @ np.ones((n,n)) @ V)
-  }
+        K = ((1-alpha) * L).astype(dtype)*1
+        coeff = coeff * (U.T @ K @ V)
+  
+    else:
+        coeff = coeff * (U.T @ np.ones((n,n)) @ V)
+    
   
   #coeff = coeff * (U.T @ K @ V)
-  X = U @ coeff @ V.T
-  Xt = X.T
-  Xt=X
+    X = U @ coeff @ V.T
+    Xt = X.T
+    Xt=X
   # Solve with linear assignment maximizing the similarity 
   # row,col = linear_sum_assignment(Xt, maximize=True)
 
@@ -212,7 +210,7 @@ def main(data, eta,lalpha,initSim,Eigtype):
   # The solver works on cost minimization, so take -X 
   #rows, cols = solve_dense(-Xt)
   #return rows, cols 
-  return Xt
+    return Xt
 
 def grampa(Src, Tar, eta):
   """

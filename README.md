@@ -1,4 +1,4 @@
-# **Experimental Analysis of Graph Alignment Algorithms.**
+# **Comprehensive Evaluation of Algorithms for Unrestricted Graph Alignment**
 
 ## **Introduction**
 The graph alignment problem calls for finding a matching between the nodes of one graph and those of another graph, in a way that they correspond to each other by some fitness measure. Over the last years, several graph alignment algorithms have been proposed and evaluated on diverse datasets and quality measures. Typically, a newly proposed algorithm is compared to previously proposed ones on some specific datasets, types of noise, and quality measures where the new proposal achieves superiority over the previous ones. However, no systematic comparison of the proposed algorithms has been attempted on the same benchmarks. This paper fills this gap by conducting an extensive, thorough, and commensurable evaluation of state-of-the-art graph alignment algorithms. Our results indicate that certain overlooked solutions perform competitively, while there is no one-size-fits-all winner.

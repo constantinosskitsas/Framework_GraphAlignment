@@ -95,8 +95,20 @@ def decompose_Tlaplacian(A,rA):
     D1,V1=np.linalg.eigh(L1)
     return [D1, V1]
     #return [D, V]
-
 def decompose_laplacian(A):
+    # Compute the degree matrix
+    D = np.diag(np.sum(A, axis=1))
+
+    n = np.shape(D)[0]
+
+    # Calculate the unnormalized Laplacian matrix
+    L = D - A
+
+    # Compute the eigenvalues and eigenvectors of L
+    D, V = np.linalg.eigh(L)
+
+    return [D, V]
+def decomposeN_laplacian(A):
 
     #  adjacency matrix
 
@@ -117,6 +129,26 @@ def decompose_laplacian(A):
 
     return [D, V]
 
+def random_walk_laplacian(A):
+    # Calculate the degree matrix D
+    D = np.diag(np.sum(A, axis=1))
+    
+    # Compute the inverse of D
+    D_inv = np.linalg.inv(D)
+    
+    # Calculate the Random Walk Laplacian L_rw
+    L_rw = np.identity(len(A)) - np.dot(D_inv, A)
+    
+    return L_rw
+def Signless_Laplacian(A):
+        # Compute the degree matrix
+    D = np.diag(np.sum(A, axis=1))
+    n = np.shape(D)[0]
+    # Calculate the unnormalized Laplacian matrix
+    L = D + A
+    # Compute the eigenvalues and eigenvectors of L
+    D, V = np.linalg.eigh(L)
+    return [D, V]
 def seigh(A):
   """
   Sort eigenvalues and eigenvectors in descending order. 
@@ -127,35 +159,50 @@ def seigh(A):
   l = l[idx]
   u = u[:,idx]
   return l, u
-def main(data, eta,lalpha):
+
+def main(data, eta,lalpha,initSim,Eigtype):
   Src = data['Src']
   Tar = data['Tar']
   n = Src.shape[0]
-  #l,U =eigh(Src)
-  #mu,V = eigh(Tar)
-  l, U = decompose_laplacian(Src)
-  mu, V = decompose_laplacian(Tar)
-  #l, U = decompose_Tlaplacian(Src,1.5)
-  #mu, V = decompose_Tlaplacian(Tar,1.5)
+        #Adjancency
+  if(Eigtype==0){ 
+    l,U =eigh(Src)
+    mu,V = eigh(Tar)
+  }
+    elif(Eigtype==1){#Laplacian
+    l, U = decompose_laplacian(Src)
+    mu, V = decompose_laplacian(Tar)
+  }
+  elif(Eigtype==2){#RandomWalk Laplacian
+    l, U = random_walk_laplacian(Src)
+    mu, V = random_walk_laplacian(Tar)
+  }elif(Eigtype==3){#RandomWalk Laplacian
+    l, U = Signless_Laplacian(Src)
+    mu, V = Signless_Laplacian(Tar)
+  }
+   else{#Normalized Laplacian
+    l, U = decomposeN_laplacian(Src)
+    mu, V = decomposeN_laplacian(Tar)
+  }
   l = np.array([l])
   mu = np.array([mu])
-  #lalpha=math.log(n,2)*5
-  #lalpha=n/10
-  
-
-  alpha=0
   dtype = np.float32
-  L = create_L(Src, Tar, lalpha,
-                     True).A.astype(dtype)
-  #K = ((1-alpha) * L).astype(dtype)*1
-  K = ((1-alpha) * L).astype(dtype)*1
   #Eq.4
   coeff = 1.0/((l.T - mu)**2 + eta**2)
   #Eq. 3
-  coeff = coeff * (U.T @ np.ones((n,n)) @ V)
+  if(initSim==1){
+    alpha=0
+    L = create_L(Src, Tar, lalpha,
+                     True).A.astype(dtype)
+    K = ((1-alpha) * L).astype(dtype)*1
+    coeff = coeff * (U.T @ K @ V)
+  }
+  else{
+    coeff = coeff * (U.T @ np.ones((n,n)) @ V)
+  }
+  
   #coeff = coeff * (U.T @ K @ V)
   X = U @ coeff @ V.T
-
   Xt = X.T
   Xt=X
   # Solve with linear assignment maximizing the similarity 

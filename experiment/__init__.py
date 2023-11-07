@@ -173,7 +173,9 @@ _KLAU_args = {
 _Grampa_args = {
    # 'eta': 0.2
    'eta': 0.2,
-   'lalpha':10000
+   'lalpha':10000,
+   'initSim':0,
+   'Eigtype':0
 }
 _GrampaS_args = {
     'eta': 0.2,

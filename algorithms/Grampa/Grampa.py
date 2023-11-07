@@ -102,7 +102,7 @@ def decompose_laplacian(A):
 
     # Compute the eigenvalues and eigenvectors of L
     D, V = np.linalg.eigh(L)
-
+    #D, V = seigh(L)
     return [D, V]
 def decomposeN_laplacian(A):
 
@@ -132,10 +132,10 @@ def random_walk_laplacian(A):
     #D_inv = np.linalg.inv(D + epsilon * np.identity(D.shape[0]))
     # Compute the inverse of D
     D_inv = np.linalg.inv(D)
-    print("jho")
     # Calculate the Random Walk Laplacian L_rw
     L_rw = np.identity(len(A)) - np.dot(D_inv, A)
-    D, V = np.linalg.eigh(L_rw)
+    #D, V = np.linalg.eigh(L_rw)
+    D, V = np.linalg.eig(L_rw)
     return [D, V]
     #return L_rw
 def Signless_Laplacian(A):
@@ -145,7 +145,7 @@ def Signless_Laplacian(A):
     # Calculate the unnormalized Laplacian matrix
     L = D + A
     # Compute the eigenvalues and eigenvectors of L
-    D, V = np.linalg.eigh(L)
+    D, V = np.linalg.eig(L)
     return [D, V]
 def seigh(A):
   """
@@ -174,7 +174,7 @@ def main(data, eta,lalpha,initSim,Eigtype):
     elif Eigtype==2:#RandomWalk Laplacian
         l, U = random_walk_laplacian(Src)
         mu, V = random_walk_laplacian(Tar)
-    elif Eigtype==3:#Sinless Laplacian
+    elif Eigtype==3:#Singless Laplacian
         l, U = Signless_Laplacian(Src)
         mu, V = Signless_Laplacian(Tar)
   

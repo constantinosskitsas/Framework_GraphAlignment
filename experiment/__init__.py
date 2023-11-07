@@ -174,7 +174,7 @@ _Grampa_args = {
    'eta': 0.2,
    'lalpha':10000,
    'initSim':0,
-   'Eigtype':0
+   'Eigtype':2
 }
 _GrampaS_args = {
     'eta': 0.2,

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import scipy
 from sklearn.metrics.pairwise import euclidean_distances
-import sinkhorn
+from algorithms.FUGAL.sinkhorn import sinkhorn,sinkhorn_epsilon_scaling,sinkhorn_knopp,sinkhorn_stabilized
     
 def plot(graph1, graph2):
     plt.figure(figsize=(12,4))
@@ -125,7 +125,7 @@ def convex_init(A, B, D, mu, niter):
     for i in range(niter):
         for it in range(1, 11):
             G = (torch.mm(torch.mm(A.T, A), P) - torch.mm(torch.mm(A.T, P), B) - torch.mm(torch.mm(A, P), B.T) + torch.mm(torch.mm(P, B), B.T))/2 + mu*D + i*(mat_ones - 2*P)
-            q = sinkhorn.sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
+            q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
             alpha = 2.0 / float(2.0 + it)
             P = P + alpha * (q - P)
     return P

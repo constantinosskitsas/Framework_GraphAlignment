@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import scipy
 from sklearn.metrics.pairwise import euclidean_distances
-from pred import feature_extraction,eucledian_dist,convex_init
+from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init
+#from pred import feature_extraction,eucledian_dist,convex_init
 def create_L(A, B, lalpha=1, mind=None, weighted=True):
     n = A.shape[0]
     m = B.shape[0]
@@ -71,7 +72,7 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
 
 
-def main(data, iter,simple):
+def main1(data, iter,simple):
   dtype = np.float32
   Src = data['Src']
   Tar = data['Tar']
@@ -79,14 +80,15 @@ def main(data, iter,simple):
   L = create_L(Src, Tar, 10000,
                      True).A.astype(dtype)
   return L
-def main1(data, iter,simple,mu):
-    dtype = np.float32
+def main(data, iter,simple,mu):
+    dtype = np.float64
     Src = data['Src']
     Tar = data['Tar']
-    n1 = len(Src.nodes())
-    n2 = len(Tar.nodes())
-    
+    n1 = Tar.shape[0]
+    n2 = Src.shape[0]
     n = max(n1, n2)
+    Src1=nx.from_numpy_array(Src)
+    Tar1=nx.from_numpy_array(Tar)
    # for i in range(n1, n):
     #    Gq.add_node(i)
     #for i in range(n2, n):
@@ -94,10 +96,12 @@ def main1(data, iter,simple,mu):
 
     #A = torch.tensor(nx.to_numpy_array(Gq), dtype = torch.float64)
     #B = torch.tensor(nx.to_numpy_array(Gt), dtype = torch.float64)
-    A = torch.tensor(nx.to_numpy_array(Src), dtype = torch.float64)
-    B = torch.tensor(nx.to_numpy_array(Tar), dtype = torch.float64)
-    F1 = feature_extraction(Src,simple)
-    F2 = feature_extraction(Tar,simple)
+    #A = torch.tensor(nx.to_numpy_array(Src), dtype = torch.float64)
+    #B = torch.tensor(nx.to_numpy_array(Tar), dtype = torch.float64)
+    A = torch.tensor((Src), dtype = torch.float64)
+    B = torch.tensor((Tar), dtype = torch.float64)
+    F1 = feature_extraction(Src1,simple)
+    F2 = feature_extraction(Tar1,simple)
     D = eucledian_dist(F1, F2, n)
     D = torch.tensor(D, dtype = torch.float64)
     P = convex_init(A, B, D, mu, iter)

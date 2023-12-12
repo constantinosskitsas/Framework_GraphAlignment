@@ -328,18 +328,19 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [10,13]
+    run = [9,13]
    # run = [10,11]
-    iters = 1
+    iters = 3
     print("start")
     graph_names = [             # n     / e
-        "ca-netscience",       # 379   / 914   / connected
+        #"ca-netscience",       # 379   / 914   / connected
         #"voles",
         #"high-school",
         #"yeast"
 
         #"bio-celegans",         # 453   / 2k    / connected
         #"in-arenas",            # 1.1k  / 5.4k  / connected
+        "arenad",
         #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
         #"inf-power",  
                   # 4.9K  / 6.6K  / connected

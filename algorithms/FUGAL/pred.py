@@ -20,7 +20,7 @@ def plot(graph1, graph2):
     nx.draw(graph2)
     plt.savefig('x1.png')
 
-def feature_extraction(G):
+def feature_extraction(G,simple):
     """Node feature extraction.
 
     Parameters
@@ -99,9 +99,10 @@ def feature_extraction(G):
     node_features[:, 1] = clusts
     node_features[:, 2] = neighbor_degs
     node_features[:, 3] = neighbor_clusts
-    node_features[:, 4] = neighbor_edges #create if statement
-    node_features[:, 5] = neighbor_outgoing_edges#
-    node_features[:, 6] = neighbors_of_neighbors#
+    if (simple==False):
+        node_features[:, 4] = neighbor_edges #create if statement
+        node_features[:, 5] = neighbor_outgoing_edges#
+        node_features[:, 6] = neighbors_of_neighbors#
 
     node_features = np.nan_to_num(node_features)
     return np.nan_to_num(node_features)

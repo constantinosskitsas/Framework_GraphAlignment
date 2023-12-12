@@ -1,7 +1,7 @@
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
 import logging
-from algorithms import gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl,Grampa,GraspB,GrampaS
+from algorithms import gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl,Grampa,GraspB,GrampaS,Fugal
 
 ex = Experiment("ex")
 
@@ -196,7 +196,12 @@ _GRASPB_args = {
     'k_span':40
 
 }
-
+_Fugal_args={
+    'iter': 10,
+    #'iter': 15, for xx dataset.
+    'simple': True,
+    'mu': 2,
+}
 
 _algs = [
     (gwl, _GW_args, [3], "GW"),
@@ -213,6 +218,8 @@ _algs = [
     (Grampa, _Grampa_args, [3], "GRAMPA"),
     (GraspB, _GRASPB_args, [-96], "GRASPB"),
     (GrampaS, _GrampaS_args, [4], "GRAMPAS"),
+    (Fugal, _Fugal_args, [3], "FUGAL"),
+
 ]   
 
 _acc_names = [

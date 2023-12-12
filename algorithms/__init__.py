@@ -10,4 +10,5 @@ from .isorank import isorank2
 from .GrASp import grasp, grasp2,GraspB
 from .Grampa import Grampa
 from .GrampaS import GrampaS
+from .FUGAL import Fugal
 

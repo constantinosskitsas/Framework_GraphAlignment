@@ -39,7 +39,9 @@ def global_config():
         10, #Grampa
         11, #Grasp-B#Fugal2
         12, #GrampaS
-        13 #Fugal
+        13, #Fugal
+        14,#Fugal2
+        15,#FAQ -approx
     ]
 
     accs = [

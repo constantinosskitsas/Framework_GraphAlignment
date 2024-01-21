@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import sparse
-#import theano
-#from theano import tensor as T
+import theano
+from theano import tensor as T
 
 
 # Full NMF matrix (which NMF factorizes with SVD)
@@ -27,11 +27,11 @@ def netmf_mat_full(A, window=10, b=1.0):
     #print("b")
     M = D_rt_inv.dot(D_rt_inv.dot(S).T)
     #print("c")
-    #m = T.matrix()
+    m = T.matrix()
 #    print("d")
-    #f = theano.function([m], T.log(T.maximum(m, 1)))
+    f = theano.function([m], T.log(T.maximum(m, 1)))
 #    print("e")
-    #Y = f(M.todense().astype(theano.config.floatX))
+    Y = f(M.todense().astype(theano.config.floatX))
 #    print("f")
     return sparse.csr_matrix(Y)
 

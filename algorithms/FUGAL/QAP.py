@@ -171,7 +171,6 @@ def main(data, iter,simple,mu):
     #D= create_L(Src, Tar, 10000,
     #                True).A.astype(dtype)
     #D=Grampa(Src,Tar)
-    print("hi")
     #print(D)
     D = torch.tensor(D, dtype = torch.float64)
     #P = convex_init(A, B, D, mu, iter)

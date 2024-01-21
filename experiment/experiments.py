@@ -344,13 +344,13 @@ def real():
     iters = 1
     print("start")
     graph_names = [             # n     / e
-        "ca-netscience",       # 379   / 914   / connected
+        #"ca-netscience",       # 379   / 914   / connected
         #"voles",
         #"high-school",
         #"yeast",
         #"MultiMagna",
         #"bio-celegans",         # 453   / 2k    / connected
-        #"in-arenas",            # 1.1k  / 5.4k  / connected
+        "in-arenas",            # 1.1k  / 5.4k  / connected
         #"arenad",
         #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
         #"inf-power",  

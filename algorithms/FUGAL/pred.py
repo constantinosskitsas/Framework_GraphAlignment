@@ -137,10 +137,6 @@ def convex_init1(A, B, D, mu, niter):
     mat_ones = torch.ones((n, n), dtype = torch.float64)
     reg = 1.0
     K=mu*D 
-    AA=torch.mm(A.T, A)
-    BT=torch.mm(B.T, A)
-    BB=torch.mm(B,B.T)
-    AB=torch.mm(A.T, B)
     for i in range(niter):
         for it in range(1, 11):
             G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T)+ K + i*(mat_ones - 2*P)
@@ -154,10 +150,6 @@ def convex_initQAP(A, B, niter):
     ones = torch.ones(n, dtype = torch.float64)
     mat_ones = torch.ones((n, n), dtype = torch.float64)
     reg = 1.0 
-    AA=torch.mm(A.T, A)
-    BT=torch.mm(B.T, A)
-    BB=torch.mm(B,B.T)
-    AB=torch.mm(A.T, B)
     for i in range(niter):
         for it in range(1, 11):
             G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T) + i*(mat_ones - 2*P)

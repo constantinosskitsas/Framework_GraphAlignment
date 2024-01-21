@@ -172,7 +172,7 @@ def main(data, iter,simple,mu):
     #                True).A.astype(dtype)
     #D=Grampa(Src,Tar)
     #print(D)
-    D = torch.tensor(D, dtype = torch.float64)
+    #D = torch.tensor(D, dtype = torch.float64)
     #P = convex_init(A, B, D, mu, iter)
     P1=convex_initQAP(A, B, mu, iter)
     #are_matrices_equal(P,P1)

@@ -37,7 +37,7 @@ def global_config():
         # 8,      # klaus
          9,       #SGWL
         10, #Grampa
-        11, #Grasp-B
+        11, #Grasp-B#Fugal2
         12, #GrampaS
         13 #Fugal
     ]

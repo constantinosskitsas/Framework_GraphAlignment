@@ -57,7 +57,7 @@ def main(data, ot_dict, mn, max_cpu=0):
             idx2node_s, idx2node_t, ot_dict, weights=None, predefine_barycenter=False,
             cluster_num=2, partition_level=3, max_node_num=0
         )
-
+    print("done")
     pairs = np.array(pairs_name)[::-1].T
 
     # print(pairs)

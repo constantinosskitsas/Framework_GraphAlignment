@@ -174,8 +174,8 @@ def main(data, iter,simple,mu):
     print("hi")
     #print(D)
     D = torch.tensor(D, dtype = torch.float64)
-    P = convex_init(A, B, D, mu, iter)
+    #P = convex_init(A, B, D, mu, iter)
     P1=convex_init1(A, B, D, mu, iter)
-    are_matrices_equal(P,P1)
+    #are_matrices_equal(P,P1)
     #P_perm, ans = convertToPermHungarian(P, n1, n2)
-    return P
+    return P1

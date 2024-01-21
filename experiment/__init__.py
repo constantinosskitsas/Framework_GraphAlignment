@@ -1,7 +1,7 @@
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
 import logging
-from algorithms import gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl,Grampa,GraspB,GrampaS,Fugal
+from algorithms import gwl, conealign, Fugal, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl,Grampa,Fugal2 as Fugal2,GrampaS,Fugal#GraspBafter Grampa
 
 ex = Experiment("ex")
 
@@ -80,13 +80,14 @@ _SGW_args = {
         'cost_bound': 1e-26,
         'update_p': False,  # optional updates of source distribution
         'lr': 0,
-        'alpha': 0
+        #'alpha': 0
+        'alpha': 1
     },
     "mn": 1,  # gwl
     # "mn": 1,  # s-gwl-3
     # "mn": 2,  # s-gwl-2
     # "mn": 3,  # s-gwl-1
-    'max_cpu': 20,
+    'max_cpu': 40,
 }
 
 _CONE_args = {
@@ -197,16 +198,16 @@ _GRASPB_args = {
 
 }
 _Fugal_args={
-    'iter': 10,
+    'iter': 15,
     #'iter': 15, for xx dataset.
     'simple': True,
-    'mu': 2,
+    'mu': 0.5,
 }
 
 _algs = [
     (gwl, _GW_args, [3], "GW"),
     (conealign, _CONE_args, [-3], "CONE"),
-    (grasp, _GRASP_args, [-3], "GRASP"),
+    (Fugal, _GRASP_args, [-3], "GRASP"),
     (regal, _REGAL_args, [-3], "REGAL"),
     (eigenalign, _LREA_args, [3], "LREA"),
     (NSD, _NSD_args, [30], "NSD"),
@@ -216,7 +217,8 @@ _algs = [
     (klaus, _KLAU_args, [3], "KLAU"),
     (sgwl, _SGW_args, [3], "SGW"),
     (Grampa, _Grampa_args, [3], "GRAMPA"),
-    (GraspB, _GRASPB_args, [-96], "GRASPB"),
+    #(Fugal, _GRASPB_args, [-96], "GRASPB"),
+    (Fugal2, _Fugal_args, [3], "FUGALB"),
     (GrampaS, _GrampaS_args, [4], "GRAMPAS"),
     (Fugal, _Fugal_args, [3], "FUGAL"),
 

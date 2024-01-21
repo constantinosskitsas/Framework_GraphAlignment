@@ -1,6 +1,6 @@
 from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args,_Grampa_args,_GrampaS_args
 from generation import generate as gen
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, grasp2 as grasp, isorank2 as isorank,Grampa,GraspB,GrampaS,Fugal
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, Fugal, isorank2 as isorank,Grampa,Fugal,GrampaS,Fugal
 import networkx as nx
 import numpy as np
 
@@ -152,13 +152,18 @@ def tuning():
     #        {'alpha': x} for x in [0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999]
     #    ]
    # ]
+    #tmp = [
+    #    10,  # Grampa
+     #   [
+    #        {'Eigtype': x} for x in [0, 1, 2, 3, 4]
+    #    ]
+    #]
     tmp = [
-        10,  # Grampa
+        13, # Grampa
         [
-            {'Eigtype': x} for x in [0, 1, 2, 3, 4]
+            {'mu': x} for x in [0.5, 1, 1.5, 2, 2.5,5]
         ]
     ]
-
 
     # _ISO_args["alpha"] = 0.8
     #_ISO_args["lalpha"] = 40
@@ -171,19 +176,25 @@ def tuning():
     iters = 5
 
     graph_names = [
-        "arenas",
+        "in-arenas",
+        "inf-euroroad",
+        "ca-netscience",
+        "bio-celegans",
+        "MultiMagna"
         #"facebook",
         # "astro",
         # "gnp"
     ]
 
-    graphs = [
-        (gen.loadnx, ("in-arenas",)),
+    #graphs = [
+    #    (gen.loadnx, ("in-arenas",)),
+    #    (gen.loadnx, ("inf-euroroad",)),
+     #   (gen.loadnx, ("voles",)),
         #(gen.loadnx, ('data/facebook.txt',)),
         # (gen.loadnx, ('data/CA-AstroPh.txt',)),
         # (nx.gnp_random_graph, (2**15, 0.0003)),
-    ]
-
+    #]
+    graphs = rgraphs(graph_names)
     noises = [
         0.00,
         0.05,
@@ -328,19 +339,19 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [9,13]
-   # run = [10,11]
-    iters = 3
+    #run = [9,13]
+    run = [9,11,13]
+    iters = 5
     print("start")
     graph_names = [             # n     / e
         #"ca-netscience",       # 379   / 914   / connected
         #"voles",
         #"high-school",
-        #"yeast"
-
+        #"yeast",
+        "MultiMagna",
         #"bio-celegans",         # 453   / 2k    / connected
         #"in-arenas",            # 1.1k  / 5.4k  / connected
-        "arenad",
+        #"arenad",
         #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
         #"inf-power",  
                   # 4.9K  / 6.6K  / connected

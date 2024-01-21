@@ -276,14 +276,17 @@ def gromov_wasserstein_discrepancy(cost_s: csr_matrix, cost_t: csr_matrix,
 
     if trans0 is None:
         trans0 = np.matmul(p_s, p_t.T)
-
     a = np.ones((n_s, 1)) / n_s
-
+    #if np.isnan(trans0).any():
+    #    print("The matrix contains NaN values.")
+    #else:
+    #    print("The matrix does not contain NaN values.")
     t = 0
     relative_error = np.inf
     # calculate invariant cost matrix
     cost_st = node_cost_st(cost_s, cost_t, p_s, p_t,
                            loss_type=ot_hyperpara['loss_type'], prior=ot_hyperpara['node_prior'])
+
     while relative_error > ot_hyperpara['iter_bound'] and t < ot_hyperpara['outer_iteration']:
         # update optimal transport via Sinkhorn iteration method
         cost = node_cost(cost_s, cost_t, trans0, cost_st, ot_hyperpara['loss_type'])
@@ -308,7 +311,10 @@ def gromov_wasserstein_discrepancy(cost_s: csr_matrix, cost_t: csr_matrix,
         relative_error = np.sum(np.abs(trans - trans0)) / np.sum(np.abs(trans0))
         trans0 = trans
         t += 1
-
+        if np.isnan(trans0).any():
+            print("The matrix contains NaN values.")
+        else:
+            print("The matrix does not contain NaN values.")
         # optionally, update source distribution
         if ot_hyperpara['update_p']:
             p_s, theta = update_distribution(a, p_s, theta,
@@ -316,6 +322,7 @@ def gromov_wasserstein_discrepancy(cost_s: csr_matrix, cost_t: csr_matrix,
     # print('proximal iteration = {}'.format(t))
     cost = node_cost(cost_s, cost_t, trans0, cost_st, ot_hyperpara['loss_type'])
     d_gw = (cost * trans0).sum()
+    print("hi3")
     return trans0, d_gw, p_s
 
 

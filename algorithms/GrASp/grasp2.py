@@ -18,6 +18,8 @@ from sklearn.neighbors import NearestNeighbors
 # np.set_printoptions(precision=3)
 
 # np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
+import numpy as np
+
 
 
 # 	#noise_level= [1]

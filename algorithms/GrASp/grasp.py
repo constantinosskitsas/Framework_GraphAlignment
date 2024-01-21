@@ -12,8 +12,16 @@ import matplotlib.pyplot as plt
 #import munkres
 from . import base_align as ba
 #import base_align as ba
-
+import numpy as np
 from sklearn.neighbors import NearestNeighbors
+try:
+    blas_info = np.distutils.__config__.blas_opt_info
+except AttributeError:
+    try:
+        blas_info = np.distutils.__config__.blas_ilp64_opt_info
+    except AttributeError:
+        blas_info = None 
+
 # np.set_printoptions(precision=4)
 
 # folder="C:/Users/Judith/Documents/MATLAB/compare_matlab_python/"

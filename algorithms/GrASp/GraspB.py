@@ -39,6 +39,8 @@ from . import base_align_pymanopt as ba
 #import base_align as ba
 
 
+import numpy as np
+
 
 from sklearn.neighbors import NearestNeighbors
 def sort_greedy_voting(match_freq):

@@ -130,6 +130,28 @@ def convex_init(A, B, D, mu, niter):
             P = P + alpha * (q - P)
     return P
 
+def convex_init1(A, B, D, mu, niter):
+    n = len(A)
+    P = torch.eye(n, dtype = torch.float64)
+    ones = torch.ones(n, dtype = torch.float64)
+    mat_ones = torch.ones((n, n), dtype = torch.float64)
+    reg = 1.0
+    K=mu*D 
+    AA=torch.mm(A.T, A)
+    BT=torch.mm(B.T, A)
+    BB=torch.mm(B,B.T)
+    AB=torch.mm(A.T, B)
+    for i in range(niter):
+        for it in range(1, 11):
+            #G = (torch.mm(AA, P) - torch.mm(torch.mm(A.T, P), B) - torch.mm(torch.mm(A, P), B.T) + torch.mm(torch.mm(P, B), B.T))/2 + K + i*(mat_ones - 2*P)
+            #G = (torch.mm(AA, P) - torch.mm(torch.mm(A.T, P), B) - torch.mm(torch.mm(A,P ), B.T) + torch.mm(P,BB))/2 + K + i*(mat_ones - 2*P)
+            #G = (torch.mm(AA, P) - torch.mm(torch.mm(A.T,P), B) - torch.mm(torch.mm(A,P ), B.T) + torch.mm(P,BB))/2 + K + i*(mat_ones - 2*P)
+            #G=2*torch.mm(AA, P)-torch.mm(BT, P)-torch.mm(AB, P)+torch.mm(torch.mm(B.T, P), B)-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T)+torch.mm(torch.mm(B, P), B.T)+ K + i*(mat_ones - 2*P)
+            G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T)+ K + i*(mat_ones - 2*P)
+            q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
+            alpha = 2.0 / float(2.0 + it)
+            P = P + alpha * (q - P)
+    return P
 def convertToPermHungarian(M, n1, n2):
     row_ind, col_ind = scipy.optimize.linear_sum_assignment(M, maximize=True)
     n = len(M)

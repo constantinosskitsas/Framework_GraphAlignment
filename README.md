@@ -153,8 +153,6 @@ Please cite our work in your publications if it helps your research:
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 ```
-##Known problems. If you use
-$conda create --name <env> --file enviroment.yml ,cone align will no work with this configuration.
 ## Contact
-For any problems or if you wan to add your algorithms to the framework contact au647909@uni.au.dk
+For any problems or if you want to add your algorithm to the framework contact au647909@uni.au.dk
 

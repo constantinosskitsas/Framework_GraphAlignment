@@ -348,18 +348,18 @@ def real():
     #run = [9,13]
     #run = [1,9,11,14]
     #run = [1,9,11,14]
-    run=[14]
-    iters = 2
+    run=[13,14,15]
+    iters = 1
     #print("start")
     graph_names = [             # n     / e
         "ca-netscience",       # 379   / 914   / connected
         #"voles",
         #"high-school",
         #"yeast",
-        "MultiMagna",
+        #"MultiMagna",
         #"bio-celegans",         # 453   / 2k    / connected
         #"in-arenas",            # 1.1k  / 5.4k  / connected
-        "arenad",
+        #"arenad",
         #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
         #"inf-power",  
                   # 4.9K  / 6.6K  / connected

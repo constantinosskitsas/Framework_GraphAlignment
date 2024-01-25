@@ -11,7 +11,5 @@ from .GrASp import grasp, grasp2,GraspB
 #from .FUGAL import Fugal2
 from .Grampa import Grampa
 from .GrampaS import GrampaS
-from .FUGAL import Fugal
-from .FUGAL import Fugal2
-from .FUGAL import QAP
+from .FUGAL import Fugal,Fugal2,QAP
 

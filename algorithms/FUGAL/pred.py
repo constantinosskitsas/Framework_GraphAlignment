@@ -152,7 +152,7 @@ def convex_initQAP(A, B, niter):
     ones = torch.ones(n, dtype = torch.float64)
     mat_ones = torch.ones((n, n), dtype = torch.float64)
     reg = 1.0 
-    for i in range(1,2):
+    for i in range(1):
         for it in range(1, 11):
             G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T) + i*(mat_ones - 2*P)
             q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)

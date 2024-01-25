@@ -345,10 +345,8 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    #run = [9,13]
-    #run = [1,9,11,14]
-    #run = [1,9,11,14]
-    run=[13,14,15]
+    run = [15]
+    #run=[13,14,15]
     iters = 1
     #print("start")
     graph_names = [             # n     / e

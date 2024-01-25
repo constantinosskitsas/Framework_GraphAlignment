@@ -288,11 +288,9 @@ def getmatching(sim, cost, mt, _log):
     elif mt == 30:
 
         try:
-
             return jv(mat_to_min)
 
         except Exception:
-
             return scipy.optimize.linear_sum_assignment(mat_to_min)
 
     elif mt == 98:

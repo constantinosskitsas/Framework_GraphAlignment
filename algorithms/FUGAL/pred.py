@@ -147,16 +147,18 @@ def convex_init1(A, B, D, mu, niter):
     return P
 def convex_initQAP(A, B, niter):
     n = len(A)
-    P = torch.ones(n, dtype = torch.float64)
+    P = torch.ones((n,n), dtype = torch.float64)
     P=P/n
     ones = torch.ones(n, dtype = torch.float64)
     mat_ones = torch.ones((n, n), dtype = torch.float64)
     reg = 1.0 
-    for it in range(1, 11):
-        G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T) + 1*(mat_ones - 2*P)
-        q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
-        alpha = 2.0 / float(2.0 + it)
-        P = P + alpha * (q - P)
+    for i in range(1,2):
+        for it in range(1, 11):
+            G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T) + i*(mat_ones - 2*P)
+            q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
+            alpha = 2.0 / float(2.0 + it)
+            P = P + alpha * (q - P)
+    print(P)
     return P
 
 def convertToPermHungarian(M, n1, n2):

@@ -159,9 +159,9 @@ def tuning():
     #    ]
     #]
     tmp = [
-        13, # Grampa
+        14, # Grampa
         [
-            {'mu': x} for x in [0.5, 1, 1.5, 2, 2.5,5]
+            {'mu': x} for x in [0.5, 1, 1.5, 2]
         ]
     ]
 
@@ -176,14 +176,19 @@ def tuning():
     iters = 5
 
     graph_names = [
-        "in-arenas",
-        "inf-euroroad",
-        "ca-netscience",
-        "bio-celegans",
-        "MultiMagna"
+        #"in-arenas",
+        #"inf-euroroad",
+        #"ca-netscience",
+        #"bio-celegans",
+       # "MultiMagna"
         #"facebook",
         # "astro",
         # "gnp"
+        #"soc-hamsterster",
+        #"socfb-Bowdoin47",
+        #"socfb-Hamilton46",
+        #"socfb-Haverford76",
+        #"socfb-Swarthmore42"
     ]
 
     #graphs = [
@@ -272,32 +277,32 @@ def real_noisetest():
 @ex.named_config
 def real_noise():
 
-    #tmp = [
-    #    "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
-    #    [
-    #        f"data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_{i}.txt" for i in [
-    #            99, 95, 90, 80]
-    #    ]
-    #]
-    #xlabel = "high-school-2013"
-
-    # tmp = [
-    #     "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
-    #     [
-    #         f"data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_{i}.txt" for i in [
-    #             99, 95, 90, 80]
-    #     ]
-    # ]
-    # xlabel = "mammalia-voles"
-
     tmp = [
-        "data/real world/MultiMagna/yeast0_Y2H1.txt",
+        "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
         [
-             f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
-                 5, 10, 15, 20, 25]
+            f"data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_{i}.txt" for i in [
+                99, 95, 90, 80]
         ]
     ]
-    xlabel = "yeast_Y2H1"
+    xlabel = "high-school-2013"
+
+    #tmp = [
+    #    "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
+    #    [
+    #        f"data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_{i}.txt" for i in [
+    #            99, 95, 90, 80]
+    #    ]
+    # ]
+    #xlabel = "mammalia-voles"
+
+    #tmp = [
+    #    "data/real world/MultiMagna/yeast0_Y2H1.txt",
+    #    [
+    #         f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
+    #             5, 10, 15, 20, 25]
+    #    ]
+    #]
+    #xlabel = "yeast_Y2H1"
     #tmp = [
     #    "data/real world/arenas/arenas_orig.txt",
     #    [
@@ -316,7 +321,8 @@ def real_noise():
     #graphs = graphss1(tmp)
     graphs = graphss(tmp)
     print(graphs)
-    run=[10]
+    run=[1,9,14]
+    #run=[14]
     iters = 1
 
     noises = [
@@ -340,18 +346,20 @@ def real():
 
     #run = [1, 2, 3, 4, 5, 6]
     #run = [9,13]
-    run = [1,9,10,11,12,13,14,15]
-    iters = 1
-    print("start")
+    #run = [1,9,11,14]
+    #run = [1,9,11,14]
+    run=[14]
+    iters = 2
+    #print("start")
     graph_names = [             # n     / e
-        #"ca-netscience",       # 379   / 914   / connected
+        "ca-netscience",       # 379   / 914   / connected
         #"voles",
         #"high-school",
         #"yeast",
-        #"MultiMagna",
+        "MultiMagna",
         #"bio-celegans",         # 453   / 2k    / connected
-        "in-arenas",            # 1.1k  / 5.4k  / connected
-        #"arenad",
+        #"in-arenas",            # 1.1k  / 5.4k  / connected
+        "arenad",
         #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
         #"inf-power",  
                   # 4.9K  / 6.6K  / connected
@@ -384,10 +392,10 @@ def real():
         # 0.04,
         # 0.05,
 
-        0.00,
+        #0.00,
         #0.05,
         #0.10,
-        #0.15,
+        0.15,
         #0.20,
         #0.25,
     ]

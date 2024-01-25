@@ -164,18 +164,19 @@ def main(data, iter,simple,mu):
     #B = torch.tensor(nx.to_numpy_array(Tar), dtype = torch.float64)
     A = torch.tensor((Src), dtype = torch.float64)
     B = torch.tensor((Tar), dtype = torch.float64)
-    simple=True
+    #simple=True
     F1 = feature_extraction(Src1,simple)
     F2 = feature_extraction(Tar1,simple)
-    D = eucledian_dist(F1, F2, n)
-    #D= create_L(Src, Tar, 10000,
-    #                True).A.astype(dtype)
-    #D=Grampa(Src,Tar)
+    #L = create_L(Src, Tar, 10000,
+    #                 True).A.astype(dtype)
     
-    #print(D)
+
+    D = eucledian_dist(F1, F2, n)
     D = torch.tensor(D, dtype = torch.float64)
+    
     P = convex_init(A, B, D, mu, iter)
-    #P1=convex_init1(A, B, D, mu, iter)
+    
+    #P=convex_init1(A, B, L, mu, iter)
     #are_matrices_equal(P,P1)
     #P_perm, ans = convertToPermHungarian(P, n1, n2)
     return P

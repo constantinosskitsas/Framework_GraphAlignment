@@ -373,4 +373,3 @@ def getmatching(sim, cost, mt, _log):
 
 
     raise Exception("wrong matching config")
-

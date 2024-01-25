@@ -68,9 +68,9 @@ _SGW_args = {
         'loss_type': 'L2',  # the key hyperparameters of GW distance
         'ot_method': 'proximal',
          #'beta': 0.025,#euroroad
-         #'beta': 0.025,#netscience,eurorad,arenas
+        'beta': 0.025,#netscience,eurorad,arenas
         #'beta': 0.1,#dense ex fb, socfb datasets
-        'beta': 0.025,# 0.025-0.1 depends on degree
+        #'beta': 0.025,# 0.025-0.1 depends on degree
         # outer, inner iteration, error bound of optimal transport
         'outer_iteration': 2000,  # num od nodes
         'iter_bound': 1e-10,
@@ -202,13 +202,13 @@ _Fugal_args={
     'iter': 15,
     #'iter': 15, for xx dataset.
     'simple': True,
-    'mu': 0.5,
+    'mu': 0.1,#1 MM,are,net --0.1 ce--2 eu
 }
 
 _algs = [
     (gwl, _GW_args, [3], "GW"),
     (conealign, _CONE_args, [-3], "CONE"),
-    (Fugal, _GRASP_args, [-3], "GRASP"),
+    (grasp, _GRASP_args, [-3], "GRASP"),
     (regal, _REGAL_args, [-3], "REGAL"),
     (eigenalign, _LREA_args, [3], "LREA"),
     (NSD, _NSD_args, [30], "NSD"),

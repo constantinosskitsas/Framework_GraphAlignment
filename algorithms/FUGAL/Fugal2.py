@@ -11,8 +11,8 @@ import time
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from sklearn.metrics.pairwise import euclidean_distances
-from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init,convex_init1
-#from pred import feature_extraction,eucledian_dist,convex_init
+from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init,convex_init1,
+
 def create_L(A, B, lalpha=1, mind=None, weighted=True):
     n = A.shape[0]
     m = B.shape[0]
@@ -133,6 +133,7 @@ def are_matrices_equal(matrix1, matrix2):
 
 
 def main(data, iter,simple,mu):
+    torch.set_num_threads(40)
     dtype = np.float64
     Src = data['Src']
     Tar = data['Tar']
@@ -153,29 +154,12 @@ def main(data, iter,simple,mu):
     n = max(n1, n2)
     Src1=nx.from_numpy_array(Src)
     Tar1=nx.from_numpy_array(Tar)
-   # for i in range(n1, n):
-    #    Gq.add_node(i)
-    #for i in range(n2, n):
-   #     Gt.add_node(i)
 
-    #A = torch.tensor(nx.to_numpy_array(Gq), dtype = torch.float64)
-    #B = torch.tensor(nx.to_numpy_array(Gt), dtype = torch.float64)
-    #A = torch.tensor(nx.to_numpy_array(Src), dtype = torch.float64)
-    #B = torch.tensor(nx.to_numpy_array(Tar), dtype = torch.float64)
     A = torch.tensor((Src), dtype = torch.float64)
     B = torch.tensor((Tar), dtype = torch.float64)
-    simple=True
-    F1 = feature_extraction(Src1,simple)
-    F2 = feature_extraction(Tar1,simple)
+    F1= feature_extraction(Src1,simple)
+    F2= feature_extraction(Tar1,simple)
     D = eucledian_dist(F1, F2, n)
-    #D= create_L(Src, Tar, 10000,
-    #                True).A.astype(dtype)
-    #D=Grampa(Src,Tar)
-    
-    #print(D)
     D = torch.tensor(D, dtype = torch.float64)
-    #P = convex_init(A, B, D, mu, iter)
     P1=convex_init1(A, B, D, mu, iter)
-    #are_matrices_equal(P,P1)
-    #P_perm, ans = convertToPermHungarian(P, n1, n2)
     return P1

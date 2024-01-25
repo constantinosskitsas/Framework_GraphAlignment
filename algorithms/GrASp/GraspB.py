@@ -1161,7 +1161,19 @@ def main(data, **args):
     Src = data['Src']
 
     Tar = data['Tar']
+    for i in range(Src.shape[0]):
+        row_sum1 = np.sum(Src[i, :])
 
+    # If the sum of the row is zero, add a self-loop
+        if row_sum1 == 0:
+            Src[i, i] = 1
+    for i in range(Tar.shape[0]):
+        row_sum = np.sum(Tar[i, :])
+
+    # If the sum of the row is zero, add a self-loop
+        if row_sum == 0:
+            Tar[i, i] = 1
+    # print(Src.tolist())
     B=align_voting_heuristic(Src,Tar,**args)
 
     #print(B)

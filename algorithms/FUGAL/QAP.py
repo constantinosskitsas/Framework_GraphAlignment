@@ -95,6 +95,7 @@ def decomposeN_laplacian(A):
     return [D, V]
 
 def main(data, iter,simple,mu):
+    print("QAP")
     dtype = np.float64
     Src = data['Src']
     Tar = data['Tar']

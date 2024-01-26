@@ -202,7 +202,13 @@ _Fugal_args={
     'iter': 15,
     #'iter': 15, for xx dataset.
     'simple': True,
-    'mu': 2,#1 MM,are,net --0.1 ce--2 eu
+    'mu': 1,#1 MM,are,net --0.1 ce--2 eu
+}
+_Fugal2_args={
+    'iter': 15,
+    #'iter': 15, for xx dataset.
+    'simple': True,
+    'mu': 1,#1 MM,are,net --0.1 ce--2 eu
 }
 
 _algs = [
@@ -222,7 +228,7 @@ _algs = [
     #(Fugal2, _Fugal_args, [3], "FUGALB"),
     (GrampaS, _GrampaS_args, [4], "GRAMPAS"),
     (Fugal, _Fugal_args, [3], "FUGAL"),
-    (Fugal2, _Fugal_args, [3], "FUGALB"),
+    (Fugal2, _Fugal2_args, [3], "FUGALB"),
     (QAP, _Fugal_args, [3], "QAP"),
 
 ]   

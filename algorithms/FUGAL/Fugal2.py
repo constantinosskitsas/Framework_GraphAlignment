@@ -133,6 +133,7 @@ def are_matrices_equal(matrix1, matrix2):
 
 
 def main(data, iter,simple,mu):
+    print("Fugal2")
     torch.set_num_threads(40)
     dtype = np.float64
     Src = data['Src']

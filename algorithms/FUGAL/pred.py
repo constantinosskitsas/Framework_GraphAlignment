@@ -158,7 +158,6 @@ def convex_initQAP(A, B, niter):
             q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
             alpha = 2.0 / float(2.0 + it)
             P = P + alpha * (q - P)
-    print(P)
     return P
 
 def convertToPermHungarian(M, n1, n2):

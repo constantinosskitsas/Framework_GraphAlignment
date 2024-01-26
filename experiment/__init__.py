@@ -202,7 +202,7 @@ _Fugal_args={
     'iter': 15,
     #'iter': 15, for xx dataset.
     'simple': True,
-    'mu': 0.1,#1 MM,are,net --0.1 ce--2 eu
+    'mu': 2,#1 MM,are,net --0.1 ce--2 eu
 }
 
 _algs = [

@@ -84,7 +84,7 @@ def noise_types(noise_level, noise_type=1):
 def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
 
     if isinstance(G, list):
-
+        print("A")
         _src, _tar, _gt = G
 
         Src_e = load_as_nx(_src)
@@ -100,12 +100,23 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
         else:
             gt_e = np.array(_gt, int)
 
-        Gt = (
-            gt_e[:, gt_e[1].argsort()][0],
-            gt_e[:, gt_e[0].argsort()][1]
-        )
+        #Gt = (
+        #    gt_e[:, gt_e[1].argsort()][0],
+        #    gt_e[:, gt_e[0].argsort()][1]
+        #)
+        n = np.amax(Tar_e) + 1
+        nedges =Tar_e.shape[0]
 
-        return Src_e, Tar_e, Gt
+        gt_e = np.array((
+            np.arange(n),
+            np.random.permutation(n)
+        ))
+        Gt = (
+        gt_e[:, gt_e[1].argsort()][0],
+        gt_e[:, gt_e[0].argsort()][1]
+        )
+        Tar_e1 = Gt[0][Tar_e]
+        return Src_e, Tar_e1, Gt
 
         # dataset = G['dataset']
         # edges = G['edges']
@@ -130,11 +141,15 @@ def generate_graphs(G, source_noise=0.00, target_noise=0.00, refill=False):
         # return Src_e, Tar_e, Gt
     elif isinstance(G, str):
         Src_e = load_as_nx(G)
+        print("B")
     elif isinstance(G, nx.Graph):
         Src_e = np.array(G.edges)
+        print("C")
     else:
+        print("D")
         return sps.csr_matrix([]), sps.csr_matrix([]), (np.empty(1), np.empty(1))
     if (np.amin(Src_e)!=0):
+        print("E")
         Src_e=Src_e-np.amin(Src_e)
     n = np.amax(Src_e) + 1
     nedges = Src_e.shape[0]
@@ -182,7 +197,7 @@ def init1(graphs, iters):
     #                     mode='r', shape=(len(graphs), iters))
 
     #     randcheck = path
-
+    print("init1")
     S_G = [
         [alg(*args) for _ in range(iters)] for alg, args in graphs
     ]
@@ -211,7 +226,7 @@ def init2(S_G, noises):
     #                   mode='r', shape=(S_G.shape[0], len(noises), S_G.shape[1]))
 
     #     randcheck = path
-
+    print("init2")
     G = [
         [
             [

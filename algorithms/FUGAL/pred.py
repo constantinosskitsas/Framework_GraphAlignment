@@ -63,36 +63,40 @@ def feature_extraction(G,simple):
     ]
 
     # number of edges in the neighborhood
-    neighbor_edges = [
-        egonets[n].number_of_edges() if node_degree_dict[n] > 0 else 0
-        for n in node_list
-    ]
+
+    if simple==False:
+        neighbor_edges = [
+            egonets[n].number_of_edges() if node_degree_dict[n] > 0 else 0
+            for n in node_list
+        ]
 
     # number of outgoing edges from the neighborhood
     # the sum of neighborhood degrees = 2*(internal edges) + external edges
     # node_features[:,5] = node_features[:,0] * node_features[:,2] - 2*node_features[:,4]
-    neighbor_outgoing_edges = [
-        len(
-            [
-                edge
-                for edge in set.union(*[set(G.edges(j)) for j in egonets[i].nodes])
-                if not egonets[i].has_edge(*edge)
-            ]
-        )
-        for i in node_list
-    ]
+    if simple==False:
+        neighbor_outgoing_edges = [
+            len(
+                [
+                    edge
+                    for edge in set.union(*[set(G.edges(j)) for j in egonets[i].nodes])
+                    if not egonets[i].has_edge(*edge)
+                ]
+            )
+            for i in node_list
+        ]   
 
     # number of neighbors of neighbors (not in neighborhood)
-    neighbors_of_neighbors = [
-        len(
-            set([p for m in G.neighbors(n) for p in G.neighbors(m)])
-            - set(G.neighbors(n))
-            - set([n])
-        )
-        if node_degree_dict[n] > 0
-        else 0
-        for n in node_list
-    ]
+    if simple==False:
+        neighbors_of_neighbors = [
+            len(
+                set([p for m in G.neighbors(n) for p in G.neighbors(m)])
+                - set(G.neighbors(n))
+                - set([n])
+            )
+            if node_degree_dict[n] > 0
+            else 0
+            for n in node_list
+        ]
 
     # assembling the features
     node_features[:, 0] = degs
@@ -130,6 +134,8 @@ def convex_init(A, B, D, mu, niter):
             alpha = 2.0 / float(2.0 + it)
             P = P + alpha * (q - P)
     return P
+
+
 def convex_init1A(A, B, D, mu, niter):
     n = len(A)
     P = torch.eye(n, dtype = torch.float64)

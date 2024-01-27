@@ -39,7 +39,12 @@ def aaa(vals, dist_type=0):
     return g
     # normald = np.random.normal(10, 2, 1000) make it 1 for standard
 
-
+def aa1(vals):
+    g = []
+    for val in vals:
+        G2=nx.newman_watts_strogatz_graph, (val, 7, 0.1)
+        g.append((lambda x: x, (G2,)))
+    return g
 def ggg(vals):
     return [str(x) for x in vals]
 
@@ -48,39 +53,43 @@ def ggg(vals):
 def scaling():
 
     # Greedied down
-    _algs[0][2][0] = 2
-    _algs[1][2][0] = -2
-    _algs[2][2][0] = -2
-    _algs[3][2][0] = -2
-    _algs[4][2][0] = 2
-    _algs[5][2][0] = 2
-    _algs[6][2][0] = 2
+   # _algs[0][2][0] = 2
+   # _algs[1][2][0] = -2
+   # _algs[2][2][0] = -2
+   # _algs[3][2][0] = -2
+   # _algs[4][2][0] = 2
+   # _algs[5][2][0] = 2
+   # _algs[6][2][0] = 2
 
-    _GW_args["max_cpu"] = 40
+  #  _GW_args["max_cpu"] = 40
     # _CONE_args["dim"] = 1000
-    _CONE_args["dim"] = 256
-    _GRASP_args["n_eig"] = 256
-    _ISO_args["alpha"] = 0.9
-    _ISO_args["lalpha"] = 100000  # full dim
+   # _CONE_args["dim"] = 256
+   # _GRASP_args["n_eig"] = 256
+   # _ISO_args["alpha"] = 0.9
+   # _ISO_args["lalpha"] = 100000  # full dim
 
-    run = [1, 2, 3, 4, 5, 6]
-
-    iters = 5
+   # run = [1, 2, 3, 4, 5, 6]
+    #run= [1, 6,9,10,11,14,15]
+    run= [1]
+    iters = 3
 
     tmp = [
+        #2**i for i in range(3, 4)
         # 2**i for i in range(10, 14)
         # 2 ** 15,
         # 2 ** 16,
         # 2 ** 17,
-        # 10, 100, 1000, 10000
+        10, 100, 1000, 10000
     ]
 
     # graphs = aaa(tmp, dist_type=0)
     # xlabel = "kdist"
     # graphs = aaa(tmp, dist_type=1)
     # xlabel = "powerlaw"
-    # graphs = aaa(tmp, dist_type=2)
+    graphs = aaa(tmp, dist_type=2)
+    #graphs = aa1(tmp)
     xlabel = "normal"
+    
     # graphs = aaa(tmp, dist_type=3)
     # xlabel = "poisson"
     graphs = []
@@ -95,8 +104,9 @@ def scaling():
         # 0.04,
     ]
 
-    s_trans = (2, 1, 0, 3)
-
+    #s_trans = (2, 1, 0, 3)
+    s_trans = (0, 2, 1, 3)
+    #xlabel = list(tmp[1][0].keys())[0]
 
 def alggs(tmp):
     alg, args, mtype, algname = _algs[tmp[0]]
@@ -277,32 +287,32 @@ def real_noisetest():
 @ex.named_config
 def real_noise():
 
- #   tmp = [
- #       "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
- #       [
-  #          f"data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_{i}.txt" for i in [
-  #              99, 95, 90, 80]
-   #     ]
-   # ]
-  #  xlabel = "high-school-2013"
-
-  #  tmp = [
-  #      "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
-  #      [
-  #          f"data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_{i}.txt" for i in [
-  #              99, 95, 90, 80]
-  #      ]
-  #   ]
-  #  xlabel = "mammalia-voles"
+   # tmp = [
+   #     "data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_100.txt",
+    #    [
+    #        f"data/real world/contacts-prox-high-school-2013/contacts-prox-high-school-2013_{i}.txt" for i in [
+    #            99, 95, 90, 80]
+    #    ]
+    #]
+   # xlabel = "high-school-2013"
 
     tmp = [
-        "data/real world/MultiMagna/yeast0_Y2H1.txt",
+        "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
         [
-             f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
-                 5, 10, 15, 20, 25]
+            f"data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_{i}.txt" for i in [
+                99, 95, 90, 80]
         ]
-    ]
-    xlabel = "yeast_Y2H1"
+     ]
+    xlabel = "mammalia-voles"
+
+  #  tmp = [
+   #     "data/real world/MultiMagna/yeast0_Y2H1.txt",
+   #     [
+   #          f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
+    #             5, 10, 15, 20, 25]
+    #    ]
+    #]
+    #xlabel = "yeast_Y2H1"
     #tmp = [
     #    "data/real world/arenas/arenas_orig.txt",
     #    [
@@ -321,7 +331,7 @@ def real_noise():
     #graphs = graphss1(tmp)
     graphs = graphss(tmp)
     print(graphs)
-    run=[14,15]
+    run=[9,13,14,15]
     #run=[14]
     iters =1
 
@@ -404,15 +414,20 @@ def synthetic():
 
     # use with 'mall'
 
-    iters = 10
-    run = [10,12]
+    iters = 3
+    run = [1,6,9,10,11,14,15]
     graph_names = [
         #"arenas",
-        "powerlaw",
-        "nw_str",
-        "watts_str",
-        "gnp",
-        "barabasi",
+        #"powerlaw",
+        #"nw_str",
+        #"watts_str",
+        #"gnp",
+        #"barabasi",
+        "nw_str128",
+        "nw_str256",
+        "nw_str512",
+       # "nw_str1024",
+       # "nw_str2048"
     ]
 
     graphs = [
@@ -424,7 +439,7 @@ def synthetic():
         #(nx.newman_watts_strogatz_graph, (1133, 7, 0.5)),
         #(nx.watts_strogatz_graph, (1133, 10, 0.5)),
         # 92-1
-        (nx.gnp_random_graph, (100, 0.5)),
+        #(nx.gnp_random_graph, (100, 0.5)),
         #(nx.gnp_random_graph, (1133, 0.009)),
         #(nx.barabasi_albert_graph, (1133, 5)),
         #(nx.algorithms.bipartite.random_graph,(800,100,0.02)),
@@ -435,20 +450,25 @@ def synthetic():
         #(nx.algorithms.bipartite.random_graph,(450,450,0.06)),
         #(nx.algorithms.bipartite.random_graph,(200,700,0.09)),
         #(nx.algorithms.bipartite.random_graph,(800,600,0.05))
+        (nx.newman_watts_strogatz_graph, (128, 7,0.5)),
+        (nx.newman_watts_strogatz_graph, (256, 7,0.5)),
+        (nx.newman_watts_strogatz_graph, (512, 20,0.5)),
+        #(nx.newman_watts_strogatz_graph, (1024, 40,0.5)),
+        #(nx.newman_watts_strogatz_graph, (2048, 7,0.5))
     ]
 
     noises = [
-        0.00,
+        #0.00,
         #0.01,
         #0.02,
         #0.03,
         #0.04,
-        #0.05,
+        0.05,
         #0.06,
         #0.07,
         #0.08,
         #0.09,
-        0.10
+        #0.10
 
         #0.1,
         #0.15,

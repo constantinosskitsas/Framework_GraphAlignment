@@ -414,8 +414,10 @@ def synthetic():
 
     # use with 'mall'
 
-    iters = 3
-    run = [1,6,9,10,11,14,15]
+    iters = 2
+    #run = [1,6,9,10,11,14,15]
+    #run = [1,6,14,15] #9,10,11
+    run=[9]
     graph_names = [
         #"arenas",
         #"powerlaw",
@@ -423,11 +425,12 @@ def synthetic():
         #"watts_str",
         #"gnp",
         #"barabasi",
-        "nw_str128",
-        "nw_str256",
-        "nw_str512",
-       # "nw_str1024",
-       # "nw_str2048"
+
+        #"nw_str512",
+        #"nw_str1024",
+        #"nw_str2048",
+        #"nw_str4096",
+        "nw_str8192",
     ]
 
     graphs = [
@@ -450,11 +453,19 @@ def synthetic():
         #(nx.algorithms.bipartite.random_graph,(450,450,0.06)),
         #(nx.algorithms.bipartite.random_graph,(200,700,0.09)),
         #(nx.algorithms.bipartite.random_graph,(800,600,0.05))
-        (nx.newman_watts_strogatz_graph, (128, 7,0.5)),
-        (nx.newman_watts_strogatz_graph, (256, 7,0.5)),
-        (nx.newman_watts_strogatz_graph, (512, 20,0.5)),
+        #(nx.newman_watts_strogatz_graph, (128, 7,0.5)),
+        #(nx.newman_watts_strogatz_graph, (256, 7,0.5)),
+        #(nx.newman_watts_strogatz_graph, (512, 7,0.5)),
+        #(nx.newman_watts_strogatz_graph, (1024, 7,0.5)),
+        #(nx.newman_watts_strogatz_graph, (2048, 7,0.5)),
+        #(nx.newman_watts_strogatz_graph, (4096, 7,0.5)),
+        (nx.newman_watts_strogatz_graph, (8192, 7,0.5)),
+        #
+        #(nx.newman_watts_strogatz_graph, (1024, 50,0.5)),
+        #(nx.newman_watts_strogatz_graph, (1024, 100,0.5)),
+        #(nx.newman_watts_strogatz_graph, (1024, 200,0.5)),
         #(nx.newman_watts_strogatz_graph, (1024, 40,0.5)),
-        #(nx.newman_watts_strogatz_graph, (2048, 7,0.5))
+        #
     ]
 
     noises = [

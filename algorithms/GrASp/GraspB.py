@@ -7,7 +7,7 @@ import networkx as nx
 import time
 
 import scipy.sparse as sps
-
+import os
 try:
     import lapjv
 except:
@@ -1153,7 +1153,7 @@ def calc_correspondence_matrix(A, B, k):
     return C
 
 def main(data, **args):
-
+    os.environ["MKL_NUM_THREADS"] = "40"
     # Src = data['Src'].A
 
     # Tar = data['Tar'].A

@@ -176,7 +176,7 @@ _Grampa_args = {
    'eta': 0.2,
    'lalpha':10000,
    'initSim':0,
-   'Eigtype':2
+   'Eigtype':0
 }
 _GrampaS_args = {
     'eta': 0.2,
@@ -202,7 +202,7 @@ _Fugal_args={
     'iter': 15,
     #'iter': 15, for xx dataset.
     'simple': True,
-    'mu': 0.3,#1 MM,are,net --0.1 ce--2 eu
+    'mu': 1,#1 MM,are,net --0.1 ce--2 eu
 }
 _Fugal2_args={
     'iter': 15,

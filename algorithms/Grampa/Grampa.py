@@ -11,6 +11,7 @@ import scipy as sci
 from numpy import inf, nan
 import scipy.sparse as sps
 import math
+import os
 
 #from lapsolver import solve_dense
 import scipy as sci
@@ -158,6 +159,7 @@ def seigh(A):
   u = u[:,idx]
   return l, u
 def main(data, eta,lalpha,initSim,Eigtype):
+    os.environ["MKL_NUM_THREADS"] = "40"
     Src = data['Src']
     Tar = data['Tar']
     n = Src.shape[0]

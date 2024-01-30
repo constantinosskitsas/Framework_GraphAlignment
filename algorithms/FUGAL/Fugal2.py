@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from sklearn.metrics.pairwise import euclidean_distances
 from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init,convex_init1
-
+import os
 def create_L(A, B, lalpha=1, mind=None, weighted=True):
     n = A.shape[0]
     m = B.shape[0]
@@ -133,6 +133,7 @@ def are_matrices_equal(matrix1, matrix2):
 
 
 def main(data, iter,simple,mu):
+    os.environ["MKL_NUM_THREADS"] = "40"
     print("Fugal2")
     torch.set_num_threads(40)
     dtype = np.float64

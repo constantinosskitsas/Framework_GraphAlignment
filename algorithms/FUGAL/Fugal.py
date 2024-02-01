@@ -1,3 +1,4 @@
+#Fugal Algorithm was provided by anonymous authors.
 import numpy as np
 from numpy import inf, nan
 import scipy.sparse as sps

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#Fugal Algorithm was provided by anonymous authors.
 """
 Rewrite ot.bregman.sinkhorn in Python Optimal Transport (https://pythonot.github.io/_modules/ot/bregman.html#sinkhorn)
 using pytorch operations.

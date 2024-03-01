@@ -12,7 +12,7 @@ import time
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from sklearn.metrics.pairwise import euclidean_distances
-from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init,convex_init1A
+from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init
 #from pred import feature_extraction,eucledian_dist,convex_init
 
 
@@ -62,7 +62,7 @@ def main(data, iter,simple,mu):
     D = eucledian_dist(F1, F2, n)
     D = torch.tensor(D, dtype = torch.float64)
     
-    P = convex_init1A(A, B, D, mu, iter)
+    P = convex_init(A, B, D, mu, iter)
     
     #P=convex_init1(A, B, L, mu, iter)
     #are_matrices_equal(P,P1)

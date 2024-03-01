@@ -121,39 +121,9 @@ def dist(A, B, P):
     obj = np.linalg.norm(np.dot(A, P) - np.dot(P, B))
     return obj*obj/2
 
+
 def convex_init(A, B, D, mu, niter):
     n = len(A)
-    P = torch.eye(n, dtype = torch.float64)
-    ones = torch.ones(n, dtype = torch.float64)
-    mat_ones = torch.ones((n, n), dtype = torch.float64)
-    reg = 1.0
-
-    for i in range(niter):
-        for it in range(1, 11):
-            G = (torch.mm(torch.mm(A.T, A), P) - torch.mm(torch.mm(A.T, P), B) - torch.mm(torch.mm(A, P), B.T) + torch.mm(torch.mm(P, B), B.T))/2 + mu*D + i*(mat_ones - 2*P)
-            q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
-            alpha = 2.0 / float(2.0 + it)
-            P = P + alpha * (q - P)
-    return P
-
-
-def convex_init1A(A, B, D, mu, niter):
-    n = len(A)
-    P = torch.eye(n, dtype = torch.float64)
-    ones = torch.ones(n, dtype = torch.float64)
-    mat_ones = torch.ones((n, n), dtype = torch.float64)
-    reg = 1.0
-    K=mu*D
-    for i in range(niter):
-        for it in range(1, 11):
-            G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T)+ K + i*(mat_ones - 2*P)
-            q = sinkhorn(ones, ones, G, reg, maxIter = 500, stopThr = 1e-3)
-            alpha = 2.0 / float(2.0 + it)
-            P = P + alpha * (q - P)
-    return P
-def convex_init1(A, B, D, mu, niter):
-    n = len(A)
-    #P = torch.eye(n, dtype = torch.float64)
     P = torch.ones((n,n), dtype = torch.float64)
     P=P/n
     ones = torch.ones(n, dtype = torch.float64)
@@ -225,34 +195,4 @@ def convertToPerm(A, B, M, n1, n2):
     else:
         return P_greedy, ans_greedy
 
-def align_new(Gq, Gt, mu, niter):
-    n1 = len(Gq.nodes())
-    n2 = len(Gt.nodes())
-    n = max(n1, n2)
-    for i in range(n1, n):
-        Gq.add_node(i)
-    for i in range(n2, n):
-        Gt.add_node(i)
 
-    A = torch.tensor(nx.to_numpy_array(Gq), dtype = torch.float64)
-    B = torch.tensor(nx.to_numpy_array(Gt), dtype = torch.float64)
-    F1 = feature_extraction(Gq)
-    F2 = feature_extraction(Gt)
-    D = eucledian_dist(F1, F2, n)
-    D = torch.tensor(D, dtype = torch.float64)
-
-    P = convex_init(A, B, D, mu, niter)
-    P_perm, ans = convertToPermHungarian(P, n1, n2)
-    return ans
-
-def predict_alignment(queries, targets, mu = 2, niter = 15):
-    n = len(queries)
-    mapping = []
-    times = []
-    for i in tqdm(range(n)):
-        t1 = time.time()
-        ans = align_new(queries[i], targets[i], mu, niter)
-        mapping.append(ans)
-        t2 = time.time()
-        times.append(t2 - t1)
-    return mapping, times

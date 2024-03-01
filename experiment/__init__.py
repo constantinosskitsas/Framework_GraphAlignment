@@ -226,7 +226,7 @@ _algs = [
     (Grampa, _Grampa_args, [3], "GRAMPA"),
     (GraspB, _GRASPB_args, [-96], "GRASPB"),
     #(Fugal2, _Fugal_args, [3], "FUGALB"),
-    (GrampaS, _GrampaS_args, [4], "GRAMPAS"),
+    #(GrampaS, _GrampaS_args, [4], "GRAMPAS"),
     (Fugal, _Fugal_args, [3], "FUGAL"),
     (Fugal2, _Fugal2_args, [3], "FUGALB"),
     (QAP, _Fugal_args, [3], "QAP"),

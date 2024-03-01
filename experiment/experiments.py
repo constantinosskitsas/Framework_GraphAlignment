@@ -296,23 +296,23 @@ def real_noise():
     #]
    # xlabel = "high-school-2013"
 
-    tmp = [
-        "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
-        [
-            f"data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_{i}.txt" for i in [
-                99, 95, 90, 80]
-        ]
-     ]
-    xlabel = "mammalia-voles"
-
-  #  tmp = [
-   #     "data/real world/MultiMagna/yeast0_Y2H1.txt",
+   # tmp = [
+   #     "data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_100.txt",
    #     [
-   #          f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
-    #             5, 10, 15, 20, 25]
+   #         f"data/real world/mamalia-voles-plj-trapping/mammalia-voles-plj-trapping_{i}.txt" for i in [
+   #             99, 95, 90, 80]
     #    ]
-    #]
-    #xlabel = "yeast_Y2H1"
+   #  ]
+   # xlabel = "mammalia-voles"
+
+    tmp = [
+        "data/real world/MultiMagna/yeast0_Y2H1.txt",
+        [
+             f"data/real world/MultiMagna/yeast{i}_Y2H1.txt" for i in [
+                 5, 10, 15, 20, 25]
+        ]
+    ]
+    xlabel = "yeast_Y2H1"
     #tmp = [
     #    "data/real world/arenas/arenas_orig.txt",
     #    [
@@ -331,10 +331,10 @@ def real_noise():
     #graphs = graphss1(tmp)
     graphs = graphss(tmp)
     print(graphs)
-    run=[9,13,14,15]
-    #run=[14]
+    #run=[9,13,14,15]
+    run=[15]
     iters =1
-
+    accs=[0,1,2,3,4,5]
     noises = [
         1.0
     ]
@@ -355,9 +355,9 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [15]
+    run = [14]
     #run=[13,14,15]
-    iters = 1
+    iters = 2
     #print("start")
     graph_names = [             # n     / e
         "ca-netscience",       # 379   / 914   / connected
@@ -403,9 +403,9 @@ def real():
         #0.00,
         #0.05,
         #0.10,
-        0.15,
+        #0.15,
         #0.20,
-        #0.25,
+        0.25,
     ]
 
 

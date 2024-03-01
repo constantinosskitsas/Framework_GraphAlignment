@@ -30,7 +30,6 @@ def are_matrices_equal(matrix1, matrix2):
 
 
 def main(data, iter,simple,mu):
-    os.environ["MKL_NUM_THREADS"] = "40"
     print("Fugal2")
     torch.set_num_threads(40)
     dtype = np.float64

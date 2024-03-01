@@ -6,14 +6,12 @@ import scipy as sci
 from math import floor, log2
 import math
 import torch
-from tqdm.auto import tqdm
 import networkx as nx
 import time
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from sklearn.metrics.pairwise import euclidean_distances
 from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init
-#from pred import feature_extraction,eucledian_dist,convex_init
 
 
 def are_matrices_equal(matrix1, matrix2):

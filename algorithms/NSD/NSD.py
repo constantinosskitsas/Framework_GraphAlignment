@@ -79,7 +79,7 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
 
 # def main(A, B, alpha, iters):
 def main(data, alpha, iters):
-
+    print("NSD")
     # Src = data['Src'].A
     # Tar = data['Tar'].A
     Src = data['Src']

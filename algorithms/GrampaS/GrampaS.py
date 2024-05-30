@@ -1,4 +1,5 @@
 import numpy as np
+#import scipy.sparse as sp
 #from scipy.optimize import linear_sum_assignment
 from numpy.linalg import inv
 from numpy.linalg import eigh,eig
@@ -10,14 +11,45 @@ import scipy as sci
 #from lapsolver import solve_dense
 from numpy import inf, nan
 import scipy.sparse as sps
-try:
+import math
+import os
+import time
+#from lapsolver import solve_dense
+import scipy as sci
+#from lapsolver import solve_dense
+def calculate_similarity_scores_from_matrices(G_A, G_B):
+    # Step 1: Calculate degrees and normalize
+    start = time.time()
+    degrees_A = np.sum(G_A, axis=1)
+    degrees_B = np.sum(G_B, axis=1)
+    
+    sum_degrees_A = np.sum(degrees_A)
+    sum_degrees_B = np.sum(degrees_B)
+    
+    normalized_degrees_A = degrees_A / sum_degrees_A
+    normalized_degrees_B = degrees_B / sum_degrees_B
+    
+    # Step 2: Compute similarity scores
+    num_nodes_A = G_A.shape[0]
+    num_nodes_B = G_B.shape[0]
+    
+    similarity_scores = np.zeros((num_nodes_A, num_nodes_B))
+    end = time.time()
+    start1 = time.time()
+    min_degrees = np.minimum.outer(normalized_degrees_A, normalized_degrees_B)
+    max_degrees = np.maximum.outer(normalized_degrees_A, normalized_degrees_B)
 
-    import lapjv
-
-except:
-
-    pass
-
+# Calculate the similarity scores using element-wise division
+    similarity_scores = min_degrees / max_degrees
+    #for u in range(num_nodes_A):
+    #    for v in range(num_nodes_B):
+    #        d_A_u = normalized_degrees_A[u]
+    #        d_B_v = normalized_degrees_B[v]
+    #        similarity_scores[u, v] = min(d_A_u, d_B_v) / max(d_A_u, d_B_v)
+    end1 = time.time()
+    print("Part 1",end-start)
+    print("Part 2",end1-start1)
+    return similarity_scores
 
 def create_L(A, B, lalpha=1, mind=None, weighted=True):
     n = A.shape[0]
@@ -61,7 +93,8 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
     for i, bj in enumerate(ab_m):
         for j in bj:
             # d = 1 - abs(a[i]-b[j]) / a[i]
-            d = 1 - abs(a[i]-b[j]) / max(a[i], b[j])
+            #d = 1 - abs(a[i]-b[j]) / max(a[i], b[j])
+            d= min(a[i],b[j])/max(a[i],b[j])
             #d = 1 - abs(a[i]-b[j]) / a[i]+b[j]
             if mind is None:
                 if d > 0:
@@ -75,48 +108,82 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
                 # lw.append(0.0 if d <= 0 else d)
                 # lw.append(d)
 
-                # print(len(li))
-                # print(len(lj))
-                # print(len(lj))
-
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
-
-def decompose_laplacian(A):
-
-    #  adjacency matrix
-
-    Deg = np.diag((np.sum(A, axis=1)))
-
-    n = np.shape(Deg)[0]
-    
-    Deg = sci.linalg.fractional_matrix_power(Deg, -0.5)
-    L = (np.identity(n)) - Deg @ A @ Deg
-    #P=np.linalg.inv(Deg)@ A@np.linalg.inv(Deg)
-    #L=np.identity(n) + P
-    #L=Deg-A
-    D, V = np.linalg.eigh(L)
-
-    return [D, V]
-
 
 def decompose_Tlaplacian(A,rA):
 
     #  adjacency matrix
     r= (rA**2-1)
     Deg = np.diag((np.sum(A, axis=1)))
-
+    
     n = np.shape(Deg)[0]
-
     #Deg = sci.linalg.fractional_matrix_power(Deg, -0.5)
 
     L = r* np.identity(n) + Deg - rA*A 
+    L1=np.ones((n,n))-np.identity(n)-A
    # print((sci.fractional_matrix_power(Deg, -0.5) * A * sci.fractional_matrix_power(Deg, -0.5)))
     # '[V1, D1] = eig(L1);
 
     D, V = np.linalg.eigh(L)
+    D1,V1=np.linalg.eigh(L1)
+    return [D1, V1]
+    #return [D, V]
+def decompose_laplacian(A):
+    # Compute the degree matrix
+    D = np.diag(np.sum(A, axis=1))
 
+    n = np.shape(D)[0]
+
+    # Calculate the unnormalized Laplacian matrix
+    L = D - A
+
+    # Compute the eigenvalues and eigenvectors of L
+    D, V = np.linalg.eigh(L)
+    #D, V = seigh(L)
+    return [D, V]
+def decomposeN_laplacian(A):
+
+    #  adjacency matrix
+    start = time.time()
+    Deg = np.linalg.inv(np.sqrt(np.diag((np.sum(A, axis=1)))))
+    #Deg = np.diag((np.sum(A, axis=1)))
+
+    n = np.shape(Deg)[0]
+
+    #Deg 
+    #Deg = sci.linalg.fractional_matrix_power(Deg, -0.5)
+
+    L = np.identity(n) - Deg @ A @ Deg
+    end = time.time()
+    print("create LApl",end-start)
+    start = time.time()
+    D, V = np.linalg.eigh(L)
+    end = time.time()
+    print("Eigen Decomp",end-start)
     return [D, V]
 
+def random_walk_laplacian(A):
+    # Calculate the degree matrix D
+    D = np.diag(np.sum(A, axis=1))
+    #epsilon = 1e-6  # Small constant
+    #D_inv = np.linalg.inv(D + epsilon * np.identity(D.shape[0]))
+    # Compute the inverse of D
+    D_inv = np.linalg.inv(D)
+    # Calculate the Random Walk Laplacian L_rw
+    L_rw = np.identity(len(A)) - np.dot(D_inv, A)
+    #D, V = np.linalg.eigh(L_rw)
+    D, V = np.linalg.eig(L_rw)
+    return [D, V]
+    #return L_rw
+def Signless_Laplacian(A):
+        # Compute the degree matrix
+    D = np.diag(np.sum(A, axis=1))
+    n = np.shape(D)[0]
+    # Calculate the unnormalized Laplacian matrix
+    L = D + A
+    # Compute the eigenvalues and eigenvectors of L
+    D, V = np.linalg.eig(L)
+    return [D, V]
 def seigh(A):
   """
   Sort eigenvalues and eigenvectors in descending order. 
@@ -127,38 +194,58 @@ def seigh(A):
   l = l[idx]
   u = u[:,idx]
   return l, u
-
-def main(data, eta,lalpha):
-  Src = data['Src']
-  Tar = data['Tar']
-  n = Src.shape[0]
-  #l,U =eigh(Src)
-  #mu,V = eigh(Tar)
-  #lalpha=10000
-  alpha=0
-  dtype = np.float32
-  L = create_L(Src, Tar, lalpha,
-                     True).A.astype(dtype)
-  K = ((1-alpha) * L).astype(dtype)*1
-  #l,U =eigh(Src)
-  #mu,V = eigh(Tar)
-  l, U = decompose_laplacian(Src)
-  mu, V = decompose_laplacian(Tar)
-  #l, U = decompose_Tlaplacian(Src,2)
- # mu, V = decompose_Tlaplacian(Tar,2)
-  l = np.array([l])
-  mu = np.array([mu])
-  #Eq.4
-  #coeff = 1.0/((l.T - mu)**2 + eta**2)
-  coeff = 1.0/((l.T - mu)**2 + eta**2)
-  #Eq. 3
-  #coeff = coeff * (U.T @ np.ones((n,n)) @ V)
-  coeff = coeff * (U.T @ K @ V)
-  X = U @ coeff @ V.T 
-
-  Xt = X.T*-1
+def main(data, eta,lalpha,initSim,Eigtype):
+    print("GrampaNL")
+    os.environ["MKL_NUM_THREADS"] = "40"
+    Src = data['Src']
+    Tar = data['Tar']
+    n = Src.shape[0]
+    print("test")
+        #Adjancency
+    if Eigtype==0:
+        l,U =eigh(Src)
+        mu,V = eigh(Tar)
   
-  #Xt=-X
+    elif Eigtype==1:#Laplacian
+        l, U = decompose_laplacian(Src)
+        mu, V = decompose_laplacian(Tar)
+  
+    elif Eigtype==2:#RandomWalk Laplacian
+        l, U = random_walk_laplacian(Src)
+        mu, V = random_walk_laplacian(Tar)
+    elif Eigtype==3:#Singless Laplacian
+        l, U = Signless_Laplacian(Src)
+        mu, V = Signless_Laplacian(Tar)
+  
+    else: #Normalized Laplacian
+        l, U = decomposeN_laplacian(Src)
+        mu, V = decomposeN_laplacian(Tar)
+    
+    l = np.array([l])
+    mu = np.array([mu])
+    dtype = np.float32
+  #Eq.4
+    coeff = 1/((l.T - mu)**2 + eta**2)
+  #Eq. 3
+    start = time.time()
+    if initSim==1:
+        alpha=0
+        #lalpha=n/2
+        L = calculate_similarity_scores_from_matrices(Src,Tar)
+        #L = create_L(Src, Tar, lalpha,
+        #             True).A.astype(dtype)
+        #K = ((1-alpha) * L).astype(dtype)*1
+        coeff = coeff * (U.T @ L @ V)
+    
+    else:
+        coeff = coeff * (U.T @ np.ones((n,n)) @ V)
+    
+    end = time.time()
+    print("L matrix",end-start)
+  #coeff = coeff * (U.T @ K @ V)
+    X = U @ coeff @ V.T
+    Xt = X.T
+    Xt=X
   # Solve with linear assignment maximizing the similarity 
   # row,col = linear_sum_assignment(Xt, maximize=True)
 
@@ -166,28 +253,38 @@ def main(data, eta,lalpha):
   # The solver works on cost minimization, so take -X 
   #rows, cols = solve_dense(-Xt)
   #return rows, cols 
-  try:
-    cols, rows, _ = lapjv.lapjv(Xt)
-    matching = np.c_[np.linspace(0, n-1, n).astype(int),rows]
-  except Exception:
-    cols, rows = sci.optimize.linear_sum_assignment(Xt)
-    matching = np.c_[rows,cols]
-    
+    return Xt
 
-    # print(cols)
+def grampa(Src, Tar, eta):
+  """
+  Summary or Description of the Function
 
-    # print(rows)
+  Parameters:
+  Src (np.array): The nxn adjacency matrix of the first graph 
+  Tar (np.array): The nxn adjacency matrix of the second graph
+  eta (float): The eta value of Eq. 4 in the paper
 
-    #matching = np.c_[np.linspace(0, n-1, n).astype(int),cols]
-    
-    #matching = np.c_[cols,np.linspace(0, n-1, n).astype(int)]
-    #matching = np.c_[rows,np.linspace(0, n-1, n).astype(int)]
+  Returns:
+  Xt similarity Matrix
+  """
+  n = Src.shape[0]
+  l,U = eigh(Src)
+  mu,V = eigh(Tar)
+  l = np.array([l])
+  mu = np.array([mu])
 
-    # print(matching)
+  #Eq.4
+  coeff = 1.0/((l.T - mu)**2 + eta**2)
+  #Eq. 3
+  coeff = coeff * (U.T @ np.ones((n,n)) @ V)
+  X = U @ coeff @ V.T
 
-  matching = matching[matching[:, 0].argsort()]
+  Xt = X.T
+  # Solve with linear assignment maximizing the similarity 
+  # row,col = linear_sum_assignment(Xt, maximize=True)
 
-    # print(matching)
-
-  return matching.astype(int).T
-  #return Xt
+  # Alternatively, we can use a more efficient solver.
+  # The solver works on cost minimization, so take -X 
+  #rows, cols = solve_dense(-Xt)
+  #return rows, cols 
+  return Xt

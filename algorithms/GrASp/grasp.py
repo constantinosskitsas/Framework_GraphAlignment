@@ -63,7 +63,7 @@ except AttributeError:
 
 
 def main(data, **args):  # alg=2, base_align=True):
-
+    print("Grasp")
     Src = data['Src']
     Tar = data['Tar']
 

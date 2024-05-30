@@ -75,7 +75,7 @@ def create_L(A, B, lalpha=1, mind=None, weighted=True):
 
 
 def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weighted=True):
-
+    print("Isorank")
     dtype = np.float32
     # dtype = np.float64
 
@@ -104,7 +104,10 @@ def main(data, alpha=0.5, tol=1e-12, maxiter=1, verbose=True, lalpha=None, weigh
 
     W1 = d1*Tar
     W2 = d2*Src
-
+    print(d1)
+    print(d2)
+    print(W1)
+    print(W2)
     W2aT = (alpha*W2.T).astype(dtype)
     K = ((1-alpha) * L).astype(dtype)
     W1 = W1.astype(dtype)

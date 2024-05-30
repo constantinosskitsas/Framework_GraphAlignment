@@ -15,13 +15,12 @@ cluster_num = [2, 4, 8]
 partition_level = [3, 2, 1]
 
 
-def main(data, ot_dict, mn, max_cpu=0):
-
+def main(data, ot_dict, mn, max_cpu=0,clus=2,level=3):
+    print("SGWL")
     Src = data['Src']
     Tar = data['Tar']
     for i in range(Src.shape[0]):
         row_sum1 = np.sum(Src[i, :])
-
     # If the sum of the row is zero, add a self-loop
         if row_sum1 == 0:
             Src[i, i] = 1
@@ -39,7 +38,6 @@ def main(data, ot_dict, mn, max_cpu=0):
     p_t, cost_t, idx2node_t = DataIO.extract_graph_info(
         nx.Graph(Tar), weights=None)
     p_t /= np.sum(p_t)
-
     if max_cpu > 0:
         torch.set_num_threads(max_cpu)
 
@@ -47,28 +45,17 @@ def main(data, ot_dict, mn, max_cpu=0):
         **ot_dict,
         'outer_iteration': Src.shape[0]
     }
-
+    
     if mn == 0:
         pairs_idx, pairs_name, pairs_confidence, trans = GwGt.direct_graph_matching(
-            cost_s, cost_t, p_s, p_t, idx2node_s, idx2node_t, ot_dict)
+            0.5 * (cost_s + cost_s.T), 0.5 * (cost_t + cost_t.T), p_s, p_t, idx2node_s, idx2node_t, ot_dict)
     else:
         pairs_idx, pairs_name, pairs_confidence, trans = GwGt.recursive_direct_graph_matching(
             0.5 * (cost_s + cost_s.T), 0.5 * (cost_t + cost_t.T), p_s, p_t,
             idx2node_s, idx2node_t, ot_dict, weights=None, predefine_barycenter=False,
-            cluster_num=2, partition_level=3, max_node_num=0
+            cluster_num=clus, partition_level=level, max_node_num=200
         )
-    print("done")
     pairs = np.array(pairs_name)[::-1].T
-
-    # print(pairs)
-    # print(pairs_idx)
-    # print(pairs.shape)
-
-    # res = sps.csr_matrix((np.ones(pairs.shape[1]), pairs)).A
-    # # res[:, -1] = 0.01
-    # # print(res)
-    # print(trans.shape)
-    # print(pairs_name)
 
     # return res
     return trans

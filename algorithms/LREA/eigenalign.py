@@ -13,7 +13,7 @@ from .. import bipartitewrapper as bmw
 
 # def main(A, B, iters, method, bmatch, default_params=True):
 def main(data, iters, method, bmatch, default_params=True):
-
+    print("LREA")
     # Src = data['Src'].A
     # Tar = data['Tar'].A
     Src = data['Src']

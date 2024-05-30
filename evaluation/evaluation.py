@@ -2,7 +2,7 @@ from . import ex
 import numpy as np
 import scipy.sparse as sps
 import os
-
+from numpy import linalg as LA
 
 def EC(A, B, ma, mb):
     adj1 = A[ma][:, ma]
@@ -24,7 +24,10 @@ def ICS(A, B, ma, mb):
 
     return intersection / induced
 
-
+def frob(A, B, ma, mb):
+    adj1 = A[ma][:, ma]
+    adj2 = B[mb][:, mb]
+    return LA.norm(adj1 - adj2, 'fro')**2
 def S3(A, B, ma, mb):
     adj1 = A[ma][:, ma]
     adj2 = B[mb][:, mb]
@@ -229,6 +232,8 @@ def evall(ma, mb, Src, Tar, Gt, _log, _run, alg, accs, save=False, eval_type=0):
         _accs.append(jacc(Src, Tar, ma, mb))
     if 5 in accs:
         _accs.append(score_MNC(Src, Tar, ma, mb))
+    if 6 in accs:
+        _accs.append(frob(Src, Tar, ma, mb))
     # if 2 in accs:
     #     _accs.append(ICorS3GT(Src, Tar, ma, mb, gmb, True))
     # if 3 in accs:

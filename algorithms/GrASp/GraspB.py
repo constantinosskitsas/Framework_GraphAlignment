@@ -1155,7 +1155,7 @@ def calc_correspondence_matrix(A, B, k):
 def main(data, **args):
     os.environ["MKL_NUM_THREADS"] = "40"
     # Src = data['Src'].A
-
+    print("GraspB")
     # Tar = data['Tar'].A
 
     Src = data['Src']

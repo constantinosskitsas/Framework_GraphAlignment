@@ -7,7 +7,7 @@ import scipy.sparse as sps
 #original code from https://github.com/HongtengXu/gwl
 
 def main(data, opt_dict, hyperpara_dict, lr, gamma, max_cpu=0):
-
+    print("GWL")
     Src = data['Src']
     Tar = data['Tar']
 

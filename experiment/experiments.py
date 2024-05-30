@@ -70,7 +70,7 @@ def scaling():
 
    # run = [1, 2, 3, 4, 5, 6]
     #run= [1, 6,9,10,11,14,15]
-    run= [1]
+    run= [13]
     iters = 3
 
     tmp = [
@@ -79,7 +79,10 @@ def scaling():
         # 2 ** 15,
         # 2 ** 16,
         # 2 ** 17,
-        10, 100, 1000, 10000
+        5,
+        10, 
+        100, 
+        #1000#, 10000
     ]
 
     # graphs = aaa(tmp, dist_type=0)
@@ -92,7 +95,7 @@ def scaling():
     
     # graphs = aaa(tmp, dist_type=3)
     # xlabel = "poisson"
-    graphs = []
+    #graphs = []
 
     graph_names = ggg(tmp)
 
@@ -169,9 +172,10 @@ def tuning():
     #    ]
     #]
     tmp = [
-        13, # Grampa
+        10, # SGWL
         [
-            {'mu': x} for x in [0.5, 1, 1.5, 2]
+            {'eta': x} for x in [0.2,0.1,0.05]
+            #{'lev': x} for x in [1, 2, 3]
         ]
     ]
 
@@ -183,22 +187,25 @@ def tuning():
 
     run = list(range(len(tmp[1])))
 
-    iters = 5
+    iters = 3
 
     graph_names = [
+        #"bio-dmela",
         "in-arenas",
         "inf-euroroad",
         "ca-netscience",
-        "bio-celegans",
+       "bio-celegans",
+       #"inf-power",  
        # "MultiMagna"
         #"facebook",
         # "astro",
         # "gnp"
         #"soc-hamsterster",
-        #"socfb-Bowdoin47",
+        "socfb-Bowdoin47",
         #"socfb-Hamilton46",
         #"socfb-Haverford76",
-        #"socfb-Swarthmore42"
+        #"socfb-Swarthmore42",
+        "soc-facebook",
     ]
 
     #graphs = [
@@ -211,15 +218,15 @@ def tuning():
     #]
     graphs = rgraphs(graph_names)
     noises = [
-        0.00,
-        0.05,
+        #0.00,
+        #0.05,
         0.10,
         0.15,
-        0.20,
-        0.25,
+        #0.20,
+        #0.25,
     ]
 
-    s_trans = (0, 2, 1, 3)
+    s_trans = (0, 2, 1, 3,4)
     xlabel = list(tmp[1][0].keys())[0]
 
 
@@ -355,9 +362,10 @@ def rgraphs(gnames):
 def real():
 
     #run = [1, 2, 3, 4, 5, 6]
-    run = [14]
-    #run=[13,14,15]
-    iters = 2
+    #run = [0,1,2,3,4,5,6,9,10,11,12,13,14]
+    #run=[3,4,5,6,10,12]
+    run=[12]
+    iters = 1
     #print("start")
     graph_names = [             # n     / e
         "ca-netscience",       # 379   / 914   / connected
@@ -365,22 +373,27 @@ def real():
         #"high-school",
         #"yeast",
         #"MultiMagna",
-        #"bio-celegans",         # 453   / 2k    / connected
-        #"in-arenas",            # 1.1k  / 5.4k  / connected
+        
+        "bio-celegans",         # 453   / 2k    / connected
+        "in-arenas",            # 1.1k  / 5.4k  / connected
+        
         #"arenad",
-        #"inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
-        #"inf-power",  
+        
+        "inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
+        "inf-power",  
+        
                   # 4.9K  / 6.6K  / connected
         #"ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
         #"bio-dmela",            # 7.4k  / 25.6k / connected
         #"CA-AstroPh",  
                  # 18k   / 195k  / connected
-        #"soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
-        #"socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
-        #"socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
-        #"socfb-Haverford76",    # 1.4K  / 59.6K / connected
-        #"socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
-        #"soc-facebook",
+        
+        "soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
+        "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
+        "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
+        "socfb-Haverford76",    # 1.4K  / 59.6K / connected
+        "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
+        "soc-facebook",
 
         #"scc_enron-only",
         #"scc_fb-forum",
@@ -400,11 +413,11 @@ def real():
         # 0.04,
         # 0.05,
 
-        #0.00,
-        #0.05,
-        #0.10,
-        #0.15,
-        #0.20,
+        0.00,
+        0.05,
+        0.10,
+        0.15,
+        0.20,
         0.25,
     ]
 
@@ -417,7 +430,7 @@ def synthetic():
     iters = 2
     #run = [1,6,9,10,11,14,15]
     #run = [1,6,14,15] #9,10,11
-    run=[9]
+    run=[13]
     graph_names = [
         #"arenas",
         #"powerlaw",
@@ -425,7 +438,11 @@ def synthetic():
         #"watts_str",
         #"gnp",
         #"barabasi",
-
+        #"nw_str128",
+        #"nw_str256",
+        #"nw_str512",
+        #"nw_str1024",
+        #"nw_str2048",
         #"nw_str512",
         #"nw_str1024",
         #"nw_str2048",
@@ -453,13 +470,13 @@ def synthetic():
         #(nx.algorithms.bipartite.random_graph,(450,450,0.06)),
         #(nx.algorithms.bipartite.random_graph,(200,700,0.09)),
         #(nx.algorithms.bipartite.random_graph,(800,600,0.05))
-        #(nx.newman_watts_strogatz_graph, (128, 7,0.5)),
+        (nx.newman_watts_strogatz_graph, (20, 7,0.5)),
         #(nx.newman_watts_strogatz_graph, (256, 7,0.5)),
         #(nx.newman_watts_strogatz_graph, (512, 7,0.5)),
         #(nx.newman_watts_strogatz_graph, (1024, 7,0.5)),
         #(nx.newman_watts_strogatz_graph, (2048, 7,0.5)),
         #(nx.newman_watts_strogatz_graph, (4096, 7,0.5)),
-        (nx.newman_watts_strogatz_graph, (8192, 7,0.5)),
+        #(nx.newman_watts_strogatz_graph, (8192, 7,0.5)),
         #
         #(nx.newman_watts_strogatz_graph, (1024, 50,0.5)),
         #(nx.newman_watts_strogatz_graph, (1024, 100,0.5)),

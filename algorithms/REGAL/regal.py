@@ -63,7 +63,7 @@ def G_to_Adj(G1, G2):
 
 # def main(Tar, Src, REGAL_args) -> object:
 def main(data, **args) -> object:
-
+    print("Regal")
     Src = data['Src']
     Tar = data['Tar']
 

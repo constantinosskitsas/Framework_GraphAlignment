@@ -554,6 +554,7 @@ def recursive_direct_graph_matching(cost_s: csr_matrix, cost_t: csr_matrix,
     """
     # apply "multi-graph partition" recursively to get a list of sub-graph sets
     costs = {0: cost_s, 1: cost_t}
+    print(max_node_num)
     probs = {0: p_s, 1: p_t}
     idx2nodes = {0: idx2node_s, 1: idx2node_t}
     costs_all, probs_all, idx2nodes_all = recursive_multi_graph_partition(costs, probs, idx2nodes, ot_hyperpara,

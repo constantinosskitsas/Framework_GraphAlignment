@@ -62,33 +62,64 @@ _GW_args = {
     # 'max_cpu': 20,
     # 'max_cpu': 4
 }
+_SGW_args1 = {
+    'ot_dict': {
+        'loss_type': 'L2',  # the key hyperparameters of GW distance
+        'ot_method': 'proximal',
+         #'beta': 0.025,#euroroad
+        #'beta': 0.2,#netscience,eurorad,arenas
+        #'beta': 0.1,#dense ex fb, socfb datasets
+        'beta': 0.2,# 0.025-0.1 depends on degree
+        # outer, inner iteration, error bound of optimal transport
+        'outer_iteration': 2000,  # num od nodes
+        'iter_bound': 1e-10,
+        'inner_iteration': 2,
+        'sk_bound': 1e-10,
+        'node_prior': 0,
+        'max_iter': 5,  
+        'cost_bound': 1e-16,
+        'update_p': False,  # optional updates of source distribution
+        'lr': 0,
+        'alpha': 0
+    },
+    "mn": 1,  # gwl
+    # "mn": 1,  # s-gwl-3
+    # "mn": 2,  # s-gwl-2
+    # "mn": 3,  # s-gwl-1
+    'clus': 8,
+    'level': 1,
+    'max_cpu': 20,
 
+}
 _SGW_args = {
     'ot_dict': {
         'loss_type': 'L2',  # the key hyperparameters of GW distance
         'ot_method': 'proximal',
          #'beta': 0.025,#euroroad
-        'beta': 0.025,#netscience,eurorad,arenas
+        #'beta': 0.2,#netscience,eurorad,arenas
         #'beta': 0.1,#dense ex fb, socfb datasets
-        #'beta': 0.025,# 0.025-0.1 depends on degree
+        'beta': 0.1,# 0.025-0.1 depends on degree
         # outer, inner iteration, error bound of optimal transport
         'outer_iteration': 2000,  # num od nodes
         'iter_bound': 1e-10,
         'inner_iteration': 2,
-        'sk_bound': 1e-30,
-        'node_prior': 1000,
-        'max_iter': 4,  # iteration and error bound for calcuating barycenter
+        'sk_bound': 1e-30,#--mine
+        'node_prior': 1000,#--mine
+        
+        'max_iter': 4,#--mine  # iteration and error bound for calcuating barycenter
         'cost_bound': 1e-26,
         'update_p': False,  # optional updates of source distribution
         'lr': 0,
-        #'alpha': 0
         'alpha': 1
     },
     "mn": 1,  # gwl
     # "mn": 1,  # s-gwl-3
     # "mn": 2,  # s-gwl-2
     # "mn": 3,  # s-gwl-1
-    'max_cpu': 40,
+    'clus': 2,
+    'level': 3,
+    'max_cpu': 20,
+
 }
 
 _CONE_args = {
@@ -179,8 +210,10 @@ _Grampa_args = {
    'Eigtype':0
 }
 _GrampaS_args = {
-    'eta': 0.2,
-    'lalpha':10000
+   'eta': 0.1,
+   'lalpha':10000,
+   'initSim':1,
+   'Eigtype':100 #any other than 0,2,3 is NL
 }
 _GRASPB_args = {
     'laa': 3,
@@ -202,13 +235,13 @@ _Fugal_args={
     'iter': 15,
     #'iter': 15, for xx dataset.
     'simple': True,
-    'mu': 0.5,#1 MM,are,net --0.1 ce--2 eu
+    'mu': 1,#1 MM,are,net --0.1 ce--2 eu
 }
 _Fugal2_args={
     'iter': 15,
     #'iter': 15, for xx dataset.
     'simple': True,
-    'mu': 0.3,#1 MM,are,net --0.1 ce--2 eu
+    'mu':1,#1 MM,are,net --0.1 ce--2 eu
 }
 
 _algs = [
@@ -222,11 +255,11 @@ _algs = [
     (isorank, _ISO_args, [3], "ISO"),
     (netalign, _NET_args, [3], "NET"),
     (klaus, _KLAU_args, [3], "KLAU"),
-    (sgwl, _SGW_args, [3], "SGW"),
+    (sgwl, _SGW_args1, [3], "SGW"),
     (Grampa, _Grampa_args, [3], "GRAMPA"),
-    (GraspB, _GRASPB_args, [-96], "GRASPB"),
+    (GraspB, _GRASPB_args, [-3], "GRASPB"),
     #(Fugal2, _Fugal_args, [3], "FUGALB"),
-    #(GrampaS, _GrampaS_args, [4], "GRAMPAS"),
+    (GrampaS, _GrampaS_args, [3], "GRAMPAS"),
     (Fugal, _Fugal_args, [3], "FUGAL"),
     (Fugal2, _Fugal2_args, [3], "FUGALB"),
     (QAP, _Fugal_args, [3], "QAP"),
@@ -240,4 +273,5 @@ _acc_names = [
     "S3",
     "jacc",
     "mnc",
+    "frob",
 ]

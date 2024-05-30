@@ -51,6 +51,7 @@ def global_config():
         # 3,      # S3
         # 4,      # jacc
         # 5,      # mnc
+        6, #frob
     ]
 
     algs = [_algs[i] for i in run]
@@ -59,7 +60,7 @@ def global_config():
 
     if mall:
         algs = [
-            (alg, args, [1, 2, 3, 30, -1, -2, -3, -30], algname) for alg, args, _, algname in algs
+            (alg, args, [1, 2, 3, 30, -1, -2, -3, -30,-96,96], algname) for alg, args, _, algname in algs
         ]
 
     acc_names = [_acc_names[i] for i in accs]

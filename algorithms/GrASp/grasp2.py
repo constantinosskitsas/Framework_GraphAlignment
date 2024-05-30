@@ -55,7 +55,7 @@ def parse_args():
 
 
 def main(data, **args):
-
+    print("Grasp2")
     # Src = data['Src'].A
     # Tar = data['Tar'].A
     Src = data['Src']

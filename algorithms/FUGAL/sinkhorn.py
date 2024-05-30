@@ -184,7 +184,8 @@ def sinkhorn_knopp(a, b, C, reg=1e-1, maxIter=1000, stopThr=1e-9,
             u, v = upre, vpre
             break
 
-        if log and it % eval_freq == 0:
+        #if log and it % eval_freq == 0:
+        if it % eval_freq == 0:
             # we can speed up the process by checking for the error only all
             # the eval_freq iterations
             # below is equivalent to:
@@ -193,7 +194,7 @@ def sinkhorn_knopp(a, b, C, reg=1e-1, maxIter=1000, stopThr=1e-9,
             b_hat = torch.matmul(u, K) * v
             err = (b - b_hat).pow(2).sum().item()
             # err = (b - b_hat).abs().sum().item()
-            log['err'].append(err)
+            #log['err'].append(err)
 
         if verbose and it % print_freq == 0:
             print('iteration {:5d}, constraint error {:5e}'.format(it, err))

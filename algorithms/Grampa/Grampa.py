@@ -159,6 +159,7 @@ def seigh(A):
   u = u[:,idx]
   return l, u
 def main(data, eta,lalpha,initSim,Eigtype):
+    print("Grampa")
     os.environ["MKL_NUM_THREADS"] = "40"
     Src = data['Src']
     Tar = data['Tar']

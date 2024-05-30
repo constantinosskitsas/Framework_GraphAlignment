@@ -275,7 +275,13 @@ def gromov_wasserstein_discrepancy(cost_s: csr_matrix, cost_t: csr_matrix,
         theta = np.zeros((n_s, 1))
 
     if trans0 is None:
+        #print("sk",len(np.nonzero(p_s[1])))
+        #print("sk",len(np.nonzero(p_t.T[1])))
         trans0 = np.matmul(p_s, p_t.T)
+    #non_zero_elements = trans0[np.nonzero(trans0)]
+    #print("skitsas",len(non_zero_elements))
+    #non_zero_elements = trans0[np.nonzero(trans0)]
+    #print("skitsas",len(non_zero_elements))
     a = np.ones((n_s, 1)) / n_s
     #if np.isnan(trans0).any():
     #    print("The matrix contains NaN values.")
@@ -310,11 +316,13 @@ def gromov_wasserstein_discrepancy(cost_s: csr_matrix, cost_t: csr_matrix,
                                                 max_iter=ot_hyperpara['inner_iteration'])
         relative_error = np.sum(np.abs(trans - trans0)) / np.sum(np.abs(trans0))
         trans0 = trans
+        #non_zero_elements = trans0[np.nonzero(trans0)]
+        #print("St",len(non_zero_elements),",",trans0.shape[0])
         t += 1
-        if np.isnan(trans0).any():
-            print("The matrix contains NaN values.")
-        else:
-            print("The matrix does not contain NaN values.")
+        #if np.isnan(trans0).any():
+        #    print("The matrix contains NaN values.")
+        #else:
+        #    print("The matrix does not contain NaN values.")
         # optionally, update source distribution
         if ot_hyperpara['update_p']:
             p_s, theta = update_distribution(a, p_s, theta,
@@ -322,7 +330,6 @@ def gromov_wasserstein_discrepancy(cost_s: csr_matrix, cost_t: csr_matrix,
     # print('proximal iteration = {}'.format(t))
     cost = node_cost(cost_s, cost_t, trans0, cost_st, ot_hyperpara['loss_type'])
     d_gw = (cost * trans0).sum()
-    print("hi3")
     return trans0, d_gw, p_s
 
 

@@ -125,6 +125,10 @@ def create_L(A, B, lalpha=10000, mind=None, weighted=True):
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
 
 def main(data, iter,simple,mu):
+<<<<<<< HEAD
+=======
+    print("Fugal2")
+>>>>>>> a2c1098fe14b1d9f120eacb8764565c338a560c0
     torch.set_num_threads(40)
     print("Fugal2")
     #torch.set_num_threads(40)

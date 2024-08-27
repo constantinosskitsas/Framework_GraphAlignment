@@ -8,7 +8,7 @@ https://openproceedings.org/2023/conf/edbt/paper-202.pdf
 We evaluate nine representative graph-alignment algorithms, and their papers and the original codes are given in the following table.
 
 |   Algorithm   |     Paper     |   Original Code   |Run Id|
-|:--------:|:------------:|:--------:|
+|:--------:|:------------:|:--------:|:--------:|
 |  GWL  |  [arXiv'2019](https://arxiv.org/abs/1901.06003)  |  [Python](https://github.com/HongtengXu/gwl)  |0|
 |  CΟΝΕ-ALign   |  [CIKM '20](https://dl.acm.org/doi/10.1145/3340531.3412136)  | [Python](https://github.com/GemsLab/CONE-Align) |1|
 |  Grasp        |    [APWeb-WAIM'2021](https://link.springer.com/chapter/10.1007/978-3-030-85896-4_4)    | [Python](https://github.com/juhuhu/GrASp)      |2|

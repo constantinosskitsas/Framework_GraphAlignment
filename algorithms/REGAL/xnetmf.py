@@ -120,10 +120,10 @@ def get_features(graph, rep_method, verbose=True):
 
     graph.khop_neighbors = khop_neighbors_nobfs
 
-    if verbose:
-        print("max degree: ", graph.max_degree)
-        after_khop = time.time()
-        print("got k hop neighbors in time: ", after_khop - before_khop)
+    #if verbose:
+    #    print("max degree: ", graph.max_degree)
+    #    after_khop = time.time()
+    #    print("got k hop neighbors in time: ", after_khop - before_khop)
 
     G_adj = graph.G_adj
     num_nodes = G_adj.shape[0]
@@ -149,8 +149,8 @@ def get_features(graph, rep_method, verbose=True):
                                       * x for x in deg_seq]
     after_degseqs = time.time()
 
-    if verbose:
-        print("got degree sequences in time: ", after_degseqs - before_degseqs)
+    #if verbose:
+    #    print("got degree sequences in time: ", after_degseqs - before_degseqs)
 
     return feature_matrix
 
@@ -189,8 +189,8 @@ def get_sample_nodes(graph, rep_method, verbose=True):
 def get_feature_dimensionality(graph, rep_method, verbose=True):
     # k*log(n) -- user can set k, default 10
     p = int(rep_method.k*math.log(graph.N, 2))
-    if verbose:
-        print("feature dimensionality is ", min(p, graph.N))
+    #if verbose:
+    #    print("feature dimensionality is ", min(p, graph.N))
     # don't return larger dimensionality than # of nodes
     rep_method.p = min(p, graph.N)
     return rep_method.p
@@ -233,9 +233,9 @@ def get_representations(graph, rep_method, verbose=True):
     Wfac = np.dot(U, np.diag(np.sqrt(X)))
     reprsn = np.dot(C, Wfac)
     after_computerep = time.time()
-    if verbose:
-        print("computed representation in time: ",
-              after_computerep - before_computerep)
+    #if verbose:
+     #   print("computed representation in time: ",
+    #          after_computerep - before_computerep)
 
     # Post-processing step to normalize embeddings (true by default, for use with REGAL)
     if rep_method.normalize:

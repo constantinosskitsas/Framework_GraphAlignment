@@ -15,10 +15,7 @@ def normout_rowstochastic(P):
 
 
 def nsd(A, B, alpha, iters, Zvecs, Wvecs):
-    # dtype = np.float16
     dtype = np.float32
-    # dtype = np.float64
-
     A = normout_rowstochastic(A).T.astype(dtype)
     B = normout_rowstochastic(B).T.astype(dtype)
     Zvecs = Zvecs.astype(dtype=dtype)
@@ -28,7 +25,6 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
 
     Sim = np.zeros((nA, nB), dtype=dtype)
     for i in range(np.shape(Zvecs)[1]):
-        print(f"<{i}>")
         z = Zvecs[:, i]
         w = Wvecs[:, i]
         z = z / sum(z)
@@ -37,35 +33,17 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
         W = np.zeros((iters + 1, nB), dtype=dtype)  # B
         W[0] = w
         Z[0] = z
-
-        print("dots")
         for k in range(1, iters + 1):
-            print(k)
             np.dot(A, Z[k-1], out=Z[k])
             np.dot(B, W[k-1], out=W[k])
 
         factor = 1.0 - alpha
-        print("krons")
         for k in range(iters + 1):
-            print(k)
-
             if k == iters:
                 W[iters] *= alpha ** iters
-                # Z[iters] *= alpha ** iters
             else:
                 W[k] *= factor
-                # Z[k] *= factor
                 factor *= alpha
-
-            # Sim += np.kron(Z[k], W[k]).reshape(nA, nB)
-
-            # Sim += np.dot(
-            #     Z[k].reshape(-1, 1), W[k].reshape(1, -1)
-            # )
-
-            # for i, w in enumerate(W[k]):
-            #     Sim[:, i] += Z[k] * w
-
             intervals = 4
             for i in range(intervals):
                 start = i * nA // intervals
@@ -76,24 +54,15 @@ def nsd(A, B, alpha, iters, Zvecs, Wvecs):
 
     return Sim
 
-
-# def main(A, B, alpha, iters):
 def main(data, alpha, iters):
     print("NSD")
-    # Src = data['Src'].A
-    # Tar = data['Tar'].A
     Src = data['Src']
     Tar = data['Tar']
-    # L = create_L(Src, Tar, 99999).A
 
     X = nsd(
         Src, Tar, alpha, iters,
         np.ones((Src.shape[0], 1)),
         np.ones((Tar.shape[0], 1)),
-        # np.ones(Src.shape),
-        # np.ones(Tar.shape),
-        # L,
-        # L.T,
     )
 
     return X

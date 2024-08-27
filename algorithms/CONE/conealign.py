@@ -71,15 +71,10 @@ def align_embeddings1(embed1, embed2, CONE_args, adj1=None, adj2=None, struc_emb
     else:
         init_sim, corr_mat = unsup_align.convex_init(
             embed1, embed2, apply_sqrt=False, niter=CONE_args['niter_init'], reg=CONE_args['reg_init'], P=corr)
-    # print(corr_mat)
-    # print(np.max(corr_mat, axis=0))
-    # print(np.max(corr_mat, axis=1))
 
     # Stochastic Alternating Optimization
     dim_align_matrix, corr_mat = unsup_align.align(
         embed1, embed2, init_sim, lr=CONE_args['lr'], bsz=CONE_args['bsz'], nepoch=CONE_args['nepoch'], niter=CONE_args['niter_align'], reg=CONE_args['reg_align'])
-    # print(dim_align_matrix.shape, corr_mat.shape)
-
     # Step 3: Match Nodes with Similar Embeddings
     # Align embedding spaces
     aligned_embed1 = embed1.dot(dim_align_matrix)

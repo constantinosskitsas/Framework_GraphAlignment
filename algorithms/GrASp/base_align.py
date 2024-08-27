@@ -38,9 +38,6 @@ def cost(X):
     sumres = np.sum(res)
 
     val = sumres - diag_res
-    #val=np.linalg.norm(X.T @ diag2 @ X - diag2, 'fro') ** 2
-
-    # print(coup)
     res = val+mu*coup
     return res
 
@@ -63,18 +60,14 @@ def optimize_AB(Cor11, Cor21, n, V11, V21, D11, D21, k):
 
     manifold = Stiefel(k, k)
     x0 = init_x0(Cor1, Cor2, n, V1, V2, D1, D2, k)
-    # x0=np.load('zwischenspeicher/B.npy')
     problem = Problem(manifold=manifold, cost=cost,verbosity=0)
 
     # (3) Instantiate a Pymanopt solver
 
-    #solver = pymanopt.solvers.conjugate_gradient.ConjugateGradient(maxtime=10000, maxiter=10000)
     solver = pymanopt.solvers.trust_regions.TrustRegions()  # maxtime=float('inf'))
 
     # let Pymanopt do the rest
     B = solver.solve(problem, x=x0)
-    # print(B)
-    # print(np.reshape(res.x[0:k*k_],(k_,k)).T@np.reshape(res.x[0:k*k_],(k_,k)))
 
     return B
 
@@ -86,7 +79,6 @@ def init_x0(Cor1, Cor2, n, V1, V2, D1, D2, k):
     for i in range(0, k):
         thing1 = np.linalg.norm(Cor1.T@V1[:, i]-Cor2.T@V2[:, i])
         thing2 = np.linalg.norm(Cor1.T@V1[:, i]+Cor2.T@V2[:, i])
-        #print('thing1: %f, thing2: %f' %(thing1,thing2))
         if(thing1 > thing2):
             B[i, i] = -1
 

@@ -67,12 +67,7 @@ def main(data, **args) -> object:
     Src = data['Src']
     Tar = data['Tar']
 
-    # adj = G_to_Adj(Src, Tar).A
     adj = G_to_Adj(Src, Tar)
-
-    # global REGAL_args
-    # REGAL_args = parse_args()
-
     if args['attributes'] is not None:
         # load vector of attributes in from file
         args['attributes'] = np.load(args['attributes'])

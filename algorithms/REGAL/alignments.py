@@ -16,17 +16,6 @@ def get_embedding_similarities(embed, embed2=None, sim_measure="euclidean", num_
     # similarity_matrix = None
     similarity_matrix = kd_align(
         embed, embed2, distance_metric=sim_measure, num_top=num_top)
-    # return kd_sim
-    print("emb")
-  # All pairwise distance computation
-    # if sim_measure == "cosine":
-    #     similarity_matrix = sklearn.metrics.pairwise.cosine_similarity(
-    #         embed, embed2)
-    # else:
-    #     similarity_matrix = sklearn.metrics.pairwise.euclidean_distances(
-    #         embed, embed2)
-    #     similarity_matrix = np.exp(-similarity_matrix)
-
     return similarity_matrix, sklearn.metrics.pairwise.euclidean_distances(
         embed, embed2)
     # return None, -similarity_matrix
@@ -75,7 +64,6 @@ def kd_align(emb1, emb2, normalize=False, distance_metric="euclidean", num_top=5
     data = np.array([])
     # change later
     dist, ind = kd_tree.query(emb1, k=num_top)
-    # print("queried alignments")
     row = np.array([])
     for i in range(emb1.shape[0]):
         row = np.concatenate((row, np.ones(num_top)*i))
@@ -126,5 +114,4 @@ def score_alignment_matrix(alignment_matrix, topk=None, topk_score_weighted=Fals
                     alignment_score += 1
                 correct_nodes.append(node_index)
         alignment_score /= float(n_nodes)
-    # print(correct_nodes)
     return alignment_score, set(correct_nodes)

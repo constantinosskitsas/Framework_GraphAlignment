@@ -199,7 +199,7 @@ def seigh(A):
   return l, u
 def main(data, eta,lalpha,initSim,Eigtype):
     print("GrampaNL")
-    os.environ["MKL_NUM_THREADS"] = "40"
+    os.environ["MKL_NUM_THREADS"] = "30"
     Src = data['Src']
     Tar = data['Tar']
     #Tar=data['Src']
@@ -234,42 +234,6 @@ def main(data, eta,lalpha,initSim,Eigtype):
   
     coeff = 1/((l.T - mu)**2 + eta**2)
     #print(coeff)
-  #Eq. 3
-    '''
-    A_src,AU=eigh(Src)
-    A_tar,AV=eigh(Tar)
-    L_src,LU=decompose_laplacian(Src)
-    L_tar,LV=decompose_laplacian(Tar)
-    NL_src,NLU=decomposeN_laplacian(Src)
-    NL_tar,NLV=decomposeN_laplacian(Tar)
-    
-    with open('A_src.txt', 'w') as file:
-        file.write(f"i val\n")
-        for idx, val in enumerate(A_src):
-            file.write(f"{idx} {val}\n")
-    with open('A_tar.txt', 'w') as file:
-        file.write(f"i val\n")
-        for idx, val in enumerate(A_tar):
-            file.write(f"{idx} {val}\n")
-    with open('L_src.txt', 'w') as file:
-        file.write(f"i val\n")
-        for idx, val in enumerate(L_src):
-            file.write(f"{idx} {val}\n")
-    with open('L_tar.txt', 'w') as file:
-        file.write(f"i val\n")
-        for idx, val in enumerate(L_tar):
-            file.write(f"{idx} {val}\n")   
-    with open('NL_src.txt', 'w') as file:
-        file.write(f"i val\n")
-        for idx, val in enumerate(NL_src):
-            file.write(f"{idx} {val}\n")
-    with open('NL_tar.txt', 'w') as file:
-        file.write(f"i val\n")
-        for idx, val in enumerate(NL_tar):
-            file.write(f"{idx} {val}\n")           
-    #start = time.time()
-    #exit()
-    '''
     if initSim==1:
         alpha=0
         #lalpha=n/2

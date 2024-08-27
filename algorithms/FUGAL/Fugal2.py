@@ -120,9 +120,7 @@ def create_L(A, B, lalpha=10000, mind=None, weighted=True):
 
 def main(data, iter,simple,mu):
     print("Fugal2")
-    torch.set_num_threads(40)
-    print("Fugal2")
-    #torch.set_num_threads(40)
+    torch.set_num_threads(30)
     dtype = np.float64
     Src = data['Src']
     Tar = data['Tar']

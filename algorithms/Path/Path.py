@@ -31,4 +31,4 @@ def main(data, **args):
     F1 = feature_extraction(Src1,simple)
     F2 = feature_extraction(Tar1,simple)
     D = eucledian_dist(F1, F2, n)
-    return D
+    return D,D

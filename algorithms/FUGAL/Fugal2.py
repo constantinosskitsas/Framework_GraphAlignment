@@ -15,15 +15,10 @@ from multiprocessing import Pool
 from joblib import Parallel, delayed
 from sklearn.metrics.pairwise import euclidean_distances
 from algorithms.FUGAL.pred import convex_initTun,feature_extractionEV,feature_extraction,feature_extractionBM,eucledian_dist,convex_init
-from algorithms.FUGAL.stochastic import find_permutation
-import algorithms.FUGAL.got_nips as got_nips
+
 import numpy as np
 import networkx as nx
-from algorithms.FUGAL.helpers.test_generators import *
-from algorithms.FUGAL.helpers.test_generator_helpers import *
-import networkx as nx
-from algorithms.FUGAL.helpers.plots import *
-import networkx as nx
+
 from matplotlib import pyplot as plt
 from sklearn.metrics import normalized_mutual_info_score
 from sklearn.metrics.cluster import adjusted_rand_score as ri
@@ -34,9 +29,8 @@ import pandas as pd
 import seaborn as sns
 import ot
 import warnings
-import algorithms.FUGAL.fgot_mgd
 import scipy.linalg as slg
-import algorithms.FUGAL.fgot_stochastic_mgd
+
 from sklearn.cluster import SpectralClustering
 
 
@@ -125,10 +119,7 @@ def create_L(A, B, lalpha=10000, mind=None, weighted=True):
     return sps.csr_matrix((lw, (li, lj)), shape=(n, m))
 
 def main(data, iter,simple,mu):
-<<<<<<< HEAD
-=======
     print("Fugal2")
->>>>>>> a2c1098fe14b1d9f120eacb8764565c338a560c0
     torch.set_num_threads(40)
     print("Fugal2")
     #torch.set_num_threads(40)
@@ -174,7 +165,7 @@ def main(data, iter,simple,mu):
     F2= feature_extraction(Tar1,simple)
     K = eucledian_dist(F1, F2, n)
     D=torch.tensor(D, dtype = torch.float64)
-    K = torch.tensor(D, dtype = torch.float64)
+    K = torch.tensor(K, dtype = torch.float64)
     P1=convex_initTun(A, B, D,K, mu, iter)
     return P1
 import numpy as np

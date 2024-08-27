@@ -45,6 +45,7 @@ def feature_extraction(G,simple):
     degs = [node_degree_dict[n] for n in node_list]
 
     # clustering coefficient
+    
     clusts = [node_clustering_dict[n] for n in node_list]
 
     # average degree of neighborhood
@@ -265,30 +266,45 @@ def feature_extractionBM(G,simple):
 
     node_features = np.nan_to_num(node_features)
     return np.nan_to_num(node_features)
-def Degree_Features(G):
+def Degree_Features(G,EFN):
     CS = []
     BS = []
     DC = []
     EC = []  # Eigenvector Centrality
     PR = []  # PageRank
     KC = []  # Katz Centrality
-
+    node_list = sorted(G.nodes())
+    node_degree_dict = dict(G.degree())
+    degs = [node_degree_dict[n] for n in node_list]
 
 # Calculate centrality measures for every vertex
     for node in G.nodes():
-        #CS.append(nx.closeness_centrality(G, u=node))
-        #BS.append(nx.betweenness_centrality(G)[node])
-        DC.append(nx.degree_centrality(G)[node])
-        EC.append(nx.eigenvector_centrality(G)[node])
-        PR.append(nx.pagerank(G)[node])
-    node_features = np.zeros(shape=(G.number_of_nodes(), 6))
-    #node_features[:, 0] = CS
-    #node_features[:, 1] = BS
-    node_features[:, 2] = DC
-    node_features[:, 3] = EC
-    node_features[:, 4] = PR
+        if (EFN==0):
+            CS.append(nx.closeness_centrality(G, u=node))
+        #BS.append(nx.betweenness_centrality(G)[node]) nono
+        elif (EFN==1):
+            DC.append(nx.degree_centrality(G)[node])
+        elif (EFN==2):
+            EC.append(nx.eigenvector_centrality(G,tol=0.0001,max_iter=10000)[node])
+        elif (EFN==3):
+            PR.append(nx.pagerank(G,tol=0.0001,max_iter=10000)[node])
+        #BS.append(nx.laplacian_centrality(G)[node]) nono
+        
+    node_features = np.zeros(shape=(G.number_of_nodes(), 1))
+    if (EFN==0):
+        node_features[:, 0] = CS
+    elif (EFN==1):
+        node_features[:, 0] = DC
+    #node_features[:, 0] = BS
+    elif (EFN==2):
+        node_features[:, 0] = EC
+    elif (EFN==3):
+        node_features[:, 0] = PR
+    #elif (EFN==4):
+    #    node_features[:, 0] = degs
     #print(node_features)
     node_features = np.nan_to_num(node_features)
+    print(node_features)
     return np.nan_to_num(node_features)
 
 
@@ -325,21 +341,21 @@ def convex_initTun(A, B, D,K, mu, niter):
     n = len(A)
     P = torch.ones((n,n), dtype = torch.float64)
     P=P/n
-    P=D
+    #P=D
     ones = torch.ones(n, dtype = torch.float64)
     mat_ones = torch.ones((n, n), dtype = torch.float64)
     reg = 1.0
     #K=mu*D*-1
-    for i in range(-10,11):
-        for it in range(1, 10):
+    for i in range(0,11):
+        for it in range(1, 11):
             #G=  A.T@torch.sign(A @ P- P@B)- torch.sign(A@P-P@B) @ B.T+K+ i*( - 2*P)
-            #G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T)+ K+ 0.2**2* i*( + P)
-            G= A.T@A@P+P@B.T@B+2*A@P@B+0.2**2*P-K
-            #q = sinkhorn(ones, ones, G, reg, maxIter = 1500, stopThr = 1e-3)
-            #alpha = 2.0 / float(2.0 + it)
-            alpha = 0.01
-            P = P -alpha*G
-            #P = P + alpha * (q - P)
+            G=-torch.mm(torch.mm(A.T, P), B)-torch.mm(torch.mm(A, P), B.T)+ mat_ones+  i*1*( - P)
+            #G= A.T@A@P+P@B.T@B+2*A@P@B+0.2**2*P-K
+            q = sinkhorn(ones, ones, G, reg, maxIter = 1000, stopThr = 1e-6)
+            alpha = 2.0 / float(2.0 + it)
+            #alpha = 0.01
+            #P = P -alpha*G
+            P = P + alpha * (q - P)
         #G= A.T@A@P+P@B.T@B-2*A@P@B-0.2**2*i*P-10*K
         #q = sinkhorn(ones, ones, G, reg, maxIter = 1500, stopThr = 1e-3)
         #alpha = 2.0 / float(2.0 + it)

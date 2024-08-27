@@ -64,7 +64,7 @@ def optimize_AB(Cor11, Cor21, n, V11, V21, D11, D21, k):
     manifold = Stiefel(k, k)
     x0 = init_x0(Cor1, Cor2, n, V1, V2, D1, D2, k)
     # x0=np.load('zwischenspeicher/B.npy')
-    problem = Problem(manifold=manifold, cost=cost)
+    problem = Problem(manifold=manifold, cost=cost,verbosity=0)
 
     # (3) Instantiate a Pymanopt solver
 

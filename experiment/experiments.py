@@ -171,10 +171,17 @@ def tuning():
     #        {'Eigtype': x} for x in [0, 1, 2, 3, 4]
     #    ]
     #]
+    #tmp = [
+    #    10, # SGWL
+    #    [
+    #        {'eta': x} for x in [0.2,0.1,0.05]
+            #{'lev': x} for x in [1, 2, 3]
+    #    ]
+    #]
     tmp = [
-        10, # SGWL
+        13, # Fugal
         [
-            {'eta': x} for x in [0.2,0.1,0.05]
+            {'EFN': x} for x in [0,1,2,3,5]
             #{'lev': x} for x in [1, 2, 3]
         ]
     ]
@@ -187,25 +194,25 @@ def tuning():
 
     run = list(range(len(tmp[1])))
 
-    iters = 3
+    iters = 5
 
     graph_names = [
         #"bio-dmela",
-        "in-arenas",
-        "inf-euroroad",
+        #"in-arenas",
+        #"inf-euroroad",
         "ca-netscience",
-       "bio-celegans",
+        "bio-celegans",
        #"inf-power",  
        # "MultiMagna"
         #"facebook",
         # "astro",
         # "gnp"
         #"soc-hamsterster",
-        "socfb-Bowdoin47",
+        #"socfb-Bowdoin47",
         #"socfb-Hamilton46",
         #"socfb-Haverford76",
         #"socfb-Swarthmore42",
-        "soc-facebook",
+        #"soc-facebook",
     ]
 
     #graphs = [
@@ -218,15 +225,15 @@ def tuning():
     #]
     graphs = rgraphs(graph_names)
     noises = [
-        #0.00,
-        #0.05,
+        0.00,
+        0.05,
         0.10,
         0.15,
-        #0.20,
-        #0.25,
+        0.20,
+        0.25,
     ]
-
-    s_trans = (0, 2, 1, 3,4)
+    #s_trans = (2, 1, 0, 3)
+    #s_trans = (0, 2, 1, 3,4)
     xlabel = list(tmp[1][0].keys())[0]
 
 
@@ -364,7 +371,7 @@ def real():
     #run = [1, 2, 3, 4, 5, 6]
     #run = [0,1,2,3,4,5,6,9,10,11,12,13,14]
     #run=[3,4,5,6,10,12]
-    run=[12]
+    run=[2,3]
     iters = 1
     #print("start")
     graph_names = [             # n     / e
@@ -374,13 +381,13 @@ def real():
         #"yeast",
         #"MultiMagna",
         
-        "bio-celegans",         # 453   / 2k    / connected
+        #"bio-celegans",         # 453   / 2k    / connected
         "in-arenas",            # 1.1k  / 5.4k  / connected
         
         #"arenad",
         
         "inf-euroroad",         # 1.2K  / 1.4K  / disc - 200
-        "inf-power",  
+        #"inf-power",  
         
                   # 4.9K  / 6.6K  / connected
         #"ca-GrQc",              # 4.2k  / 13.4K / connected - (5.2k  / 14.5K)?
@@ -388,12 +395,12 @@ def real():
         #"CA-AstroPh",  
                  # 18k   / 195k  / connected
         
-        "soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
-        "socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
-        "socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
+        #"soc-hamsterster",      # 2.4K  / 16.6K / disc - 400
+        #"socfb-Bowdoin47",      # 2.3K  / 84.4K / disc - only 2
+        #"socfb-Hamilton46",     # 2.3K  / 96.4K / disc - only 2
         "socfb-Haverford76",    # 1.4K  / 59.6K / connected
-        "socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
-        "soc-facebook",
+        #"socfb-Swarthmore42",   # 1.7K  / 61.1K / disc - only 2
+        #"soc-facebook",
 
         #"scc_enron-only",
         #"scc_fb-forum",
@@ -413,12 +420,12 @@ def real():
         # 0.04,
         # 0.05,
 
-        0.00,
+        #0.00,
         0.05,
         0.10,
         0.15,
         0.20,
-        0.25,
+        #0.25,
     ]
 
 

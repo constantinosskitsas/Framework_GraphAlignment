@@ -11,7 +11,7 @@ import time
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from sklearn.metrics.pairwise import euclidean_distances
-from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init
+from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init,Degree_Features
 
 
 def are_matrices_equal(matrix1, matrix2):
@@ -29,8 +29,9 @@ def are_matrices_equal(matrix1, matrix2):
     return True
 
 
-def main(data, iter,simple,mu):
+def main(data, iter,simple,mu,EFN=5):
     print("Fugal")
+    print(EFN)
     torch.set_num_threads(40)
     dtype = np.float64
     Src = data['Src']
@@ -54,9 +55,15 @@ def main(data, iter,simple,mu):
     Tar1=nx.from_numpy_array(Tar)
     A = torch.tensor((Src), dtype = torch.float64)
     B = torch.tensor((Tar), dtype = torch.float64)
-    #simple=True
-    F1 = feature_extraction(Src1,simple)
-    F2 = feature_extraction(Tar1,simple)
+    simple=True
+    #
+    #
+    if (EFN<5):
+        F1 = Degree_Features(Src1,EFN)*n1
+        F2 = Degree_Features(Tar1,EFN)*n1
+    if (EFN==5):
+        F1 = feature_extraction(Src1,simple)
+        F2 = feature_extraction(Tar1,simple)
     D = eucledian_dist(F1, F2, n)
     D = torch.tensor(D, dtype = torch.float64)
     

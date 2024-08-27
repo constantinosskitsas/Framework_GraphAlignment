@@ -1,4 +1,6 @@
 import numpy as np
+from algorithms.FUGAL.pred import convex_initTun,feature_extractionEV,feature_extraction,feature_extractionBM,eucledian_dist,convex_init
+
 #import scipy.sparse as sp
 #from scipy.optimize import linear_sum_assignment
 from numpy.linalg import inv
@@ -17,9 +19,10 @@ import time
 #from lapsolver import solve_dense
 import scipy as sci
 #from lapsolver import solve_dense
+
 def calculate_similarity_scores_from_matrices(G_A, G_B):
     # Step 1: Calculate degrees and normalize
-    start = time.time()
+    #start = time.time()
     degrees_A = np.sum(G_A, axis=1)
     degrees_B = np.sum(G_B, axis=1)
     
@@ -34,8 +37,8 @@ def calculate_similarity_scores_from_matrices(G_A, G_B):
     num_nodes_B = G_B.shape[0]
     
     similarity_scores = np.zeros((num_nodes_A, num_nodes_B))
-    end = time.time()
-    start1 = time.time()
+    #end = time.time()
+    #start1 = time.time()
     min_degrees = np.minimum.outer(normalized_degrees_A, normalized_degrees_B)
     max_degrees = np.maximum.outer(normalized_degrees_A, normalized_degrees_B)
 
@@ -46,9 +49,9 @@ def calculate_similarity_scores_from_matrices(G_A, G_B):
     #        d_A_u = normalized_degrees_A[u]
     #        d_B_v = normalized_degrees_B[v]
     #        similarity_scores[u, v] = min(d_A_u, d_B_v) / max(d_A_u, d_B_v)
-    end1 = time.time()
-    print("Part 1",end-start)
-    print("Part 2",end1-start1)
+    #end1 = time.time()
+    #print("Part 1",end-start)
+    #print("Part 2",end1-start1)
     return similarity_scores
 
 def create_L(A, B, lalpha=1, mind=None, weighted=True):
@@ -131,7 +134,7 @@ def decompose_Tlaplacian(A,rA):
 def decompose_laplacian(A):
     # Compute the degree matrix
     D = np.diag(np.sum(A, axis=1))
-
+    print(D)
     n = np.shape(D)[0]
 
     # Calculate the unnormalized Laplacian matrix
@@ -199,8 +202,11 @@ def main(data, eta,lalpha,initSim,Eigtype):
     os.environ["MKL_NUM_THREADS"] = "40"
     Src = data['Src']
     Tar = data['Tar']
+    #Tar=data['Src']
     n = Src.shape[0]
     print("test")
+    Eigtype=0
+    initSim=1
         #Adjancency
     if Eigtype==0:
         l,U =eigh(Src)
@@ -225,13 +231,57 @@ def main(data, eta,lalpha,initSim,Eigtype):
     mu = np.array([mu])
     dtype = np.float32
   #Eq.4
+  
     coeff = 1/((l.T - mu)**2 + eta**2)
+    #print(coeff)
   #Eq. 3
-    start = time.time()
+    '''
+    A_src,AU=eigh(Src)
+    A_tar,AV=eigh(Tar)
+    L_src,LU=decompose_laplacian(Src)
+    L_tar,LV=decompose_laplacian(Tar)
+    NL_src,NLU=decomposeN_laplacian(Src)
+    NL_tar,NLV=decomposeN_laplacian(Tar)
+    
+    with open('A_src.txt', 'w') as file:
+        file.write(f"i val\n")
+        for idx, val in enumerate(A_src):
+            file.write(f"{idx} {val}\n")
+    with open('A_tar.txt', 'w') as file:
+        file.write(f"i val\n")
+        for idx, val in enumerate(A_tar):
+            file.write(f"{idx} {val}\n")
+    with open('L_src.txt', 'w') as file:
+        file.write(f"i val\n")
+        for idx, val in enumerate(L_src):
+            file.write(f"{idx} {val}\n")
+    with open('L_tar.txt', 'w') as file:
+        file.write(f"i val\n")
+        for idx, val in enumerate(L_tar):
+            file.write(f"{idx} {val}\n")   
+    with open('NL_src.txt', 'w') as file:
+        file.write(f"i val\n")
+        for idx, val in enumerate(NL_src):
+            file.write(f"{idx} {val}\n")
+    with open('NL_tar.txt', 'w') as file:
+        file.write(f"i val\n")
+        for idx, val in enumerate(NL_tar):
+            file.write(f"{idx} {val}\n")           
+    #start = time.time()
+    #exit()
+    '''
     if initSim==1:
         alpha=0
         #lalpha=n/2
-        L = calculate_similarity_scores_from_matrices(Src,Tar)
+        #L = calculate_similarity_scores_from_matrices(Src,Tar)
+        Src1=nx.from_numpy_array(Src)
+        Tar1=nx.from_numpy_array(Tar)
+        F1= feature_extraction(Src1,True)
+        F2= feature_extraction(Tar1,True)
+        K = eucledian_dist(F1, F2, n)
+        L=np.max(K)-K
+        #K.max()-K
+        #L=np.ones((n,n))+L
         #L = create_L(Src, Tar, lalpha,
         #             True).A.astype(dtype)
         #K = ((1-alpha) * L).astype(dtype)*1
@@ -239,13 +289,36 @@ def main(data, eta,lalpha,initSim,Eigtype):
     
     else:
         coeff = coeff * (U.T @ np.ones((n,n)) @ V)
-    
-    end = time.time()
-    print("L matrix",end-start)
+    #print(coeff)
+    #end = time.time()
+    #print("L matrix",end-start)
   #coeff = coeff * (U.T @ K @ V)
     X = U @ coeff @ V.T
     Xt = X.T
     Xt=X
+    '''
+    print(Xt)
+    A_src = np.array([A_src])
+    A_tar = np.array([A_tar])
+    coeff = 1/((A_src.T - A_tar)**2 + eta**2)
+    coeff = coeff * (AU.T @ L @ AV)
+    X1 = AU @ coeff @ AV.T
+    
+    np.savetxt('A_X.txt', X1, delimiter=',')
+    L_src = np.array([L_src])
+    L_tar = np.array([L_tar])
+    coeff = 1/((L_src.T - L_tar)**2 + eta**2)
+    coeff = coeff * (LU.T @ L @ LV)
+    X2 = LU @ coeff @ LV.T
+    print(X2)
+    np.savetxt('L_X.txt', X2, delimiter=',')
+    NL_src = np.array([NL_src])
+    NL_tar = np.array([NL_tar])
+    coeff = 1/((NL_src.T - NL_tar)**2 + eta**2)
+    coeff = coeff * (NLU.T @ L @ NLV)
+    X3 = NLU @ coeff @ NLV.T
+    np.savetxt('NL_X.txt', X3, delimiter=',')
+    '''
   # Solve with linear assignment maximizing the similarity 
   # row,col = linear_sum_assignment(Xt, maximize=True)
 

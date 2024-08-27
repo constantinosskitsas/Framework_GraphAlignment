@@ -19,10 +19,8 @@ import time
 #from lapsolver import solve_dense
 import scipy as sci
 #from lapsolver import solve_dense
-
 def calculate_similarity_scores_from_matrices(G_A, G_B):
     # Step 1: Calculate degrees and normalize
-    #start = time.time()
     degrees_A = np.sum(G_A, axis=1)
     degrees_B = np.sum(G_B, axis=1)
     
@@ -37,22 +35,13 @@ def calculate_similarity_scores_from_matrices(G_A, G_B):
     num_nodes_B = G_B.shape[0]
     
     similarity_scores = np.zeros((num_nodes_A, num_nodes_B))
-    #end = time.time()
-    #start1 = time.time()
+
     min_degrees = np.minimum.outer(normalized_degrees_A, normalized_degrees_B)
     max_degrees = np.maximum.outer(normalized_degrees_A, normalized_degrees_B)
-
 # Calculate the similarity scores using element-wise division
     similarity_scores = min_degrees / max_degrees
-    #for u in range(num_nodes_A):
-    #    for v in range(num_nodes_B):
-    #        d_A_u = normalized_degrees_A[u]
-    #        d_B_v = normalized_degrees_B[v]
-    #        similarity_scores[u, v] = min(d_A_u, d_B_v) / max(d_A_u, d_B_v)
-    #end1 = time.time()
-    #print("Part 1",end-start)
-    #print("Part 2",end1-start1)
     return similarity_scores
+
 
 def create_L(A, B, lalpha=1, mind=None, weighted=True):
     n = A.shape[0]
@@ -244,52 +233,13 @@ def main(data, eta,lalpha,initSim,Eigtype):
         F2= feature_extraction(Tar1,True)
         K = eucledian_dist(F1, F2, n)
         L=np.max(K)-K
-        #K.max()-K
-        #L=np.ones((n,n))+L
-        #L = create_L(Src, Tar, lalpha,
-        #             True).A.astype(dtype)
-        #K = ((1-alpha) * L).astype(dtype)*1
+        #L = calculate_similarity_scores_from_matrices(Src,Tar)
         coeff = coeff * (U.T @ L @ V)
-    
     else:
         coeff = coeff * (U.T @ np.ones((n,n)) @ V)
-    #print(coeff)
-    #end = time.time()
-    #print("L matrix",end-start)
-  #coeff = coeff * (U.T @ K @ V)
     X = U @ coeff @ V.T
     Xt = X.T
     Xt=X
-    '''
-    print(Xt)
-    A_src = np.array([A_src])
-    A_tar = np.array([A_tar])
-    coeff = 1/((A_src.T - A_tar)**2 + eta**2)
-    coeff = coeff * (AU.T @ L @ AV)
-    X1 = AU @ coeff @ AV.T
-    
-    np.savetxt('A_X.txt', X1, delimiter=',')
-    L_src = np.array([L_src])
-    L_tar = np.array([L_tar])
-    coeff = 1/((L_src.T - L_tar)**2 + eta**2)
-    coeff = coeff * (LU.T @ L @ LV)
-    X2 = LU @ coeff @ LV.T
-    print(X2)
-    np.savetxt('L_X.txt', X2, delimiter=',')
-    NL_src = np.array([NL_src])
-    NL_tar = np.array([NL_tar])
-    coeff = 1/((NL_src.T - NL_tar)**2 + eta**2)
-    coeff = coeff * (NLU.T @ L @ NLV)
-    X3 = NLU @ coeff @ NLV.T
-    np.savetxt('NL_X.txt', X3, delimiter=',')
-    '''
-  # Solve with linear assignment maximizing the similarity 
-  # row,col = linear_sum_assignment(Xt, maximize=True)
-
-  # Alternatively, we can use a more efficient solver.
-  # The solver works on cost minimization, so take -X 
-  #rows, cols = solve_dense(-Xt)
-  #return rows, cols 
     return Xt
 
 def grampa(Src, Tar, eta):

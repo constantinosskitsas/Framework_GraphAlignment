@@ -3,11 +3,13 @@ import scipy as sci
 import networkx as nx
 import time
 import scipy.sparse as sps
+import scipy.sparse.linalg as spsl
 import os
 try:
     import lapjv
 except:
     pass
+#import lapjv
 import os
 import fast_pagerank
 import contextlib
@@ -42,6 +44,7 @@ def sort_greedy_voting(match_freq):
         i-=1
     return matching[:,0],matching[:,1]
 def parse_args():
+    print("se thelw san trelos")
     parser=argparse.ArgumentParser(description= "RUN GASP")
     parser.add_argument('--graph',nargs='?', default='arenas')
     # 1:nn 2:sortgreedy 3: jv 
@@ -61,6 +64,7 @@ def parse_args():
     parser.add_argument('--noise_levels', type=list,default=[0,2,4,6,8,10])#,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
     return parser.parse_args()
 def align_voting_heuristic(A1, A2,q,k,laa,icp, icp_its, lower_t, upper_t, linsteps, corr_func, ba_,k_span):
+    print(q,k,laa,icp, icp_its, lower_t, upper_t, linsteps, corr_func, ba_,k_span)
     k_list = list(range(max(2,int(k-k_span/2)),int(k+k_span/2)))
     matchings = [0]*len(k_list)
     # voting - 1:greedy, 2:jv
@@ -72,9 +76,9 @@ def align_voting_heuristic(A1, A2,q,k,laa,icp, icp_its, lower_t, upper_t, linste
         t = np.logspace(math.log(lower_t,10), math.log(upper_t,10), q)
     n = np.shape(A1)[0]
     start = time.time()
-    D1, V1 = decompose_laplacian(A1)
+    D1, V1 = decompose_laplacian1(A1)
     # # # #
-    D2, V2 = decompose_laplacian(A2)
+    D2, V2 = decompose_laplacian1(A2)
     if corr_func==2:
         Cor1 = calc_pagerank_corr_func(q, A1)
         Cor2 = calc_pagerank_corr_func(q, A2)
@@ -114,8 +118,6 @@ def align_voting_heuristic(A1, A2,q,k,laa,icp, icp_its, lower_t, upper_t, linste
             if match == 6:
                 matching = kd_align(G1_emb, G2_emb)
         end=time.time()
-    #  np.savetxt('/home/au640507/spectral-graph-alignment/permutations_no_subset/arenas/noise_level_1/matching_' + str(
-    #     i) + '.txt', matching, fmt="%d")
         if not icp: 
             matching = dict(matching.astype(int))
         #matching=matching.astype(int)
@@ -318,9 +320,11 @@ def hungarian_matching(G1_emb, G2_emb):
     dist = sci.spatial.distance_matrix(G1_emb.T, G2_emb.T)
     n = np.shape(dist)[0]
     try:
+        
         cols, rows, _ = lapjv.lapjv(dist)
         matching = np.c_[cols, np.linspace(0, n-1, n).astype(int)]
     except Exception:
+
         cols, rows = sci.optimize.linear_sum_assignment(dist)   
         matching = np.c_[rows, cols]
     matching=matching[matching[:,0].argsort()]
@@ -346,26 +350,57 @@ def decompose_laplacian(A):
     L  = np.identity(n) - Deg @ A @ Deg
     D, V = np.linalg.eigh(L) # return eigenvalue vector, eigenvector matrix of L
     return [D, V]
-def decompose_unnormalized_laplacian(A):
-    Deg = np.diag((np.sum(A, axis=1)))
-    n = np.shape(Deg)[0]
-    L = Deg- A
-    D, V = np.linalg.eig(L)
+
+def adj_to_laplacian(mat, normalized):
+    """
+    Converts a sparse or dence adjacency matrix to Laplacian.
+
+    Parameters
+    ----------
+    mat : obj
+        Input adjacency matrix. If it is a Laplacian matrix already, return it.
+    normalized : bool
+        Whether to use normalized Laplacian.
+        Normalized and unnormalized Laplacians capture different properties of graphs, e.g. normalized Laplacian spectrum can determine whether a graph is bipartite, but not the number of its edges. We recommend using normalized Laplacian.
+    Returns
+    -------
+    obj
+        Laplacian of the input adjacency matrix
+    Examples
+    --------
+    >>> mat_to_laplacian(numpy.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]), False)
+    [[ 2, -1, -1], [-1,  2, -1], [-1, -1,  2]]
+    """
+    if sps.issparse(mat):
+        if np.all(mat.diagonal() >= 0):  # Check diagonal
+            if np.all((mat-sps.diags(mat.diagonal())).data <= 0):  # Check off-diagonal elements
+                return mat
+    else:
+        if np.all(np.diag(mat) >= 0):  # Check diagonal
+            if np.all(mat - np.diag(mat) <= 0):  # Check off-diagonal elements
+                return mat
+    deg = np.squeeze(np.asarray(mat.sum(axis=1)))
+    if sps.issparse(mat):
+        L = sps.diags(deg) - mat
+    else:
+        L = np.diag(deg) - mat
+    if not normalized:
+        return L
+    with np.errstate(divide='ignore'):
+        sqrt_deg = 1.0 / np.sqrt(deg)
+    sqrt_deg[sqrt_deg == np.inf] = 0
+    if sps.issparse(mat):
+        sqrt_deg_mat = sps.diags(sqrt_deg)
+    else:
+        sqrt_deg_mat = np.diag(sqrt_deg)
+    return sqrt_deg_mat.dot(L).dot(sqrt_deg_mat)
+
+
+def decompose_laplacian1(A, normalized=True, n_eig=100):
+    l = adj_to_laplacian(A, normalized)
+    D, V = spsl.eigsh(l, n_eig, which='SM')
     return [D, V]
-def decompose_rw_normalized_laplacian(A):
-    #  adjacency matrix
-    Deg = np.diag((np.sum(A, axis=1)))
-    n = np.shape(Deg)[0]
-    L = np.identity(n) - np.linalg.inv(Deg) @ A
-    D, V = np.linalg.eig(L)
-    return [D, V]
-def decompose_rw_laplacian(A):
-    #  adjacency matrix
-    Deg = np.diag((np.sum(A, axis=1)))
-    n = np.shape(Deg)[0]
-    L = np.linalg.inv(Deg) @ A
-    D, V = np.linalg.eig(L)
-    return [D, V]
+
 def calc_corresponding_functions(n, q, t, d, V):
     # corresponding functions are the heat kernel diagonals in each time step
     # t= time steps, d= eigenvalues, V= eigenvectors, n= number of nodes, q= number of corresponding functions
@@ -387,21 +422,23 @@ def calc_correspondence_matrix(A, B, k):
         C[i, i] = np.linalg.lstsq(Bt[:,i].reshape(-1,1), At[:,i].reshape(-1,1),rcond=None)[0]
     return C
 def main(data, **args):
-    os.environ["MKL_NUM_THREADS"] = "40"
+    os.environ["MKL_NUM_THREADS"] = "20"
     print("GraspB")
     Src = data['Src']
     Tar = data['Tar']
-    for i in range(Src.shape[0]):
-        row_sum1 = np.sum(Src[i, :])
+    #for i in range(Src.shape[0]):
+    #    row_sum1 = np.sum(Src[i, :])
     # If the sum of the row is zero, add a self-loop
-        if row_sum1 == 0:
-            Src[i, i] = 1
-    for i in range(Tar.shape[0]):
-        row_sum = np.sum(Tar[i, :])
-        if row_sum == 0:
-            Tar[i, i] = 1
+    #    if row_sum1 == 0:
+    #        Src[i, i] = 1
+   # for i in range(Tar.shape[0]):
+   #     row_sum = np.sum(Tar[i, :])
+    #    if row_sum == 0:
+     #       Tar[i, i] = 1
     B=align_voting_heuristic(Src,Tar,**args)
+    print(B)
     return B
 if __name__ == '__main__':
-    args = parse_args()
-    main(args)    
+    #args = parse_args()
+    #main(args)  
+    main()  

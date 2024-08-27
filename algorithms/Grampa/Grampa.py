@@ -16,39 +16,7 @@ import os
 #from lapsolver import solve_dense
 import scipy as sci
 #from lapsolver import solve_dense
-def calculate_similarity_scores_from_matrices(G_A, G_B):
-    # Step 1: Calculate degrees and normalize
-    #start = time.time()
-    degrees_A = np.sum(G_A, axis=1)
-    degrees_B = np.sum(G_B, axis=1)
-    
-    sum_degrees_A = np.sum(degrees_A)
-    sum_degrees_B = np.sum(degrees_B)
-    
-    normalized_degrees_A = degrees_A / sum_degrees_A
-    normalized_degrees_B = degrees_B / sum_degrees_B
-    
-    # Step 2: Compute similarity scores
-    num_nodes_A = G_A.shape[0]
-    num_nodes_B = G_B.shape[0]
-    
-    similarity_scores = np.zeros((num_nodes_A, num_nodes_B))
-    #end = time.time()
-    #start1 = time.time()
-    min_degrees = np.minimum.outer(normalized_degrees_A, normalized_degrees_B)
-    max_degrees = np.maximum.outer(normalized_degrees_A, normalized_degrees_B)
 
-# Calculate the similarity scores using element-wise division
-    similarity_scores = min_degrees / max_degrees
-    #for u in range(num_nodes_A):
-    #    for v in range(num_nodes_B):
-    #        d_A_u = normalized_degrees_A[u]
-    #        d_B_v = normalized_degrees_B[v]
-    #        similarity_scores[u, v] = min(d_A_u, d_B_v) / max(d_A_u, d_B_v)
-    #end1 = time.time()
-    #print("Part 1",end-start)
-    #print("Part 2",end1-start1)
-    return similarity_scores
 def create_L(A, B, lalpha=1, mind=None, weighted=True):
     n = A.shape[0]
     m = B.shape[0]
@@ -188,54 +156,21 @@ def seigh(A):
   l = l[idx]
   u = u[:,idx]
   return l, u
-def main(data, eta,lalpha,initSim,Eigtype):
+def main(data, eta):
     print("Grampa")
     os.environ["MKL_NUM_THREADS"] = "40"
     Src = data['Src']
     Tar = data['Tar']
     n = Src.shape[0]
-    Eigtype=0
-    initSim=1
-    print("test")
-        #Adjancency
-    if Eigtype==0:
-        l,U =eigh(Src)
-        mu,V = eigh(Tar)
-  
-    elif Eigtype==1:#Laplacian
-        l, U = decompose_laplacian(Src)
-        mu, V = decompose_laplacian(Tar)
-  
-    elif Eigtype==2:#RandomWalk Laplacian
-        l, U = random_walk_laplacian(Src)
-        mu, V = random_walk_laplacian(Tar)
-    elif Eigtype==3:#Singless Laplacian
-        l, U = Signless_Laplacian(Src)
-        mu, V = Signless_Laplacian(Tar)
-  
-    else: #Normalized Laplacian
-        l, U = decomposeN_laplacian(Src)
-        mu, V = decomposeN_laplacian(Tar)
-  
+    l,U =eigh(Src)
+    mu,V = eigh(Tar)
     l = np.array([l])
     mu = np.array([mu])
     dtype = np.float32
   #Eq.4
     coeff = 1.0/((l.T - mu)**2 + eta**2)
   #Eq. 3
-    if initSim==1:
-        alpha=0
-        L = calculate_similarity_scores_from_matrices(Src,Tar)
-        #L = create_L(Src, Tar, lalpha,
-        #             True).A.astype(dtype)
-        K = ((1-alpha) * L).astype(dtype)*1
-        coeff = coeff * (U.T @ K @ V)
-  
-    else:
-        coeff = coeff * (U.T @ np.ones((n,n)) @ V)
-    
-  
-  #coeff = coeff * (U.T @ K @ V)
+    coeff = coeff * (U.T @ np.ones((n,n)) @ V)
     X = U @ coeff @ V.T
     Xt = X.T
     Xt=X

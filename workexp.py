@@ -38,10 +38,16 @@ def global_config():
         9,       #SGWL
         10, #Grampa
         11, #Grasp-B
-        12, #GrampaS
-        13, #Fugal
-        14,#Fugal2
-        15,#FAQ -approx
+        12, #Fugal
+        13,#FAQ -approx
+        14,#GOT
+        15,#FGOT
+        16,#Parrot
+        17,#DS++
+        18,#MDS
+        #14, #GrampaS
+        #15,#Fugal2
+        
     ]
 
     accs = [

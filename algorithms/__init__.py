@@ -12,4 +12,9 @@ from .GrASp import grasp, grasp2,GraspB
 from .Grampa import Grampa
 from .GrampaS import GrampaS
 from .FUGAL import Fugal,Fugal2,QAP
-
+from .Path import Path
+from .DSPP import Dspp
+from .Fgot import fgot
+from .Got import got
+from .Parrot import Parrot
+from .MDS import Mds 

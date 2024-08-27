@@ -2,6 +2,7 @@ from sacred import Experiment
 from sacred.observers import FileStorageObserver
 import logging
 from algorithms import gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl,Grampa,GraspB,GrampaS,Fugal,Fugal2,QAP
+from algorithms import Parrot,Path,got,fgot,Dspp,Mds
 #GraspBafter Grampa
 
 ex = Experiment("ex")
@@ -86,8 +87,8 @@ _SGW_args1 = {
     # "mn": 1,  # s-gwl-3
     # "mn": 2,  # s-gwl-2
     # "mn": 3,  # s-gwl-1
-    'clus': 8,
-    'level': 1,
+    'clus': 2,
+    'level': 3,
     'max_cpu': 20,
 
 }
@@ -98,7 +99,7 @@ _SGW_args = {
          #'beta': 0.025,#euroroad
         #'beta': 0.2,#netscience,eurorad,arenas
         #'beta': 0.1,#dense ex fb, socfb datasets
-        'beta': 0.1,# 0.025-0.1 depends on degree
+        'beta': 0.2,# 0.025-0.1 depends on degree
         # outer, inner iteration, error bound of optimal transport
         'outer_iteration': 2000,  # num od nodes
         'iter_bound': 1e-10,
@@ -139,17 +140,37 @@ _CONE_args = {
 }
 
 _GRASP_args = {
-    'laa': 2,
-    'icp': False,
+    #'laa': 2,
+    #'icp': False,
+    'laa': 3,
+    'icp': True,
     'icp_its': 3,
-    'q': 100,
+    #'q': 100,
+    'q': 20,
     'k': 20,
     #'n_eig': Src.shape[0] - 1
     'n_eig': 100,
-    'lower_t': 1.0,
+    #'lower_t': 1.0,
+    'lower_t': 0.1,
     'upper_t': 50.0,
     'linsteps': True,
     'base_align': True
+}
+_GRASPB_args = {
+    'laa': 3,
+    'icp': True,
+    'icp_its': 3,
+    'q': 20,
+    'k': 20,
+    #'n_eig': Src.shape[0] - 1
+    #n_eig': 100,
+    'lower_t': 0.1,
+    'upper_t': 50.0,
+    'linsteps': True,
+    'ba_': True,
+    'corr_func': 1,
+    'k_span':40
+
 }
 
 _REGAL_args = {
@@ -205,9 +226,6 @@ _KLAU_args = {
 }
 _Grampa_args = {
    'eta': 0.2,
-   'lalpha':10000,
-   'initSim':0,
-   'Eigtype':0
 }
 _GrampaS_args = {
    'eta': 0.1,
@@ -215,22 +233,7 @@ _GrampaS_args = {
    'initSim':1,
    'Eigtype':100 #any other than 0,2,3 is NL
 }
-_GRASPB_args = {
-    'laa': 3,
-    'icp': True,
-    'icp_its': 3,
-    'q': 20,
-    'k': 20,
-    #'n_eig': Src.shape[0] - 1
-    #n_eig': 100,
-    'lower_t': 0.1,
-    'upper_t': 50.0,
-    'linsteps': True,
-    'ba_': True,
-    'corr_func': 3,
-    'k_span':40
 
-}
 _Fugal_args={
     'iter': 15,
     #'iter': 15, for xx dataset.
@@ -243,7 +246,24 @@ _Fugal2_args={
     'simple': True,
     'mu':1,#1 MM,are,net --0.1 ce--2 eu
 }
-
+_path_args={
+    'iter': 15,
+}
+_dspp_args={
+    'iter': 15,
+}
+_parrot_args={
+    'iter': 15,
+}
+_got_args={
+    'iter': 15,
+}
+_fgot_args={
+    'iter': 15,
+}
+_mds_args={
+    'iter': 15,
+}
 _algs = [
     (gwl, _GW_args, [3], "GW"),
     (conealign, _CONE_args, [-3], "CONE"),
@@ -251,18 +271,23 @@ _algs = [
     (regal, _REGAL_args, [-3], "REGAL"),
     (eigenalign, _LREA_args, [3], "LREA"),
     (NSD, _NSD_args, [30], "NSD"),
-
     (isorank, _ISO_args, [3], "ISO"),
     (netalign, _NET_args, [3], "NET"),
     (klaus, _KLAU_args, [3], "KLAU"),
-    (sgwl, _SGW_args1, [3], "SGW"),
+    (sgwl, _SGW_args, [3], "SGW"),
     (Grampa, _Grampa_args, [3], "GRAMPA"),
     (GraspB, _GRASPB_args, [-3], "GRASPB"),
+    (Fugal, _Fugal_args, [3], "FUGAL"),
+    (QAP, _Fugal_args, [3], "QAP"),
+    (Parrot, _parrot_args, [3], "PARROT"),
+    (fgot, _fgot_args, [3], "FGOT"),
+    (got, _got_args, [3], "GOT"),
+    (Path, _path_args, [3], "PATH"),
+    (Dspp, _dspp_args, [3], "DS++"),
+    (Mds, _mds_args, [3], "MDS"),
     #(Fugal2, _Fugal_args, [3], "FUGALB"),
     (GrampaS, _GrampaS_args, [3], "GRAMPAS"),
-    (Fugal, _Fugal_args, [3], "FUGAL"),
     (Fugal2, _Fugal2_args, [3], "FUGALB"),
-    (QAP, _Fugal_args, [3], "QAP"),
 
 ]   
 

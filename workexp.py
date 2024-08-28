@@ -43,8 +43,9 @@ def global_config():
         14,#GOT
         15,#FGOT
         16,#Parrot
-        17,#DS++
-        18,#MDS
+        17,#Path
+        18,#DS++
+        19,#MDS
         #14, #GrampaS
         #15,#Fugal2
         
@@ -57,7 +58,7 @@ def global_config():
         # 3,      # S3
         # 4,      # jacc
         # 5,      # mnc
-        6, #frob
+        #6, #frob
     ]
 
     algs = [_algs[i] for i in run]

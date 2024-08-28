@@ -27,8 +27,9 @@ We evaluate nine representative graph-alignment algorithms, and their papers and
 | Got        | [-](-) |[-](-) |14|
 |  Fgot      | [-](-) |[-](-) |15|
 |   Parrot      | [-](-) |[-](-) |16|
-|   DS++      | [-](-) |[-](-) |17|
-|   MDS      | [-](-) |[-](-) |18|
+|   Path      | [-](-) |[-](-) |17|
+|   DS++      | [-](-) |[-](-) |18|
+|   MDS      | [-](-) |[-](-) |19|
 
 
 

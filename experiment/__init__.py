@@ -262,7 +262,16 @@ _fgot_args={
     'iter': 15,
 }
 _mds_args={
-    'iter': 15,
+    'n_components': 2,
+    'alpha': 1.0,
+    'max_iter': 500,
+    'tol': 1e-5,
+    'min_eps': 0.001,
+    'eps':0.01,
+    'eps_annealing': True,
+    'alpha_annealing': True,
+    'gw_init': True,
+    'return_stress': False
 }
 _algs = [
     (gwl, _GW_args, [3], "GW"),
@@ -279,12 +288,12 @@ _algs = [
     (GraspB, _GRASPB_args, [-3], "GRASPB"),
     (Fugal, _Fugal_args, [3], "FUGAL"),
     (QAP, _Fugal_args, [3], "QAP"),
-    (Parrot, _parrot_args, [-3], "PARROT"),
-    (fgot, _fgot_args, [-3], "FGOT"),
     (got, _got_args, [-3], "GOT"),
+    (fgot, _fgot_args, [-3], "FGOT"),
+    (Parrot, _parrot_args, [-3], "PARROT"),
     (Path, _path_args, [-3], "PATH"),
     (Dspp, _dspp_args, [-3], "DS++"),
-    (Mds, _mds_args, [-3], "MDS"),
+    (Mds, _mds_args, [3], "MDS"),
     #(Fugal2, _Fugal_args, [3], "FUGALB"),
     (GrampaS, _GrampaS_args, [3], "GRAMPAS"),
     (Fugal2, _Fugal2_args, [3], "FUGALB"),

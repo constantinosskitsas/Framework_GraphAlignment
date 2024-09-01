@@ -19,16 +19,15 @@ We evaluate nine representative graph-alignment algorithms, and their papers and
 |  Net-Align        |    [ACM'2013](https://dl.acm.org/doi/10.1145/2435209.2435212)    |[Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/)      |7|
 |  Klau's        | [APBC '2009](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-S1-S59) | [Matlab](https://www.cs.purdue.edu/homes/dgleich/codes/netalign/) |8|
 |  S-GWL        | [NeurIPS'2019](https://proceedings.neurips.cc/paper/2019/file/6e62a992c676f611616097dbea8ea030-Paper.pdf) | [Python](https://github.com/HongtengXu/s-gwl) |9|
-| Graal        | [JRSICU'2010](https://royalsocietypublishing.org/doi/10.1098/rsif.2010.0063) | [C](http://www0.cs.ucl.ac.uk/staff/natasa/GRAAL/) |
 | Grampa        | [ICML'2020](https://dl.acm.org/doi/abs/10.5555/3524938.3525218) | [-](-) |10|
 | B-Grasp        | [TKDD'23](https://dl.acm.org/doi/full/10.1145/3561058) |[Python](https://github.com/AU-DIS/GRASP) |11|
 | Fugal        | [-](-) |[-](-) |12|
 |  FAQ       | [-](-) |[-](-) |13|
-| Got        | [-](-) |[-](-) |14|
-|  Fgot      | [-](-) |[-](-) |15|
-|   Parrot      | [-](-) |[-](-) |16|
-|   Path      | [-](-) |[-](-) |17|
-|   DS++      | [-](-) |[-](-) |18|
+| Got        | [NIPS'19](https://arxiv.org/abs/1906.02085) |[Python](https://github.com/Hermina/GOT) |14|
+|  Fgot      | [AAAI'22](https://cdn.aaai.org/ojs/20738/20738-13-24751-1-2-20220628.pdf) |[Python](https://github.com/Hermina/fGOT) |15|
+|   Parrot      | [WWW'23](https://dl.acm.org/doi/10.1145/3543507.3583357) |[Matlab](https://github.com/zhichenz98/PARROT-WWW23) |16|
+|   Path      | [TPAMI'08](https://ieeexplore.ieee.org/document/4641936) |[C](https://projects.cbio.mines-paristech.fr/graphm/) |17|
+|   DS++      | [TOG'17](https://dl.acm.org/doi/abs/10.1145/3130800.3130826) |[-](-) |18|
 |   MDS      | [ICLR'23](https://arxiv.org/abs/2207.02968) |[Python](https://github.com/BorgwardtLab/JointMDS?tab=readme-ov-file) |19|
 
 

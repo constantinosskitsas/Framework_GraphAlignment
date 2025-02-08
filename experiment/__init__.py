@@ -247,19 +247,32 @@ _Fugal2_args={
     'mu':1,#1 MM,are,net --0.1 ce--2 eu
 }
 _path_args={
-    'iter': 15,
 }
 _dspp_args={
-    'iter': 15,
+    
 }
+
 _parrot_args={
-    'iter': 15,
+"sepRwrIter":100,
+"prodRwrIter": 50,
+"alpha" : 0.1,  
+"inIter" : 5,     
+"outIter" : 10,   
+"beta" : 0.5,   
+"gamma" : 0.9,  
+"l1" : 1e-3,  
+"l2" : 4e-4, 
+"l3" : 1e-2,  
+"l4" : 1e-5,  
 }
 _got_args={
-    'iter': 15,
+    'it':10,
+    'tau':2,
+    'n_samples':20,
+    'epochs':600,
+    'lr':0.5
 }
 _fgot_args={
-    'iter': 15,
 }
 _mds_args={
     'n_components': 2,
@@ -288,11 +301,11 @@ _algs = [
     (GraspB, _GRASPB_args, [-3], "GRASPB"),
     (Fugal, _Fugal_args, [3], "FUGAL"),
     (QAP, _Fugal_args, [3], "QAP"),
-    (got, _got_args, [-3], "GOT"),
-    (fgot, _fgot_args, [-3], "FGOT"),
-    (Parrot, _parrot_args, [-3], "PARROT"),
-    (Path, _path_args, [-3], "PATH"),
-    (Dspp, _dspp_args, [-3], "DS++"),
+    (got, _got_args, [3], "GOT"),
+    (fgot, _fgot_args, [3], "FGOT"),
+    (Parrot, _parrot_args, [3], "PARROT"),
+    (Path, _path_args, [3], "PATH"),
+    (Dspp, _dspp_args, [3], "DS++"),
     (Mds, _mds_args, [3], "MDS"),
     #(Fugal2, _Fugal_args, [3], "FUGALB"),
     (GrampaS, _GrampaS_args, [3], "GRAMPAS"),

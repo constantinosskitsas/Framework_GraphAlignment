@@ -371,18 +371,21 @@ def real():
     #run = [1, 2, 3, 4, 5, 6]
     #run = [0,1,2,3,4,5,6,9,10,11,12,13,14,15]
     #run=[12,13,14,15,16,17,18]
-    run=[19]
+
+    run=[10,14,15,16,17,18,19]
+    run=[14,17]
+    run=[16]
     #run=[1,2,3,4,5,7,8,9,10,11,12,13,14]
     iters = 1
     #print("start")
     graph_names = [             # n     / e
-        "ca-netscience",       # 379   / 914   / connected
+        #"ca-netscience",       # 379   / 914   / connected
         #"voles",
         #"high-school",
         #"yeast",
         #"MultiMagna",
         
-        #"bio-celegans",         # 453   / 2k    / connected
+        "bio-celegans",         # 453   / 2k    / connected
         #"in-arenas",            # 1.1k  / 5.4k  / connected
         
         #"arenad",
@@ -435,10 +438,12 @@ def synthetic():
 
     # use with 'mall'
 
-    iters = 2
+    iters = 1
     #run = [1,6,9,10,11,14,15]
     #run = [1,6,14,15] #9,10,11
-    run=[13]
+    #run=[13]
+    #run=[16]
+    run=[14,15,17]
     graph_names = [
         #"arenas",
         #"powerlaw",
@@ -455,7 +460,7 @@ def synthetic():
         #"nw_str1024",
         #"nw_str2048",
         #"nw_str4096",
-        "nw_str8192",
+        "nw_str20",
     ]
 
     graphs = [
@@ -478,7 +483,7 @@ def synthetic():
         #(nx.algorithms.bipartite.random_graph,(450,450,0.06)),
         #(nx.algorithms.bipartite.random_graph,(200,700,0.09)),
         #(nx.algorithms.bipartite.random_graph,(800,600,0.05))
-        (nx.newman_watts_strogatz_graph, (20, 7,0.5)),
+        (nx.newman_watts_strogatz_graph, (50, 5,0.2)),
         #(nx.newman_watts_strogatz_graph, (256, 7,0.5)),
         #(nx.newman_watts_strogatz_graph, (512, 7,0.5)),
         #(nx.newman_watts_strogatz_graph, (1024, 7,0.5)),
@@ -495,11 +500,11 @@ def synthetic():
 
     noises = [
         #0.00,
-        #0.01,
+        0.01,
         #0.02,
         #0.03,
         #0.04,
-        0.05,
+        #0.05,
         #0.06,
         #0.07,
         #0.08,

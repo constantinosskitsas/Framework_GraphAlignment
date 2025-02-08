@@ -60,6 +60,7 @@ def main(data, iter,simple,mu,EFN=5):
     if (EFN<5):
         F1 = Degree_Features(Src1,EFN)*n1
         F2 = Degree_Features(Tar1,EFN)*n1
+    #EFN 5 equals fugal
     if (EFN==5):
         F1 = feature_extraction(Src1,simple)
         F2 = feature_extraction(Tar1,simple)

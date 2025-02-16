@@ -12,6 +12,7 @@ import numpy.linalg as lg
 import scipy.linalg as slg
 from matplotlib import pyplot as plt
 from   numpy import linalg as LA
+import os
 
 import networkx as nx
 import time
@@ -40,7 +41,8 @@ def loss(DS, g1, g2, loss_type, epsilon = 5e-4):
     """
     Calculate loss, with the help of initially calculated params
     """
-     
+
+    print("Torch num_threads:", torch.get_num_threads())
     if loss_type == 'w_simple':
         cost = - 2 * torch.trace( g1 @ DS @ g2 @ DS.t() )
         
@@ -57,6 +59,9 @@ def loss(DS, g1, g2, loss_type, epsilon = 5e-4):
 def main(data, tau=1, n_samples=5, epochs=1000, lr=1, 
             std_init = 5, loss_type = 'w_simple', seed=42, verbose=True, tol = 1e-12, adapt_lr = False):   
     print("fgot")
+    os.environ["OMP_NUM_THREADS"] = "20" 
+    torch.set_num_threads(20)
+    os.environ["MKL_NUM_THREADS"] = "20"
     g1 = data['Src']
     g2 = data['Tar']
     # Initialization
@@ -72,8 +77,7 @@ def main(data, tau=1, n_samples=5, epochs=1000, lr=1,
     g2 = to_torch(g2)
     
     # g1 = g1 - 0.5*torch.diag(torch.diag(g1))
-    # g2 = g2 - 0.5*torch.diag(torch.diag(g2))
-    
+    # g2 = g2 - 0.5*torch.diag(torch.diag(g2)
     
     mean = to_torch(np.outer(np.repeat(1/n, n), np.repeat(1/m, m)))
     mean = mean.requires_grad_()
@@ -97,7 +101,6 @@ def main(data, tau=1, n_samples=5, epochs=1000, lr=1,
         # Aux.
         s2 = std.data**2
         d  = lr/2 * s2 * std.grad
-        
         # Update
         mean_prev = mean.data
         mean.data = mean.data - lr * mean.grad * s2

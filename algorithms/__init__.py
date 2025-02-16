@@ -18,3 +18,5 @@ from .Fgot import fgot
 from .Got import got
 from .Parrot import Parrot
 from .MDS import Mds 
+from .GradP import gradp
+from .mcmc import mc

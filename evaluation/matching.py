@@ -225,12 +225,13 @@ def getmatching(sim, cost, mt, _log):
 
             raise Exception("Empty sim matrix")
         if mt==4:
-            return sim
+            return np.arange(0,len(sim)),sim
 
         if mt == 30:
 
             mat_to_min = -np.log(sim)
 
+        
         else:
 
             mat_to_min = sim

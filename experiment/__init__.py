@@ -2,7 +2,7 @@ from sacred import Experiment
 from sacred.observers import FileStorageObserver
 import logging
 from algorithms import gwl, conealign, grasp as grasp, regal, eigenalign, NSD, isorank2 as isorank, netalign, klaus, sgwl,Grampa,GraspB,GrampaS,Fugal,Fugal2,QAP
-from algorithms import Parrot,Path,got,fgot,Dspp,Mds
+from algorithms import Parrot,Path,got,fgot,Dspp,Mds,gradp,mc
 #GraspBafter Grampa
 
 ex = Experiment("ex")
@@ -267,11 +267,13 @@ _parrot_args={
 }
 _got_args={
     'it':10,
-    'tau':2,
+    'tau':1,
     'n_samples':20,
-    'epochs':600,
-    'lr':0.5
-}
+    'epochs':500,
+    'lr':0.5,
+    'loss_type':'l2',
+    'alpha':0.1,
+    'ones':True}
 _fgot_args={
 }
 _mds_args={
@@ -286,6 +288,9 @@ _mds_args={
     'gw_init': True,
     'return_stress': False
 }
+_gradP_args={
+}
+_mcmc_args={}
 _algs = [
     (gwl, _GW_args, [3], "GW"),
     (conealign, _CONE_args, [-3], "CONE"),
@@ -307,6 +312,8 @@ _algs = [
     (Path, _path_args, [3], "PATH"),
     (Dspp, _dspp_args, [3], "DS++"),
     (Mds, _mds_args, [3], "MDS"),
+    (gradp, _gradP_args, [4], "GradP"),
+    (mc, _mcmc_args, [4], "mc"),
     #(Fugal2, _Fugal_args, [3], "FUGALB"),
     (GrampaS, _GrampaS_args, [3], "GRAMPAS"),
     (Fugal2, _Fugal2_args, [3], "FUGALB"),

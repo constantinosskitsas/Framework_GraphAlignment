@@ -348,12 +348,10 @@ def sinkhorn_knopp(a, b, M, reg, numItermax=1000,
     np.divide(M, -reg, out=K)
     np.exp(K, out=K)
 
-    # print(np.min(K))
     tmp2 = np.empty(b.shape, dtype=M.dtype)
 
     Kp = (1 / a).reshape(-1, 1) * K
-#     print(Kp)
-#     print('-----------')
+
     cpt = 0
     err = 1
     while (err > stopThr and cpt < numItermax):

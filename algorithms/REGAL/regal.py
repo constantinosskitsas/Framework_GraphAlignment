@@ -66,7 +66,8 @@ def main(data, **args) -> object:
     print("Regal")
     Src = data['Src']
     Tar = data['Tar']
-
+    os.environ["MKL_NUM_THREADS"] = "20"
+    os.environ["OMP_NUM_THREADS"] = "20" 
     adj = G_to_Adj(Src, Tar)
     if args['attributes'] is not None:
         # load vector of attributes in from file

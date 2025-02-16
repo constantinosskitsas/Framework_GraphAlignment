@@ -4,6 +4,8 @@ from scipy.sparse import csr_matrix, coo_matrix
 from scipy.sparse.linalg import LinearOperator
 import torch
 from scipy.sparse.csgraph import shortest_path
+import os
+
 
 def solveDSpp(D1, D2, problemType):
     n = D1.shape[0]

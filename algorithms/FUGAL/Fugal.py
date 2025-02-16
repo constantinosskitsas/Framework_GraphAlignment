@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from sklearn.metrics.pairwise import euclidean_distances
 from algorithms.FUGAL.pred import feature_extraction,eucledian_dist,convex_init,Degree_Features
-
+import os
 
 def are_matrices_equal(matrix1, matrix2):
     # Check if dimensions are the same

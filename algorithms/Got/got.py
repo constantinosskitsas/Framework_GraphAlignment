@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import torch
 torch.set_default_tensor_type('torch.DoubleTensor')
 import random
-
+import os
 import numpy.linalg as lg
 import scipy.linalg as slg
 import sklearn
@@ -152,16 +152,20 @@ def find_permutation(x, y, it, tau, n_samples, epochs, lr, loss_type = 'l2', alp
 
 # ---------------------------------------------------------------------------------------------------------------
 
-def main(data, it, tau, n_samples, epochs, lr, loss_type = 'w', seed=42, verbose=True):
+def main(data, it, tau, n_samples, epochs, lr,alpha,ones, loss_type = 'w', seed=42, verbose=True):
     print("got")
     # NumPy -> PyTorch
     A = data['Src']
     B = data['Tar']
-    x = torch.from_numpy(A.astype(np.double))
-    y = torch.from_numpy(B.astype(np.double))
-    
+
+    os.environ["OMP_NUM_THREADS"] = "40" 
+    os.environ["MKL_NUM_THREADS"] = "40"
+    torch.set_num_threads(40)
     # Initialization
     torch.manual_seed(seed)
+    [x_reg, y_reg] = regularise_and_invert(A, B, alpha, ones)
+    x = torch.from_numpy(x_reg.astype(np.double))
+    y = torch.from_numpy(y_reg.astype(np.double))
     n = x.shape[0]
     mean = torch.rand(n, n, requires_grad=True)
     std  = 10 * torch.ones(n, n)
@@ -175,7 +179,6 @@ def main(data, it, tau, n_samples, epochs, lr, loss_type = 'w', seed=42, verbose
     optimizer = torch.optim.Adam([mean,std], lr=lr, amsgrad=True)
     history = []
     for epoch in range(epochs):
-        print(epoch)
         cost = 0
         cost_vec = np.zeros((1,n_samples))
         for sample in range(n_samples):

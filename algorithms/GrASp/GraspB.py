@@ -5,6 +5,7 @@ import time
 import scipy.sparse as sps
 import scipy.sparse.linalg as spsl
 import os
+import torch
 try:
     import lapjv
 except:
@@ -44,7 +45,6 @@ def sort_greedy_voting(match_freq):
         i-=1
     return matching[:,0],matching[:,1]
 def parse_args():
-    print("se thelw san trelos")
     parser=argparse.ArgumentParser(description= "RUN GASP")
     parser.add_argument('--graph',nargs='?', default='arenas')
     # 1:nn 2:sortgreedy 3: jv 
@@ -64,7 +64,7 @@ def parse_args():
     parser.add_argument('--noise_levels', type=list,default=[0,2,4,6,8,10])#,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
     return parser.parse_args()
 def align_voting_heuristic(A1, A2,q,k,laa,icp, icp_its, lower_t, upper_t, linsteps, corr_func, ba_,k_span):
-    print(q,k,laa,icp, icp_its, lower_t, upper_t, linsteps, corr_func, ba_,k_span)
+    #print(q,k,laa,icp, icp_its, lower_t, upper_t, linsteps, corr_func, ba_,k_span)
     k_list = list(range(max(2,int(k-k_span/2)),int(k+k_span/2)))
     matchings = [0]*len(k_list)
     # voting - 1:greedy, 2:jv
@@ -423,6 +423,8 @@ def calc_correspondence_matrix(A, B, k):
     return C
 def main(data, **args):
     os.environ["MKL_NUM_THREADS"] = "20"
+    os.environ["OMP_NUM_THREADS"] = "20" 
+    torch.set_num_threads(20)
     print("GraspB")
     Src = data['Src']
     Tar = data['Tar']
@@ -436,7 +438,7 @@ def main(data, **args):
     #    if row_sum == 0:
      #       Tar[i, i] = 1
     B=align_voting_heuristic(Src,Tar,**args)
-    print(B)
+    #print(B)
     return B
 if __name__ == '__main__':
     #args = parse_args()

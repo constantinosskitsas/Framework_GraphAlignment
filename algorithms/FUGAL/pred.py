@@ -304,7 +304,7 @@ def Degree_Features(G,EFN):
     #    node_features[:, 0] = degs
     #print(node_features)
     node_features = np.nan_to_num(node_features)
-    print(node_features)
+    #print(node_features)
     return np.nan_to_num(node_features)
 
 

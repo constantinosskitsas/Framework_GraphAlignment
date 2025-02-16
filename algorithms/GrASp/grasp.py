@@ -8,6 +8,7 @@ import os
 from sklearn.preprocessing import normalize
 import argparse
 import matplotlib.pyplot as plt
+import torch
 #import base_align as ba
 #import munkres
 from . import base_align as ba
@@ -26,7 +27,9 @@ def main(data, **args):  # alg=2, base_align=True):
     print("Grasp")
     Src = data['Src']
     Tar = data['Tar']
-
+    os.environ["OMP_NUM_THREADS"] = "20" 
+    os.environ["MKL_NUM_THREADS"] = "20"
+    torch.set_num_threads(20)
     if args['n_eig'] is None:
         args['n_eig'] = Src.shape[0] - 1
     G1_emb, G2_emb = functional_maps_gen(Src, Tar, **args)

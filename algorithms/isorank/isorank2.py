@@ -2,7 +2,6 @@ import numpy as np
 from numpy import inf, nan
 import scipy.sparse as sps
 import scipy
-
 # from algorithms import bipartiteMatching
 # from algorithms.NSD.NSD import fast2, findnz1
 # from data import similarities_preprocess, ReadFile

@@ -46,6 +46,8 @@ def global_config():
         17,#Path
         18,#DS++
         19,#MDS
+        20,
+        21
         #14, #GrampaS
         #15,#Fugal2
         

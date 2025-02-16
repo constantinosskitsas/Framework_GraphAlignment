@@ -25,7 +25,7 @@ def main(S, w, li, lj, a=0.5, b=1, alpha=2/3, rtype=2, tol=1e-12, maxiter=100, v
     nzi = li.copy()
     nzi += 1
     nzi = np.insert(nzi, [0], [0])
-    print("Isorank")
+    print("Isorank-XX")
     nzj = lj.copy()
     nzj += 1
     nzj = np.insert(nzj, [0], [0])

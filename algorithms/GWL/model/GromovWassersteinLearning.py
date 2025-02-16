@@ -89,6 +89,10 @@ class GromovWassersteinEmbedding(nn.Module):
             # f1(a) = a^2, f2(b) = b^2, h1(a) = a, h2(b) = 2b
             # cost_st = f1(cost_s)*mu_s*1_nt^T + 1_ns*mu_t^T*f2(cost_t)^T
             # cost = cost_st - h1(cost_s)*trans*h2(cost_t)^T
+            #cost_t = cost_t.to(torch.float64)
+            #cost_s = cost_s.to(torch.float64)
+            #mu_s = mu_s.to(torch.float64)
+            #mu_t = mu_t.to(torch.float64)
             f1_st = torch.matmul(cost_s ** 2, mu_s).repeat(1, trans.size(1))
             f2_st = torch.matmul(torch.t(mu_t), torch.t(
                 cost_t ** 2)).repeat(trans.size(0), 1)
@@ -129,10 +133,17 @@ class GromovWassersteinEmbedding(nn.Module):
         return loss
 
     def forward(self, index1, index2, trans, mu_s, mu_t, cost1, cost2, prior=None, mask1=None, mask2=None, mask12=None):
+        mu_s = mu_s.to(torch.float64)
+        mu_t = mu_t.to(torch.float64)
         cost_s = self.self_cost_mat(index1, 0)
         cost_t = self.self_cost_mat(index2, 1)
+        cost_t = cost_t.to(torch.float64)
+        cost_s = cost_s.to(torch.float64)
         cost_st = self.mutual_cost_mat(index1, index2)
+
+
         cost = self.tensor_times_mat(cost_s, cost_t, trans, mu_s, mu_t)
+
         d_gw = (cost * trans).sum()
         d_w = (cost_st * trans).sum()
         regularizer = self.similarity(

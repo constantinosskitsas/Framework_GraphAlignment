@@ -158,7 +158,8 @@ def seigh(A):
   return l, u
 def main(data, eta):
     print("Grampa")
-    os.environ["MKL_NUM_THREADS"] = "40"
+    os.environ["MKL_NUM_THREADS"] = "20"
+    os.environ["OMP_NUM_THREADS"] = "20" 
     Src = data['Src']
     Tar = data['Tar']
     n = Src.shape[0]
@@ -200,7 +201,7 @@ def grampa(Src, Tar, eta):
   mu,V = eigh(Tar)
   l = np.array([l])
   mu = np.array([mu])
-
+  os.environ["OMP_NUM_THREADS"] = "20" 
   #Eq.4
   coeff = 1.0/((l.T - mu)**2 + eta**2)
   #Eq. 3

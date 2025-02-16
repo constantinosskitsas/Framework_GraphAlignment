@@ -9,7 +9,7 @@ from scipy.linalg._expm_frechet import vec
 from . import decomposeX, newbound_methods
 # from .. import bipartiteMatching
 from .. import bipartitewrapper as bmw
-
+import os
 
 # def main(A, B, iters, method, bmatch, default_params=True):
 def main(data, iters, method, bmatch, default_params=True):
@@ -18,7 +18,6 @@ def main(data, iters, method, bmatch, default_params=True):
     # Tar = data['Tar'].A
     Src = data['Src']
     Tar = data['Tar']
-
     # D = 0
     s1, s2, s3 = find_parameters(Src, Tar)
 

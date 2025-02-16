@@ -1,9 +1,9 @@
 import numpy as np
 from scipy import sparse
+import theano
+from theano import tensor as T
 #import theano
 #from theano import tensor as T
-import pytensor
-from pytensor import tensor as T
 
 # Full NMF matrix (which NMF factorizes with SVD)
 # Taken from MILE code
@@ -26,8 +26,8 @@ def netmf_mat_full(A, window=10, b=1.0):
     D_rt_inv = sparse.diags(d_rt ** -1)
     M = D_rt_inv.dot(D_rt_inv.dot(S).T)
     m = T.matrix()
-    f = pytensor.function([m], T.log(T.maximum(m, 1)))
-    Y = f(M.todense().astype(pytensor.config.floatX))
+    f = theano.function([m], T.log(T.maximum(m, 1)))
+    Y = f(M.todense().astype(theano.config.floatX))
     return sparse.csr_matrix(Y)
 
 #Used in NetMF, AROPE
@@ -60,9 +60,9 @@ def netmf_mat_full1(A, window=10, b=1.0):
     #print("c")
     m = T.matrix()
 #    print("d")
-    f = pytensor.function([m], T.log(T.maximum(m, 1)))
+    f = theano.function([m], T.log(T.maximum(m, 1)))
 #    print("e")
-    Y = f(M.todense().astype(pytensor.config.floatX))
+    Y = f(M.todense().astype(theano.config.floatX))
 #    print("f")
     return sparse.csr_matrix(Y)
 

@@ -2,6 +2,7 @@ import scipy.sparse as sps
 import numpy as np
 from ..maxrowmatchcpp import column_maxmatchsum
 from .. import bipartitewrapper as bmw
+import os
 #original code https://www.cs.purdue.edu/homes/dgleich/codes/netalign/
 
 def maxrowmatch(Q, li, lj, m, n):
@@ -31,7 +32,8 @@ def main(data, a=1, b=1, gamma=0.4, stepm=25, rtype=1, maxiter=1000, verbose=Tru
     li = data['li']
     lj = data['lj']
     w = data['w']
-
+    os.environ["MKL_NUM_THREADS"] = "20"
+    os.environ["OMP_NUM_THREADS"] = "20" 
     setup, m, n = bmw.bipartite_setup(li, lj, w)
 
     S = sps.csr_matrix(S, dtype=float)

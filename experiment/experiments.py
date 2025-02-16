@@ -1,9 +1,9 @@
-from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args,_Grampa_args,_GrampaS_args
+from . import ex, _algs, _CONE_args, _GRASP_args, _GW_args, _ISO_args, _KLAU_args, _LREA_args, _NET_args, _NSD_args, _REGAL_args,_Grampa_args,_GrampaS_args,_gradP_args,_mcmc_args
 from generation import generate as gen
-from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, Fugal, isorank2 as isorank,Grampa,Fugal,GrampaS,Fugal
+from algorithms import regal, eigenalign, conealign, netalign, NSD, klaus, gwl, Fugal, isorank2 as isorank,Grampa,Fugal,GrampaS,Fugal,gradp,mc
 import networkx as nx
 import numpy as np
-
+import os
 # mprof run workexp.py with playground run=[1,2,3,4,5] iters=2 win
 
 
@@ -367,25 +367,23 @@ def rgraphs(gnames):
 
 @ ex.named_config
 def real():
-
     #run = [1, 2, 3, 4, 5, 6]
     #run = [0,1,2,3,4,5,6,9,10,11,12,13,14,15]
     #run=[12,13,14,15,16,17,18]
 
-    run=[10,14,15,16,17,18,19]
+    #run=[0,1,2,3,4,5,6,9,10,11,12,13,14,15,16,17,18]
     run=[14,17]
-    run=[16]
-    #run=[1,2,3,4,5,7,8,9,10,11,12,13,14]
+    run=[20]
     iters = 1
     #print("start")
     graph_names = [             # n     / e
-        #"ca-netscience",       # 379   / 914   / connected
+        "ca-netscience",       # 379   / 914   / connected
         #"voles",
         #"high-school",
         #"yeast",
         #"MultiMagna",
         
-        "bio-celegans",         # 453   / 2k    / connected
+        #"bio-celegans",         # 453   / 2k    / connected
         #"in-arenas",            # 1.1k  / 5.4k  / connected
         
         #"arenad",

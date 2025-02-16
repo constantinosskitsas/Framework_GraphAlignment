@@ -188,7 +188,7 @@ def seigh(A):
   return l, u
 def main(data, eta,lalpha,initSim,Eigtype):
     print("GrampaNL")
-    os.environ["MKL_NUM_THREADS"] = "30"
+    os.environ["MKL_NUM_THREADS"] = "20"
     Src = data['Src']
     Tar = data['Tar']
     #Tar=data['Src']

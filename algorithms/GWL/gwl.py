@@ -4,6 +4,7 @@ from torch.optim import lr_scheduler
 import torch
 import numpy as np
 import scipy.sparse as sps
+import os
 #original code from https://github.com/HongtengXu/gwl
 
 def main(data, opt_dict, hyperpara_dict, lr, gamma, max_cpu=0):

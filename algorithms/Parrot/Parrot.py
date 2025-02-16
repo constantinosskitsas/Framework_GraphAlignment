@@ -59,7 +59,7 @@ def sinkhorn_knopp(a, b, M, reg, numItermax=1000, stopThr=1e-9,
 
         #     if err < stopThr:
         #         break
-    print(u.shape, K.shape, v.shape)
+    #print(u.shape, K.shape, v.shape)
     return u.reshape((-1, 1)) * K * v.reshape((1, -1))
 
 def get_prod_rwr(L1, L2, nodeCost, H, beta, gamma, prodRwrIter):
@@ -268,7 +268,7 @@ def cpot(L1, L2, crossC, intraC1, intraC2, inIter, outIter, H, l1, l2, l3, l4):
     # outIter = min(outIter, np.max(crossC) * np.log(max(nx, ny)) * eps ** (-3))
     
     while i < outIter:
-        print("Sum: ", np.sum(T))
+        #print("Sum: ", np.sum(T))
         T_old = T
         CGW = temp1 - intraC1 @ T @ intraC2.T  # Frobenius GWD
         C = crossC - l2 * np.log(L1 @ T @ L2.T) - l3 * np.log(H) + l4 * CGW  # modified cost
@@ -317,7 +317,7 @@ def main(data, sepRwrIter, prodRwrIter, alpha, beta, gamma, inIter, outIter, l1,
     
     # calculate cross-graph/intra-graph cost if not pre-computed
     crossC, intraC1, intraC2 = get_cost(A1, A2, H, sepRwrIter, prodRwrIter, alpha, beta, gamma)
-    print(np.max(crossC), np.min(crossC), np.sum(crossC))
+    #print(np.max(crossC), np.min(crossC), np.sum(crossC))
     T, W, res = cpot(L1, L2, crossC, intraC1, intraC2, inIter, outIter, H, l1, l2, l3, l4)
     
     return T,T

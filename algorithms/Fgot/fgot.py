@@ -42,7 +42,7 @@ def loss(DS, g1, g2, loss_type, epsilon = 5e-4):
     Calculate loss, with the help of initially calculated params
     """
 
-    print("Torch num_threads:", torch.get_num_threads())
+    #print("Torch num_threads:", torch.get_num_threads())
     if loss_type == 'w_simple':
         cost = - 2 * torch.trace( g1 @ DS @ g2 @ DS.t() )
         

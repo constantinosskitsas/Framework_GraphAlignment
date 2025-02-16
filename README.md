@@ -170,3 +170,6 @@ For any problems or if you want to add your algorithm to the framework contact a
 ## Known Problems.
 Graph-B works only with LapJV at this moment.
 Algorithms from ID 14-19 to be added.
+To investigate
+Got and Path 0 accuracy without noise
+Fgot and Ds++ low accuracy without noise

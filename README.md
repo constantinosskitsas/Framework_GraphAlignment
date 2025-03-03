@@ -29,8 +29,7 @@ We evaluate nine representative graph-alignment algorithms, and their papers and
 |   Path      | [TPAMI'08](https://ieeexplore.ieee.org/document/4641936) |[C](https://projects.cbio.mines-paristech.fr/graphm/) |17|
 |   DS++      | [TOG'17](https://dl.acm.org/doi/abs/10.1145/3130800.3130826) |[-](-) |18|
 |   MDS      | [ICLR'23](https://arxiv.org/abs/2207.02968) |[Python](https://github.com/BorgwardtLab/JointMDS?tab=readme-ov-file) |19|
-|   Grad+      | [CIKM'22](https://dl.acm.org/doi/pdf/10.1145/3511808.3557605) |[Python](https://github.com/jindeok/GradAlign_plus) |19|
-
+|   Grad+      | [CIKM'22](https://dl.acm.org/doi/pdf/10.1145/3511808.3557605) |[Python](https://github.com/jindeok/GradAlign_plus) |20|
 |   immnc      | [SIGIR'23](https://dl.acm.org/doi/pdf/10.1145/3539618.3591735) |[Python](https://github.com/OceanTangWei/MMNC) |21|
 
 
